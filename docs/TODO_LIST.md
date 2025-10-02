@@ -8,15 +8,15 @@
 
 - [x] `npx create-next-app@latest prometrage --typescript --tailwind --app`
 - [x] Installer dépendances : `shadcn/ui`, `tanstack/react-query`, `zustand`, `react-hook-form`, `zod`
-- [ ] Setup Prisma + PostgreSQL (Neon ou Supabase)
+- [x] Setup Prisma + PostgreSQL (Neon ou Supabase)
 - [ ] Configuration ESLint + Prettier mobile-first
 - [ ] Setup tests avec Vitest
 - [ ] Créer structure de dossiers
 
 #### Configuration de base
 
-- [ ] `.env.local` avec variables d'environnement
-- [ ] `prisma/schema.prisma` avec modèles Projet et Menuiserie
+- [x] `.env.local` avec variables d'environnement
+- [x] `prisma/schema.prisma` avec modèles Projet et Menuiserie
 - [ ] Configuration Uploadthing ou Vercel Blob
 - [x] Setup TanStack Query provider
 - [ ] Configuration Tailwind pour mobile-first

@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modèle Projet - Représente un projet client avec ses menuiseries
+model Projet {
+  id        String   @id @default(cuid())
+  reference String   @unique // ex: "KOMP-2024-001"
+
+  // Informations client
+  clientNom     String
+  clientAdresse String?
+  clientTel     String?
+  clientEmail   String?
+
+  // Fichier PDF original
+  pdfUrl        String?
+  pdfOriginalNom String?
+
+  // Relations
+  menuiseries Menuiserie[]
+
+  // Métadonnées
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reference])
+  @@index([clientNom])
+  @@index([createdAt])
+}
+
+// Modèle Menuiserie - Représente une menuiserie d'un projet
+model Menuiserie {
+  id        String   @id @default(cuid())
+
+  // Relation au projet
+  projetId  String
+  projet    Projet   @relation(fields: [projetId], references: [id], onDelete: Cascade)
+
+  // Identifiants
+  repere    String?  // ex: "Salon", "Chambre 1"
+  intitule  String   // ex: "Coulissant 2 vantaux"
+
+  // Données flexibles stockées en JSON
+  // Permet d'ajouter des champs sans migration
+  donneesOriginales Json  // Données extraites du PDF
+  donneesModifiees  Json? // Modifications artisan (null si pas modifié)
+
+  // Analyse des écarts
+  ecarts    Json?    // Liste des écarts calculés
+
+  // Validation
+  validee   Boolean  @default(false)
+  dateValidation DateTime?
+
+  // Ordre d'affichage
+  ordre     Int      @default(0)
+
+  // Métadonnées
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projetId])
+  @@index([validee])
+  @@index([ordre])
+}
