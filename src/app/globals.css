@@ -119,4 +119,31 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Mobile-first: base styles optimized for touch */
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
+  }
+
+  /* Minimum touch target size (44x44px Apple HIG) */
+  button,
+  a,
+  input[type="checkbox"],
+  input[type="radio"] {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Responsive font sizes */
+  body {
+    font-size: 16px; /* Mobile base - prevents iOS zoom on input focus */
+  }
+
+  /* Input optimizations for mobile */
+  input,
+  textarea,
+  select {
+    font-size: 16px; /* Prevents iOS auto-zoom */
+  }
 }

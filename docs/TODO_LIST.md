@@ -9,9 +9,9 @@
 - [x] `npx create-next-app@latest prometrage --typescript --tailwind --app`
 - [x] Installer dépendances : `shadcn/ui`, `tanstack/react-query`, `zustand`, `react-hook-form`, `zod`
 - [x] Setup Prisma + PostgreSQL (Neon ou Supabase)
-- [ ] Configuration ESLint + Prettier mobile-first
-- [ ] Setup tests avec Vitest
-- [ ] Créer structure de dossiers
+- [x] Configuration ESLint + Prettier mobile-first
+- [x] Setup tests avec Vitest
+- [x] Créer structure de dossiers
 
 #### Configuration de base
 
@@ -19,7 +19,7 @@
 - [x] `prisma/schema.prisma` avec modèles Projet et Menuiserie
 - [ ] Configuration Uploadthing ou Vercel Blob
 - [x] Setup TanStack Query provider
-- [ ] Configuration Tailwind pour mobile-first
+- [x] Configuration Tailwind pour mobile-first
 
 ### 📱 Phase 2 : Core Features Mobile (Semaine 2)
 
