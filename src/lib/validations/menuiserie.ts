@@ -28,18 +28,14 @@ export const MenuiserieDataSchema = z.object({
   // Gamme de produits
   gamme: z
     .enum(["OPTIMAX", "PERFORMAX", "INNOVAX"], {
-      errorMap: () => ({
-        message: "La gamme doit être OPTIMAX, PERFORMAX ou INNOVAX",
-      }),
+      message: "La gamme doit être OPTIMAX, PERFORMAX ou INNOVAX",
     })
     .optional(),
 
   // Type de pose
   pose: z
     .enum(["tunnel", "applique", "renovation"], {
-      errorMap: () => ({
-        message: "Le type de pose doit être tunnel, applique ou renovation",
-      }),
+      message: "Le type de pose doit être tunnel, applique ou renovation",
     })
     .optional(),
 

@@ -25,12 +25,12 @@
 
 #### Homepage Mobile
 
-- [ ] **TDD** : Test liste des projets
-- [ ] Composant `ProjectList` responsive
-- [ ] **TDD** : Test bouton upload PDF
-- [ ] Composant `UploadButton` avec zone drop
-- [ ] Navigation mobile (bottom tabs ou burger)
-- [ ] Loading states avec skeletons
+- [x] **TDD** : Test liste des projets
+- [x] Composant `ProjectList` responsive
+- [x] **TDD** : Test bouton upload PDF
+- [x] Composant `UploadButton` avec zone drop
+- [x] Navigation mobile (Header responsive)
+- [x] Loading states avec skeletons
 
 #### Upload & Parsing PDF (fichier référence dans /docs/fm.pdf)
 
