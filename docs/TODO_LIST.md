@@ -47,7 +47,7 @@
 - [x] Schema `ProjetSchema` avec validation
 - [x] Schema `MenuiserieSchema` avec validation
 - [x] Migration Prisma initiale
-- [ ] Seed data pour tests
+- [x] Seed data pour tests
 
 ### 📝 Phase 3 : Formulaire Prise de Côtes (Semaine 3)
 
