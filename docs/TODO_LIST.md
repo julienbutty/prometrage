@@ -43,10 +43,10 @@
 
 #### Modèle de données
 
-- [ ] **TDD** : Tests validation Zod schemas
-- [ ] Schema `ProjetSchema` avec validation
-- [ ] Schema `MenuiserieSchema` avec validation
-- [ ] Migration Prisma initiale
+- [x] **TDD** : Tests validation Zod schemas
+- [x] Schema `ProjetSchema` avec validation
+- [x] Schema `MenuiserieSchema` avec validation
+- [x] Migration Prisma initiale
 - [ ] Seed data pour tests
 
 ### 📝 Phase 3 : Formulaire Prise de Côtes (Semaine 3)
