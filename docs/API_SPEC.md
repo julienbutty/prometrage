@@ -20,6 +20,7 @@ Accept: application/json
 #### POST `/api/upload/pdf`
 
 Upload et parse un fichier PDF de fiche métreur.
+fichier référence dans /docs/fm.pdf
 
 **Request:**
 

@@ -7,7 +7,7 @@
 #### Setup projet
 
 - [x] `npx create-next-app@latest prometrage --typescript --tailwind --app`
-- [ ] Installer dépendances : `shadcn/ui`, `tanstack/react-query`, `zustand`, `react-hook-form`, `zod`
+- [x] Installer dépendances : `shadcn/ui`, `tanstack/react-query`, `zustand`, `react-hook-form`, `zod`
 - [ ] Setup Prisma + PostgreSQL (Neon ou Supabase)
 - [ ] Configuration ESLint + Prettier mobile-first
 - [ ] Setup tests avec Vitest
@@ -18,7 +18,7 @@
 - [ ] `.env.local` avec variables d'environnement
 - [ ] `prisma/schema.prisma` avec modèles Projet et Menuiserie
 - [ ] Configuration Uploadthing ou Vercel Blob
-- [ ] Setup TanStack Query provider
+- [x] Setup TanStack Query provider
 - [ ] Configuration Tailwind pour mobile-first
 
 ### 📱 Phase 2 : Core Features Mobile (Semaine 2)
@@ -32,7 +32,7 @@
 - [ ] Navigation mobile (bottom tabs ou burger)
 - [ ] Loading states avec skeletons
 
-#### Upload & Parsing PDF
+#### Upload & Parsing PDF (fichier référence dans /docs/fm.pdf)
 
 - [ ] **TDD** : Tests parsing patterns (repère, dimensions, etc.)
 - [ ] Fonction `parsePDF` avec pdf.js

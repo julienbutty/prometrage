@@ -5,6 +5,7 @@
 ### 🎯 Contexte du projet
 
 Application mobile-first pour artisans permettant la prise de côtes sur chantier basée sur des fiches métreur PDF. Les utilisateurs ne sont pas forcément à l'aise avec le digital, l'interface doit être extrêmement simple et intuitive.
+(fichier référence d'upload dans /docs/fm.pdf)
 
 ### ⚙️ Stack technique OBLIGATOIRE
 
