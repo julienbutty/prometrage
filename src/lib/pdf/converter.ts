@@ -1,30 +1,42 @@
 /**
  * PDF to Base64 converter
- * Converts PDF File to base64 string for Anthropic API
+ * Works in both browser (File) and Node.js (Buffer/ArrayBuffer) environments
  */
 
 /**
- * Convert PDF File to base64 string
- * @param file - PDF File object
+ * Convert PDF File or ArrayBuffer to base64 string
+ * @param file - PDF File object or ArrayBuffer
  * @returns Base64 encoded string (without data URI prefix)
  */
-export async function pdfToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
+export async function pdfToBase64(file: File | ArrayBuffer): Promise<string> {
+  // Handle ArrayBuffer (server-side or direct buffer)
+  if (file instanceof ArrayBuffer) {
+    return Buffer.from(file).toString("base64");
+  }
 
-    reader.onload = () => {
-      const base64 = reader.result as string;
-      // Remove the "data:application/pdf;base64," prefix
-      const base64Data = base64.split(",")[1];
-      resolve(base64Data);
-    };
+  // Handle File object (browser)
+  if (typeof FileReader !== "undefined") {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
 
-    reader.onerror = () => {
-      reject(new Error("Failed to read PDF file"));
-    };
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        // Remove the "data:application/pdf;base64," prefix
+        const base64Data = base64.split(",")[1];
+        resolve(base64Data);
+      };
 
-    reader.readAsDataURL(file);
-  });
+      reader.onerror = () => {
+        reject(new Error("Failed to read PDF file"));
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Fallback for server-side File object (Next.js API routes)
+  const arrayBuffer = await file.arrayBuffer();
+  return Buffer.from(arrayBuffer).toString("base64");
 }
 
 /**
