@@ -17,7 +17,7 @@ const anthropic = new Anthropic({
 
 // Configuration
 const CONFIG = {
-  model: "claude-sonnet-4-5-20250514" as const,
+  model: "claude-sonnet-4-20250514" as const, // Claude Sonnet 4 with PDF support
   maxTokens: 4096,
   maxRetries: parseInt(process.env.AI_PARSING_MAX_RETRIES || "3", 10),
   minConfidence: parseFloat(process.env.AI_PARSING_MIN_CONFIDENCE || "0.7"),
