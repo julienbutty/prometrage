@@ -34,16 +34,19 @@
 
 #### Upload & Parsing PDF via IA (fichier référence dans /docs/fm.pdf)
 
-- [ ] **Setup** : Installation du SDK Anthropic (`npm install @anthropic-ai/sdk`)
-- [ ] **Config** : Variable d'environnement `ANTHROPIC_API_KEY`
-- [ ] **TDD** : Tests parsing via IA avec mock responses
-- [ ] Fonction `parsePDFWithAI` avec retry automatique
-- [ ] **TDD** : Test validation Zod des réponses IA
-- [ ] Prompt structuré pour extraction JSON
-- [ ] API Route `/api/upload/pdf` avec appel Anthropic
-- [ ] Gestion des erreurs IA (low confidence, rate limit, parsing error)
+- [x] **Setup** : Installation du SDK Anthropic (`npm install @anthropic-ai/sdk`)
+- [x] **Config** : Variable d'environnement `ANTHROPIC_API_KEY`
+- [x] **TDD** : Tests parsing via IA avec mock responses
+- [x] Fonction `parsePDFWithAI` avec retry automatique
+- [x] **TDD** : Test validation Zod des réponses IA
+- [x] Prompt structuré pour extraction JSON
+- [x] API Route `/api/upload/pdf` avec appel Anthropic
+- [x] Gestion des erreurs IA (low confidence, rate limit, parsing error)
+- [x] Stockage métadonnées IA (confidence, warnings, tokens)
+- [x] **TEST RÉUSSI** : Parsing de fm.pdf avec 90% de confiance ✅
 - [ ] Progress bar upload avec statut parsing IA
-- [ ] Stockage métadonnées IA (confidence, warnings, tokens)
+- [ ] Intégration frontend pour upload PDF
+- [ ] Upload fichier vers storage cloud (Uploadthing/Vercel Blob)
 
 #### Modèle de données
 

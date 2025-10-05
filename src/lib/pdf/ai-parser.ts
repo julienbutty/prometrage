@@ -143,8 +143,12 @@ export async function parsePDFWithAI(
 
       console.log(`[AI Parser] Success on attempt ${attempt + 1}`);
       console.log(`[AI Parser] Tokens used: ${tokensUsed}`);
-      console.log(`[AI Parser] Confidence: ${validated.metadata.confidence.toFixed(2)}`);
-      console.log(`[AI Parser] Menuiseries found: ${validated.menuiseries.length}`);
+      console.log(
+        `[AI Parser] Confidence: ${validated.metadata.confidence.toFixed(2)}`
+      );
+      console.log(
+        `[AI Parser] Menuiseries found: ${validated.menuiseries.length}`
+      );
 
       // Return parsed data with extended metadata
       return {
