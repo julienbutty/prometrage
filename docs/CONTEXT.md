@@ -15,7 +15,7 @@ const stack = {
   ui: "Shadcn/ui + Tailwind CSS",
   state: "TanStack Query + Zustand",
   forms: "React Hook Form + Zod",
-  pdf: "pdf.js",
+  pdf: "Anthropic Claude Sonnet 4.5 (Vision API)",
   db: "PostgreSQL + Prisma",
   hosting: "Vercel",
 };
@@ -140,35 +140,73 @@ interface DonneesMenuiserie {
 }
 ```
 
-### 🎯 Patterns de parsing PDF
+### 🎯 Parsing PDF via IA
 
 ```typescript
-// Patterns d'extraction prioritaires
-const PDF_PATTERNS = {
-  // Repère (avant les deux points)
-  repere: /^([^:]+)\s*:\s*(.+)$/,
+// Prompt structuré pour extraction via Claude Vision
+const EXTRACTION_PROMPT = `
+Tu es un expert en extraction de données de fiches métreur.
 
-  // Dimensions
-  dimensions: /Larg\s*(\d+)\s*mm\s*x\s*Haut\s*(\d+)\s*mm/i,
+Analyse ce PDF et extrais TOUTES les menuiseries au format JSON strict.
+Pour chaque menuiserie, extrais :
 
-  // Gamme (3 valeurs possibles)
-  gamme: /Gamme\s*(Optimax|Performax|Innovax)/i,
+{
+  "menuiseries": [
+    {
+      "repere": "Salon" | null,
+      "intitule": "Coulissant 2 vantaux",
+      "largeur": 3000,  // En mm (nombre)
+      "hauteur": 2250,  // En mm (nombre)
+      "gamme": "OPTIMAX" | "PERFORMAX" | "INNOVAX",
+      "pose": "tunnel" | "applique" | "renovation",
+      "dormant": "avec aile" | "sans aile",
+      "intercalaire": "blanc" | "noir",
+      ...
+    }
+  ],
+  "metadata": {
+    "confidence": 0.95,
+    "warnings": ["..."],
+    "clientInfo": { "nom": "...", ... }
+  }
+}
 
-  // Pose (3 types)
-  pose: /Pose\s+en\s+(tunnel|applique|rénovation)/i,
+RÈGLES STRICTES:
+1. Dimensions en nombres (millimètres)
+2. Si illisible → null + warning
+3. Gammes en MAJUSCULES
+4. Poses en minuscules
+`;
 
-  // Dormant
-  dormant: /Dormant.*?(avec|sans)\s+aile/i,
+// Workflow parsing IA
+async function parsePDFWithAI(pdfFile: File): Promise<ParsedData> {
+  // 1. Convertir PDF en base64
+  const pdfBase64 = await fileToBase64(pdfFile);
 
-  // Intercalaire
-  intercalaire: /Intercalaire\s*:\s*(blanc|noir)/i,
+  // 2. Appel API Anthropic avec retry
+  const response = await anthropic.messages.create({
+    model: "claude-sonnet-4-5-20250514",
+    max_tokens: 4096,
+    messages: [{
+      role: "user",
+      content: [
+        { type: "document", source: { type: "base64", media_type: "application/pdf", data: pdfBase64 } },
+        { type: "text", text: EXTRACTION_PROMPT }
+      ]
+    }]
+  });
 
-  // Ouvrant principal (coulissants)
-  ouvrant: /Ouvrant\s+principal\s+à\s+(droite|gauche)/i,
+  // 3. Validation Zod stricte
+  const data = JSON.parse(response.content[0].text);
+  const validated = menuiseriesResponseSchema.parse(data);
 
-  // Rails
-  rails: /Rails\s+(inox|alu)/i,
-};
+  // 4. Vérifier confiance
+  if (validated.metadata.confidence < 0.7) {
+    throw new Error("AI_LOW_CONFIDENCE - Vérification manuelle requise");
+  }
+
+  return validated;
+}
 ```
 
 ### 🚨 Système d'alertes écarts

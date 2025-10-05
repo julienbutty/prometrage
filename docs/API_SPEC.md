@@ -19,7 +19,7 @@ Accept: application/json
 
 #### POST `/api/upload/pdf`
 
-Upload et parse un fichier PDF de fiche métreur.
+Upload et parse un fichier PDF de fiche métreur via IA (Anthropic Claude Vision).
 fichier référence dans /docs/fm.pdf
 
 **Request:**
@@ -65,7 +65,14 @@ Content-Type: multipart/form-data
     "parseStatus": {
       "total": 3,
       "success": 3,
-      "errors": []
+      "errors": [],
+      "aiMetadata": {
+        "model": "claude-sonnet-4-5-20250514",
+        "confidence": 0.95,
+        "tokensUsed": 1250,
+        "warnings": [],
+        "retryCount": 0
+      }
     }
   }
 }
@@ -364,6 +371,9 @@ Content-Disposition: attachment; filename="KOMP-2024-001.xlsx"
 | `VALIDATION_ERROR` | 400         | Données invalides           | Vérifier les champs         |
 | `INVALID_PDF`      | 400         | PDF non valide ou illisible | Réessayer avec un autre PDF |
 | `PARSE_ERROR`      | 400         | Échec du parsing PDF        | Vérifier le format du PDF   |
+| `AI_PARSE_ERROR`   | 500         | L'IA n'a pas pu parser le PDF | Retry automatique ou manuel |
+| `AI_LOW_CONFIDENCE`| 422         | Confiance IA < 70%          | Vérification manuelle requise |
+| `AI_RATE_LIMIT`    | 429         | Limite API IA atteinte      | Réessayer dans 1 minute     |
 | `NOT_FOUND`        | 404         | Ressource introuvable       | Vérifier l'ID               |
 | `UNAUTHORIZED`     | 401         | Non authentifié             | Se connecter                |
 | `FORBIDDEN`        | 403         | Accès refusé                | Vérifier permissions        |

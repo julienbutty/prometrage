@@ -13,7 +13,7 @@ Application mobile-first pour artisans permettant la prise de côtes sur chantie
 - **UI** : Shadcn/ui + Tailwind CSS
 - **State** : TanStack Query (cache) + Zustand (state global)
 - **Forms** : React Hook Form + Zod
-- **PDF** : pdf.js ou pdfjs-dist (en cas de difficulté de parsing et d'extraction nous pourrons envisager déleguer le parsing à de l'IA)
+- **PDF** : Anthropic Claude Sonnet 4.5 (Vision API) pour parsing intelligent via IA avec retry et validation Zod
 - **Database** : PostgreSQL + Prisma
 - **TypeScript** : Mode strict obligatoire
 
@@ -148,23 +148,78 @@ const mutation = useMutation({
 });
 ```
 
-#### 6. Parsing PDF - Patterns stricts
+#### 6. Parsing PDF via IA - Règles strictes
 
 ```typescript
-// Extraction avec patterns spécifiques
-const PATTERNS = {
-  repere: /^([^:]+)\s*:\s*(.+)$/,
-  dimensions: /Larg\s*(\d+)\s*mm\s*x\s*Haut\s*(\d+)\s*mm/i,
-  gamme: /Gamme\s*(OPTIMAX|PERFORMAX|INNOVAX)/i,
-  pose: /Pose\s+en\s+(tunnel|applique|rénovation)/i,
-};
+// Extraction via Anthropic Claude Vision API
+import Anthropic from "@anthropic-ai/sdk";
 
-// TOUJOURS valider après extraction
-const schema = z.object({
-  largeur: z.number().min(100).max(10000),
-  hauteur: z.number().min(100).max(10000),
-  gamme: z.enum(["OPTIMAX", "PERFORMAX", "INNOVAX"]),
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
 });
+
+// Fonction de parsing avec retry
+async function parsePDFWithAI(pdfBase64: string, retries = 3): Promise<MenuiserieData[]> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await anthropic.messages.create({
+        model: "claude-sonnet-4-5-20250514",
+        max_tokens: 4096,
+        messages: [{
+          role: "user",
+          content: [
+            {
+              type: "document",
+              source: {
+                type: "base64",
+                media_type: "application/pdf",
+                data: pdfBase64
+              }
+            },
+            {
+              type: "text",
+              text: EXTRACTION_PROMPT
+            }
+          ]
+        }]
+      });
+
+      // Extraction du JSON depuis la réponse
+      const jsonText = extractJSON(response.content[0].text);
+      const data = JSON.parse(jsonText);
+
+      // TOUJOURS valider avec Zod après extraction IA
+      const validated = menuiseriesResponseSchema.parse(data);
+
+      // Vérifier le score de confiance
+      if (validated.metadata.confidence < 0.7) {
+        throw new Error("AI_LOW_CONFIDENCE");
+      }
+
+      return validated.menuiseries;
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      await wait(1000 * (i + 1)); // Backoff exponentiel
+    }
+  }
+}
+
+// Schema de validation Zod pour réponse IA
+const menuiseriesResponseSchema = z.object({
+  menuiseries: z.array(menuiserieSchema),
+  metadata: z.object({
+    confidence: z.number().min(0).max(1),
+    warnings: z.array(z.string()),
+    clientInfo: clientSchema.optional(),
+  }),
+});
+
+// IMPORTANT: Rate limiting
+const rateLimiter = {
+  tokens: 0,
+  lastReset: Date.now(),
+  maxTokensPerMinute: 100000,
+};
 ```
 
 ### 📊 MODÈLE DE DONNÉES

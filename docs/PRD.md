@@ -31,7 +31,7 @@ Application web **mobile-first** permettant aux artisans de faire des prises de 
 - **UI** : Shadcn/ui + Tailwind CSS
 - **State** : TanStack Query + Zustand
 - **Forms** : React Hook Form + Zod
-- **PDF** : PDF.js ou pdfjs-dist pour le parsing
+- **PDF** : Anthropic Claude Sonnet 4.5 (Vision API) pour parsing intelligent via IA
 - **Base de données** : PostgreSQL + Prisma
 - **Hébergement** : Vercel
 - **Storage** : Uploadthing ou Vercel Blob
@@ -135,50 +135,128 @@ enum Status {
 }
 ```
 
-### 4. Parsing PDF - Règles d'extraction
+### 4. Parsing PDF via IA - Approche intelligente
 
-#### 4.1 Patterns de détection
+#### 4.1 Workflow d'extraction par IA
 
-```javascript
-// Détection du repère
-const detectRepere = (text) => {
-  // Pattern: "Mot : " avant l'intitulé
-  const match = text.match(/^([^:]+)\s*:\s*(.+)$/);
-  if (match) {
-    return {
-      repere: match[1].trim(),
-      intitule: match[2].trim(),
-    };
-  }
-  return { repere: null, intitule: text };
+```typescript
+// 1. Upload et préparation du PDF
+const processPDF = async (file: File) => {
+  // Conversion PDF → Images (ou extraction texte enrichi)
+  const pdfData = await convertPDFToBase64(file);
+
+  // 2. Envoi à l'API Anthropic Claude avec prompt structuré
+  const response = await anthropic.messages.create({
+    model: "claude-sonnet-4-5-20250514",
+    max_tokens: 4096,
+    messages: [{
+      role: "user",
+      content: [
+        {
+          type: "document",
+          source: {
+            type: "base64",
+            media_type: "application/pdf",
+            data: pdfData
+          }
+        },
+        {
+          type: "text",
+          text: EXTRACTION_PROMPT
+        }
+      ]
+    }]
+  });
+
+  // 3. Validation de la réponse avec Zod
+  const extractedData = JSON.parse(response.content[0].text);
+  const validated = menuiseriesArraySchema.parse(extractedData);
+
+  return validated;
 };
-
-// Extraction dimensions
-const extractDimensions = (text) => {
-  // Pattern: "Larg XXXX mm x Haut YYYY mm"
-  const regex = /Larg\s*(\d+)\s*mm\s*x\s*Haut\s*(\d+)\s*mm/i;
-  const match = text.match(regex);
-  return match
-    ? {
-        largeur: parseInt(match[1]),
-        hauteur: parseInt(match[2]),
-      }
-    : null;
-};
-
-// Mapping des valeurs
-const GAMMES = ["OPTIMAX", "PERFORMAX", "INNOVAX"];
-const POSES = ["tunnel", "applique", "renovation"];
-const INTERCALAIRES = ["blanc", "noir"];
 ```
 
-#### 4.2 Stratégie d'extraction
+#### 4.2 Prompt structuré pour extraction
 
-1. Upload PDF → Conversion en texte
-2. Identification des sections par patterns
-3. Extraction ligne par ligne avec regex
-4. Validation des valeurs extraites
-5. Stockage en JSON flexible
+```typescript
+const EXTRACTION_PROMPT = `
+Tu es un expert en extraction de données de fiches métreur pour menuiseries.
+
+Analyse ce PDF et extrais TOUTES les menuiseries présentes.
+Pour chaque menuiserie, extrais les données suivantes au format JSON strict :
+
+{
+  "menuiseries": [
+    {
+      "repere": "Salon" | null,  // Texte avant ":" si présent
+      "intitule": "Coulissant 2 vantaux",  // Titre de la menuiserie
+      "largeur": 3000,  // En millimètres (nombre)
+      "hauteur": 2250,  // En millimètres (nombre)
+      "hauteurAllege": 1000,  // Optionnel
+      "gamme": "OPTIMAX" | "PERFORMAX" | "INNOVAX",
+      "couleurInt": "RAL 9016",
+      "couleurExt": "RAL 7016",
+      "pose": "tunnel" | "applique" | "renovation",
+      "dimensions": "clair de bois" | "execution",
+      "dormant": "avec aile" | "sans aile",
+      "habillageInt": "Plat 30x2" | "Sans habillage",
+      "habillageExt": "Cornière 20x20" | "Sans habillage",
+      "doubleVitrage": "44.2.16w Argon.4 PTR+",
+      "intercalaire": "blanc" | "noir",
+      "ouvrantPrincipal": "droite" | "gauche",  // Pour coulissants
+      "fermeture": "Description",
+      "poignee": "Description",
+      "rails": "inox" | "alu",
+      "couleurJoints": "RAL...",
+      "couleurQuincaillerie": "Description",
+      "couleurPareTempete": "RAL...",
+      "couleurPetitsBois": "Description"
+    }
+  ],
+  "metadata": {
+    "confidence": 0.95,  // Score de confiance global (0-1)
+    "warnings": ["Dimension hauteur peu lisible pour menuiserie #2"],
+    "clientInfo": {
+      "nom": "KOMPANIETZ",
+      "adresse": "37 Chemin du Cuvier",
+      "tel": "06 25 91 01 48",
+      "email": "paul.kompanietz@gmail.com"
+    }
+  }
+}
+
+RÈGLES STRICTES:
+1. Toutes les dimensions DOIVENT être des nombres en millimètres
+2. Si une valeur est illisible, utilise null et ajoute un warning
+3. Normalise les gammes en MAJUSCULES (OPTIMAX, PERFORMAX, INNOVAX)
+4. Normalise les poses en minuscules (tunnel, applique, renovation)
+5. Extrais TOUTES les menuiseries, même partiellement remplies
+6. Conserve les descriptions exactes pour couleurs et options
+
+Réponds UNIQUEMENT avec le JSON, sans texte additionnel.
+`;
+```
+
+#### 4.3 Stratégie d'extraction avec IA
+
+1. **Upload PDF** → Conversion en base64 ou images
+2. **Envoi à Claude Vision** avec prompt structuré JSON
+3. **Parsing réponse** et extraction du JSON
+4. **Validation Zod stricte** des données extraites
+5. **Gestion des erreurs** :
+   - Retry automatique si parsing échoue (max 3 tentatives)
+   - Fallback vers extraction manuelle si confiance < 70%
+   - Stockage des warnings pour revue utilisateur
+6. **Stockage** en JSON flexible avec métadonnées IA
+
+#### 4.4 Avantages de l'approche IA
+
+- ✅ **Robustesse** : Gère les variations de format automatiquement
+- ✅ **Contexte** : Comprend la mise en page et les tableaux complexes
+- ✅ **Maintenance** : Pas de regex fragiles à maintenir
+- ✅ **Évolutivité** : Adaptation naturelle aux nouveaux formats
+- ✅ **Confiance** : Score de confiance pour chaque extraction
+- ✅ **Warnings** : Signalement automatique des zones ambiguës
 
 ### 5. Interface utilisateur
 
@@ -418,8 +496,9 @@ GET    /api/export/:projetId // Export des données
 #### Sprint 1 (2 semaines)
 
 - Setup Next.js + Shadcn + TanStack
-- Upload PDF + parsing basique
-- Modèle de données
+- Configuration Anthropic Claude API
+- Upload PDF + parsing via IA avec retry
+- Modèle de données avec métadonnées IA
 - UI mobile homepage
 
 #### Sprint 2 (2 semaines)

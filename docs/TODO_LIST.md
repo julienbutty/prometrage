@@ -32,14 +32,18 @@
 - [x] Navigation mobile (Header responsive)
 - [x] Loading states avec skeletons
 
-#### Upload & Parsing PDF (fichier référence dans /docs/fm.pdf)
+#### Upload & Parsing PDF via IA (fichier référence dans /docs/fm.pdf)
 
-- [ ] **TDD** : Tests parsing patterns (repère, dimensions, etc.)
-- [ ] Fonction `parsePDF` avec pdf.js
-- [ ] **TDD** : Test extraction menuiseries
-- [ ] API Route `/api/upload/pdf`
-- [ ] Progress bar upload
-- [ ] Gestion erreurs parsing
+- [ ] **Setup** : Installation du SDK Anthropic (`npm install @anthropic-ai/sdk`)
+- [ ] **Config** : Variable d'environnement `ANTHROPIC_API_KEY`
+- [ ] **TDD** : Tests parsing via IA avec mock responses
+- [ ] Fonction `parsePDFWithAI` avec retry automatique
+- [ ] **TDD** : Test validation Zod des réponses IA
+- [ ] Prompt structuré pour extraction JSON
+- [ ] API Route `/api/upload/pdf` avec appel Anthropic
+- [ ] Gestion des erreurs IA (low confidence, rate limit, parsing error)
+- [ ] Progress bar upload avec statut parsing IA
+- [ ] Stockage métadonnées IA (confidence, warnings, tokens)
 
 #### Modèle de données
 
