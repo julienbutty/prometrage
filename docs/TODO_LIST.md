@@ -31,6 +31,9 @@
 - [x] Composant `UploadButton` avec zone drop
 - [x] Navigation mobile (Header responsive)
 - [x] Loading states avec skeletons
+- [x] API Route `/api/projets` pour lister les projets
+- [x] Intégration TanStack Query sur homepage
+- [x] Navigation vers page détail projet
 
 #### Upload & Parsing PDF via IA (fichier référence dans /docs/fm.pdf)
 
@@ -44,8 +47,10 @@
 - [x] Gestion des erreurs IA (low confidence, rate limit, parsing error)
 - [x] Stockage métadonnées IA (confidence, warnings, tokens)
 - [x] **TEST RÉUSSI** : Parsing de fm.pdf avec 90% de confiance ✅
+- [x] Intégration frontend pour upload PDF (avec TanStack Query mutation)
+- [x] Toast notifications (Sonner) pour feedback upload
+- [x] Redirection automatique vers projet après upload
 - [ ] Progress bar upload avec statut parsing IA
-- [ ] Intégration frontend pour upload PDF
 - [ ] Upload fichier vers storage cloud (Uploadthing/Vercel Blob)
 
 #### Modèle de données
@@ -56,16 +61,36 @@
 - [x] Migration Prisma initiale
 - [x] Seed data pour tests
 
-### 📝 Phase 3 : Formulaire Prise de Côtes (Semaine 3)
+#### Page Détail Projet
+
+- [x] **TDD** : Test API GET `/api/projets/[id]`
+- [x] Page `/projet/[id]` responsive mobile-first
+- [x] Affichage infos client (adresse, téléphone, PDF)
+- [x] Liste des menuiseries avec badges
+- [x] Navigation vers menuiserie individuelle
+- [x] Bouton CTA fixe en bas "Commencer la prise de côtes"
+
+### 📝 Phase 3 : Formulaire Prise de Côtes (Semaine 3) - COMPLÉTÉE ✅
+
+#### API Menuiseries
+
+- [x] **TDD** : Tests API GET /api/menuiseries/[id]
+- [x] **TDD** : Tests API PUT /api/menuiseries/[id]
+- [x] API route GET /api/menuiseries/[id] avec infos projet
+- [x] API route PUT /api/menuiseries/[id] avec validation
+- [x] Fonction `calculateEcarts` avec niveaux d'alerte (faible/moyen/élevé)
 
 #### Formulaire Mobile
 
-- [ ] **TDD** : Test formulaire dimensions
-- [ ] Composant `DimensionsForm` avec gros inputs
-- [ ] **TDD** : Test calcul écarts
-- [ ] Fonction `calculateEcart` avec niveaux d'alerte
-- [ ] **TDD** : Test sauvegarde données
-- [ ] Hook `useAutoSave` avec debounce
+- [x] Page `/menuiserie/[id]` mobile-first responsive
+- [x] Formulaire dynamique pour TOUS les champs du PDF
+- [x] Inputs numériques optimisés mobile (h-14, inputMode)
+- [x] Labels français automatiques pour tous les champs
+- [x] Badges d'écarts colorés selon niveau (vert/orange/rouge)
+- [x] Alerte visuelle si écarts détectés
+- [x] Sauvegarde avec TanStack Query mutation
+- [x] Toast notifications succès/erreur
+- [ ] Hook `useAutoSave` avec debounce (optionnel)
 
 #### Composants formulaire
 
