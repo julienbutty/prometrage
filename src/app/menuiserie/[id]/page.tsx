@@ -20,6 +20,24 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { FieldWithDiff } from "@/components/forms/FieldWithDiff";
+import { NavigationBar } from "@/components/menuiseries/NavigationBar";
+
+interface NavigationInfo {
+  total: number;
+  currentIndex: number;
+  currentPosition: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  nextId: string | null;
+  previousId: string | null;
+  allMenuiseries: Array<{
+    id: string;
+    repere: string | null;
+    intitule: string;
+    ordre: number;
+    donneesModifiees: any;
+  }>;
+}
 
 interface Menuiserie {
   id: string;
@@ -33,6 +51,7 @@ interface Menuiserie {
     reference: string;
     clientNom: string;
   };
+  navigation: NavigationInfo;
 }
 
 // Champs numériques critiques (toujours visibles)
@@ -66,6 +85,7 @@ export default function MenuiseriePage() {
   const [observations, setObservations] = useState("");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [observationsOpen, setObservationsOpen] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const { data: menuiserie, isLoading } = useQuery({
     queryKey: ["menuiserie", menuiserieId],
@@ -114,6 +134,7 @@ export default function MenuiseriePage() {
   });
 
   const handleFieldChange = (key: string, value: string) => {
+    setHasUnsavedChanges(true);
     setFormData((prev) => {
       const newData = { ...prev, [key]: value };
       // Convert to number if it's a numeric field
@@ -133,6 +154,31 @@ export default function MenuiseriePage() {
     };
 
     updateMutation.mutate({ donneesModifiees });
+    setHasUnsavedChanges(false);
+  };
+
+  const handleNavigate = (targetId: string) => {
+    if (hasUnsavedChanges) {
+      const confirm = window.confirm(
+        "Vous avez des modifications non sauvegardées. Voulez-vous continuer sans sauvegarder ?"
+      );
+      if (!confirm) return;
+    }
+
+    router.push(`/menuiserie/${targetId}`);
+    setHasUnsavedChanges(false);
+  };
+
+  const handleNext = () => {
+    if (menuiserie?.navigation.nextId) {
+      handleNavigate(menuiserie.navigation.nextId);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (menuiserie?.navigation.previousId) {
+      handleNavigate(menuiserie.navigation.previousId);
+    }
   };
 
   if (isLoading) {
@@ -185,15 +231,28 @@ export default function MenuiseriePage() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push(`/projet/${menuiserie.projet.id}`)}
+            onClick={() => {
+              if (hasUnsavedChanges) {
+                const confirm = window.confirm(
+                  "Vous avez des modifications non sauvegardées. Voulez-vous continuer sans sauvegarder ?"
+                );
+                if (!confirm) return;
+              }
+              router.push(`/projet/${menuiserie.projet.id}`);
+            }}
             className="h-10 w-10"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-bold truncate">
-              {menuiserie.repere || "Menuiserie"}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg font-bold truncate">
+                {menuiserie.repere || "Menuiserie"}
+              </h1>
+              <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded whitespace-nowrap">
+                {menuiserie.navigation.currentPosition}/{menuiserie.navigation.total}
+              </span>
+            </div>
             <p className="text-sm text-gray-600 truncate">
               {menuiserie.intitule}
             </p>
@@ -324,16 +383,30 @@ export default function MenuiseriePage() {
         </Collapsible>
       </div>
 
-      {/* Fixed Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-lg">
-        <Button
-          className="w-full h-14 text-lg"
-          onClick={handleSave}
-          disabled={updateMutation.isPending}
-        >
-          <Save className="mr-2 h-5 w-5" />
-          {updateMutation.isPending ? "Enregistrement..." : "Enregistrer"}
-        </Button>
+      {/* Fixed Bottom Navigation + Save */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
+        <div className="p-4 space-y-3">
+          {/* Navigation Bar */}
+          <NavigationBar
+            hasNext={menuiserie.navigation.hasNext}
+            hasPrevious={menuiserie.navigation.hasPrevious}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+            currentPosition={menuiserie.navigation.currentPosition}
+            total={menuiserie.navigation.total}
+            disabled={updateMutation.isPending}
+          />
+
+          {/* Save Button */}
+          <Button
+            className="w-full h-14 text-lg"
+            onClick={handleSave}
+            disabled={updateMutation.isPending}
+          >
+            <Save className="mr-2 h-5 w-5" />
+            {updateMutation.isPending ? "Enregistrement..." : "Enregistrer"}
+          </Button>
+        </div>
       </div>
     </div>
   );

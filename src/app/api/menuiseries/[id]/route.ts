@@ -48,9 +48,37 @@ export async function GET(
       );
     }
 
+    // Get all menuiseries from the same project for navigation
+    const allMenuiseries = await prisma.menuiserie.findMany({
+      where: { projetId: menuiserie.projetId },
+      select: {
+        id: true,
+        repere: true,
+        intitule: true,
+        ordre: true,
+        donneesModifiees: true,
+      },
+      orderBy: { ordre: "asc" },
+    });
+
+    // Find current index
+    const currentIndex = allMenuiseries.findIndex((m) => m.id === id);
+
     return NextResponse.json({
       success: true,
-      data: menuiserie,
+      data: {
+        ...menuiserie,
+        navigation: {
+          total: allMenuiseries.length,
+          currentIndex: currentIndex,
+          currentPosition: currentIndex + 1,
+          hasNext: currentIndex < allMenuiseries.length - 1,
+          hasPrevious: currentIndex > 0,
+          nextId: currentIndex < allMenuiseries.length - 1 ? allMenuiseries[currentIndex + 1].id : null,
+          previousId: currentIndex > 0 ? allMenuiseries[currentIndex - 1].id : null,
+          allMenuiseries: allMenuiseries,
+        },
+      },
     });
   } catch (error) {
     console.error("[API] Get menuiserie error:", error);
