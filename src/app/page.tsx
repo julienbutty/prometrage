@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Header } from "@/components/layout/Header";
 import { ProjectList } from "@/components/ProjectList";
 import { UploadButton } from "@/components/UploadButton";
+import { UploadProgress } from "@/components/UploadProgress";
 
 interface Projet {
   id: string;
@@ -21,6 +23,7 @@ interface Projet {
 export default function Home() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [uploadingFile, setUploadingFile] = useState<string | null>(null);
 
   const { data: projets = [], isLoading } = useQuery({
     queryKey: ["projets"],
@@ -36,6 +39,8 @@ export default function Home() {
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
+      setUploadingFile(file.name); // Show progress modal
+
       const formData = new FormData();
       formData.append("file", file);
 
@@ -56,9 +61,14 @@ export default function Home() {
         description: `${data.data.parseStatus.total} menuiserie(s) détectée(s)`,
       });
       queryClient.invalidateQueries({ queryKey: ["projets"] });
-      router.push(`/projet/${data.data.projetId}`);
+      // Don't close progress modal yet - it will auto-close and redirect
+      setTimeout(() => {
+        setUploadingFile(null);
+        router.push(`/projet/${data.data.projetId}`);
+      }, 1500);
     },
     onError: (error: Error) => {
+      setUploadingFile(null); // Close progress modal
       toast.error("Erreur d'upload", {
         description: error.message,
       });
@@ -74,6 +84,10 @@ export default function Home() {
 
   const handleUpload = async (file: File) => {
     uploadMutation.mutate(file);
+  };
+
+  const handleProgressComplete = () => {
+    // Progress modal completed - will redirect via onSuccess
   };
 
   if (isLoading) {
@@ -120,6 +134,13 @@ export default function Home() {
         {/* Liste des projets */}
         <ProjectList projects={projects} />
       </main>
+
+      {/* Upload Progress Modal */}
+      <UploadProgress
+        open={!!uploadingFile}
+        fileName={uploadingFile || undefined}
+        isComplete={uploadMutation.isSuccess}
+      />
     </div>
   );
 }
