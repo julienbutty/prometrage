@@ -27,14 +27,14 @@ Application web **mobile-first** permettant aux artisans de faire des prises de 
 
 #### 2.1 Core Stack
 
-- **Framework** : Next.js 15+ (App Router)
-- **UI** : Shadcn/ui + Tailwind CSS
+- **Framework** : Next.js 15.5.4 (App Router) avec React 19.1.0
+- **UI** : Shadcn/ui + Tailwind CSS v4
 - **State** : TanStack Query + Zustand
 - **Forms** : React Hook Form + Zod
-- **PDF** : Anthropic Claude Sonnet 4.5 (Vision API) pour parsing intelligent via IA
-- **Base de données** : PostgreSQL + Prisma
+- **PDF** : Anthropic Claude Sonnet 4 (claude-sonnet-4-20250514) avec Vision API pour parsing intelligent
+- **Base de données** : PostgreSQL 16 + Prisma 6.16.3
 - **Hébergement** : Vercel
-- **Storage** : Uploadthing ou Vercel Blob
+- **Storage** : Uploadthing ou Vercel Blob (EN ATTENTE)
 
 #### 2.2 Architecture mobile-first
 
@@ -73,11 +73,14 @@ model Projet {
 model Menuiserie {
   id            String   @id @default(cuid())
   projetId      String
-  projet        Projet   @relation(fields: [projetId], references: [id])
+  projet        Projet   @relation(fields: [projetId], references: [id], onDelete: Cascade)
 
   // Identification
   repere        String?  // Ex: "Salon"
   intitule      String   // Ex: "Coulissant 2 vantaux"
+
+  // Image (EN ATTENTE - infrastructure prête)
+  imageBase64   String?  @db.Text  // Image extraite du PDF en base64
 
   // Données extraites du PDF (valeurs originales)
   donneesOriginales Json
@@ -90,6 +93,13 @@ model Menuiserie {
 
   validee       Boolean  @default(false)
   dateValidation DateTime?
+
+  // Ordre d'affichage
+  ordre         Int      @default(0)
+
+  @@index([projetId])
+  @@index([validee])
+  @@index([ordre])
 }
 
 // Structure JSON pour les données
@@ -147,7 +157,7 @@ const processPDF = async (file: File) => {
 
   // 2. Envoi à l'API Anthropic Claude avec prompt structuré
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-5-20250514",
+    model: "claude-sonnet-4-20250514",  // Claude Sonnet 4 (avec support PDF)
     max_tokens: 4096,
     messages: [{
       role: "user",
@@ -493,27 +503,33 @@ GET    /api/export/:projetId // Export des données
 
 ### 9. Roadmap MVP
 
-#### Sprint 1 (2 semaines)
+#### Sprint 1 (2 semaines) - ✅ COMPLÉTÉ
 
-- Setup Next.js + Shadcn + TanStack
-- Configuration Anthropic Claude API
-- Upload PDF + parsing via IA avec retry
-- Modèle de données avec métadonnées IA
-- UI mobile homepage
+- ✅ Setup Next.js 15.5.4 + Shadcn + TanStack Query
+- ✅ Configuration Anthropic Claude Sonnet 4 API
+- ✅ Upload PDF + parsing via IA avec retry automatique et backoff exponentiel
+- ✅ Modèle de données Prisma avec métadonnées IA (confidence, warnings, tokens)
+- ✅ UI mobile homepage avec liste projets
 
-#### Sprint 2 (2 semaines)
+#### Sprint 2 (2 semaines) - ✅ COMPLÉTÉ
 
-- Formulaire prise de côtes responsive
-- Calcul et affichage des écarts
-- Sauvegarde modifications
-- Navigation entre menuiseries
+- ✅ Formulaire prise de côtes responsive avec tous les champs PDF
+- ✅ Calcul et affichage des écarts en temps réel (composant FieldWithDiff)
+- ✅ Sauvegarde modifications avec TanStack Query mutation
+- ✅ Navigation entre menuiseries (Previous/Next avec métadonnées API)
+- ✅ Progressive Disclosure (sections collapsibles - réduction 56% scroll)
+- ✅ Indicateurs visuels de complétion (cercles verts/bleus/gris)
+- ✅ Toast notifications (Sonner)
 
-#### Sprint 3 (1 semaine)
+#### Sprint 3 (1 semaine) - EN COURS
 
-- Optimisations mobile
-- Tests sur vrais téléphones
-- Déploiement Vercel
-- Documentation
+- ✅ Tests unitaires : 64/64 tests PASS (composants + validations + AI parser)
+- ⚠️ Tests intégration : 5 tests échouent (Prisma timing - configuration connue)
+- ⏸️ Extraction images PDF (infrastructure prête, extraction en attente)
+- ⏳ Optimisations mobile (à venir)
+- ⏳ Tests sur vrais téléphones (à venir)
+- ⏳ Déploiement Vercel (à venir)
+- ⏳ Documentation utilisateur (à venir)
 
 ### 10. Points d'attention
 

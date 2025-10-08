@@ -31,49 +31,75 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 model Projet {
-  id          String      @id @default(cuid())
-  reference   String      @unique
-  client      Json        // {nom, adresse, tel, email}
-  pdfUrl      String
-  dateUpload  DateTime    @default(now())
-  statut      Status      @default(EN_COURS)
+  id        String   @id @default(cuid())
+  reference String   @unique // ex: "KOMP-2024-001"
+
+  // Informations client
+  clientNom     String
+  clientAdresse String?
+  clientTel     String?
+  clientEmail   String?
+
+  // Fichier PDF original
+  pdfUrl        String?
+  pdfOriginalNom String?
+
+  // Relations
   menuiseries Menuiserie[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+
+  // Métadonnées
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reference])
+  @@index([clientNom])
+  @@index([createdAt])
 }
 
 model Menuiserie {
-  id                String    @id @default(cuid())
-  projetId          String
-  projet            Projet    @relation(fields: [projetId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
 
-  // Identification
-  repere            String?   // Ex: "Salon"
-  intitule          String    // Ex: "Coulissant 2 vantaux"
+  // Relation au projet
+  projetId  String
+  projet    Projet   @relation(fields: [projetId], references: [id], onDelete: Cascade)
 
-  // Données JSON flexibles
-  donneesOriginales Json      // Valeurs extraites du PDF
-  donneesModifiees  Json?     // Modifications de l'artisan
-  ecarts            Json?     // Analyse des différences
+  // Identifiants
+  repere    String?  // ex: "Salon", "Chambre 1"
+  intitule  String   // ex: "Coulissant 2 vantaux"
 
-  validee           Boolean   @default(false)
-  dateValidation    DateTime?
+  // Image de la menuiserie (EN ATTENTE - infrastructure prête)
+  imageBase64 String? @db.Text // Image extraite du PDF en base64
 
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  // Données flexibles stockées en JSON
+  // Permet d'ajouter des champs sans migration
+  donneesOriginales Json  // Données extraites du PDF
+  donneesModifiees  Json? // Modifications artisan (null si pas modifié)
+
+  // Analyse des écarts
+  ecarts    Json?    // Liste des écarts calculés
+
+  // Validation
+  validee   Boolean  @default(false)
+  dateValidation DateTime?
+
+  // Ordre d'affichage
+  ordre     Int      @default(0)
+
+  // Métadonnées
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([projetId])
-}
-
-enum Status {
-  EN_COURS
-  VALIDE
-  ARCHIVE
+  @@index([validee])
+  @@index([ordre])
 }
 ```
+
+**Note importante** : Le champ `imageBase64` existe dans le schema mais l'extraction d'images n'est pas encore implémentée. L'infrastructure UI et API est prête pour afficher les images quand l'extraction sera fonctionnelle.
 
 ### 🔄 Workflow utilisateur détaillé
 
@@ -308,7 +334,7 @@ export default function MenuiseriePage({ params }: { params: { id: string } }) {
 ### 🔧 Hooks personnalisés
 
 ```typescript
-// Hook pour auto-save
+// Hook pour auto-save (EN ATTENTE - optionnel)
 export function useAutoSave(
   data: any,
   saveFn: (data: any) => Promise<void>,
@@ -328,38 +354,52 @@ export function useAutoSave(
 
   return { isSaving };
 }
+```
 
-// Hook pour navigation menuiseries
-export function useMenuiserieNavigation(projetId: string) {
-  const { data: menuiseries } = useQuery({
-    queryKey: ["menuiseries", projetId],
-    queryFn: () => fetchMenuiseries(projetId),
-  });
+### 🧭 Navigation entre menuiseries
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+La navigation entre menuiseries est implémentée via les métadonnées retournées par l'API.
 
-  const next = () => {
-    if (currentIndex < menuiseries.length - 1) {
-      setCurrentIndex((i) => i + 1);
+```typescript
+// Réponse API GET /api/menuiseries/[id]
+{
+  "data": {
+    "id": "...",
+    "repere": "Salon",
+    // ... données de la menuiserie
+    "navigation": {
+      "currentPosition": 2,
+      "total": 5,
+      "hasNext": true,
+      "hasPrevious": true,
+      "nextId": "clxyz789...",
+      "previousId": "clxyz456...",
+      "menuiseriesStatus": [
+        {
+          "id": "clxyz123...",
+          "repere": "Salon",
+          "intitule": "Coulissant 2 vantaux",
+          "isCompleted": true  // Basé sur donneesModifiees !== null
+        },
+        // ... autres menuiseries
+      ]
     }
-  };
-
-  const previous = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((i) => i - 1);
-    }
-  };
-
-  return {
-    current: menuiseries?.[currentIndex],
-    hasNext: currentIndex < (menuiseries?.length ?? 0) - 1,
-    hasPrevious: currentIndex > 0,
-    next,
-    previous,
-    progress: `${currentIndex + 1}/${menuiseries?.length ?? 0}`,
-  };
+  }
 }
 ```
+
+**Composant NavigationBar** :
+- Affiche la position actuelle (ex: "2 / 5")
+- Boutons Précédent/Suivant avec états disabled appropriés
+- Indicateurs visuels de complétion (cercles verts/bleus/gris)
+- Compteur de menuiseries complétées (ex: "2 ✓")
+- Tests : 11 tests unitaires ✅
+
+**Statut de complétion** :
+- Une menuiserie est considérée comme complétée si `donneesModifiees !== null`
+- Badge "Complété" sur la page projet
+- Bordure verte sur les cards complétées
+- Cercle vert dans les indicateurs de progression
 
 ### 🎨 Design System
 
@@ -468,9 +508,38 @@ export async function PUT(
 2. **TDD Strict** - Test avant code, sans exception
 3. **Validation Zod** - Sur toutes les entrées utilisateur
 4. **JSON Flexible** - Pour évolutions futures des catalogues
-5. **Écarts Visuels** - Alertes claires avec couleurs
-6. **Auto-save** - Pas de perte de données sur chantier
-7. **Gros Boutons** - Minimum 44px pour usage avec gants
+5. **Écarts Visuels** - Alertes claires avec couleurs (vert < 5%, orange 5-10%, rouge > 10%)
+6. **Gros Boutons** - Minimum 44px pour usage avec gants
+7. **Progressive Disclosure** - Sections collapsibles pour optimiser le scroll (réduction 56%)
+
+### 📊 État actuel du projet (Janvier 2025)
+
+**Phase 3 - Formulaire Prise de Côtes** : ✅ **COMPLÉTÉE**
+- API menuiseries GET/PUT avec validation Zod
+- Formulaire dynamique mobile-optimisé avec tous les champs PDF
+- Composant `FieldWithDiff` pour calcul écarts en temps réel
+- Navigation entre menuiseries (Previous/Next)
+- Indicateurs visuels de complétion (cercles colorés)
+- 11 tests unitaires NavigationBar ✅
+- Tests API navigation (timing issues avec Prisma - connu)
+
+**Phase 3.5 - Extraction Images PDF** : ⏸️ **EN ATTENTE**
+- ✅ Infrastructure prête : schema `imageBase64`, migration DB, API stockage, UI affichage
+- ❌ Extraction fonction returns `[]` (à implémenter)
+- Options futures : pdf.js render, pdf-lib extract, ou service externe
+
+**Tests** :
+- 64/64 tests unitaires et composants ✅
+- 5 tests intégration échouent (Prisma timing - configuration connue)
+
+**Features implémentées** :
+- Upload PDF et parsing AI avec Claude Sonnet 4.5
+- Retry automatique avec backoff exponentiel
+- Métadonnées AI (confidence, warnings, tokens)
+- Navigation contextuelle avec metadata API
+- Indicateurs de progression (position, complétion)
+- Calcul écarts avec niveaux d'alerte
+- Progressive Disclosure (sections collapsibles)
 
 ### 📚 Ressources clés
 

@@ -17,6 +17,7 @@ export const ClientInfoSchema = z.object({
 export const AIMenuiserieSchema = z.object({
   repere: z.string().nullable(),
   intitule: z.string().min(1),
+  imageBase64: z.string().optional().nullable(), // Image en base64 extraite du PDF
   largeur: z.number().min(100).max(10000),
   hauteur: z.number().min(100).max(10000),
   hauteurAllege: z.number().optional().nullable(),

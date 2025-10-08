@@ -8,11 +8,15 @@ export const EXTRACTION_PROMPT = `Tu es un expert en extraction de données de f
 Analyse ce PDF et extrais TOUTES les menuiseries présentes.
 Pour chaque menuiserie, extrais les données suivantes au format JSON strict :
 
+IMPORTANT : Chaque menuiserie dans le PDF a une image/schéma associé (vue technique de la fenêtre/porte).
+Tu DOIS extraire cette image et la fournir en base64 dans le champ "imageBase64".
+
 {
   "menuiseries": [
     {
       "repere": "Salon" | null,
       "intitule": "Coulissant 2 vantaux",
+      "imageBase64": "data:image/png;base64,iVBORw0KGgo...",
       "largeur": 3000,
       "hauteur": 2250,
       "hauteurAllege": 1000,
@@ -58,5 +62,6 @@ RÈGLES STRICTES:
 7. Le score de confiance doit refléter la qualité globale de l'extraction (0-1)
 8. Si le repère n'est pas explicite, utilise null
 9. Pour les champs optionnels absents, utilise null (ne les omets pas)
+10. **EXTRACTION D'IMAGES** : Pour chaque menuiserie, extrais l'image/schéma technique associé et fournis-le en base64 avec le préfixe data URI complet (ex: "data:image/png;base64,...")
 
 Réponds UNIQUEMENT avec le JSON, sans texte additionnel avant ou après.`;

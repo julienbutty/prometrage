@@ -67,7 +67,7 @@ Content-Type: multipart/form-data
       "success": 3,
       "errors": [],
       "aiMetadata": {
-        "model": "claude-sonnet-4-5-20250514",
+        "model": "claude-sonnet-4-20250514",  // Claude Sonnet 4 (pas 4.5)
         "confidence": 0.95,
         "tokensUsed": 1250,
         "warnings": [],
@@ -76,6 +76,8 @@ Content-Type: multipart/form-data
     }
   }
 }
+
+**Note** : Le champ `imageBase64` est présent dans les menuiseries mais reste `null` car l'extraction d'images n'est pas encore implémentée (infrastructure prête).
 ```
 
 **Response Error (400):**
@@ -192,7 +194,7 @@ Mise à jour du statut d'un projet.
 
 #### GET `/api/menuiseries/[id]`
 
-Détail complet d'une menuiserie avec analyse des écarts.
+Détail complet d'une menuiserie avec analyse des écarts et métadonnées de navigation.
 
 **Response:**
 
@@ -204,6 +206,7 @@ Détail complet d'une menuiserie avec analyse des écarts.
     "projetId": "clxyz123...",
     "repere": "Salon",
     "intitule": "Coulissant 2 vantaux",
+    "imageBase64": null,  // EN ATTENTE - Infrastructure prête mais extraction non implémentée
     "donneesOriginales": {
       "largeur": 3000,
       "hauteur": 2250,
@@ -227,14 +230,50 @@ Détail complet d'une menuiserie avec analyse des écarts.
         "valeurOriginale": 3000,
         "valeurModifiee": 3050,
         "pourcentage": 1.67,
-        "niveau": "info"
+        "niveau": "faible"  // "faible" < 5%, "moyen" 5-10%, "élevé" > 10%
       }
     ],
     "validee": false,
-    "dateModification": "2024-01-15T14:30:00Z"
+    "dateModification": "2024-01-15T14:30:00Z",
+    "navigation": {
+      "currentPosition": 2,
+      "total": 5,
+      "hasNext": true,
+      "hasPrevious": true,
+      "nextId": "clxyz789...",
+      "previousId": "clxyz123...",
+      "menuiseriesStatus": [
+        {
+          "id": "clxyz123...",
+          "repere": "Entrée",
+          "intitule": "Porte-fenêtre",
+          "isCompleted": true
+        },
+        {
+          "id": "clxyz456...",
+          "repere": "Salon",
+          "intitule": "Coulissant 2 vantaux",
+          "isCompleted": true
+        },
+        {
+          "id": "clxyz789...",
+          "repere": null,
+          "intitule": "Châssis fixe",
+          "isCompleted": false
+        }
+      ]
+    }
   }
 }
 ```
+
+**Métadonnées de navigation** :
+- `currentPosition` : Position actuelle (1-indexed)
+- `total` : Nombre total de menuiseries du projet
+- `hasNext` / `hasPrevious` : Booléens pour états des boutons
+- `nextId` / `previousId` : IDs pour navigation (null si pas de suivant/précédent)
+- `menuiseriesStatus` : Liste complète avec statuts de complétion
+  - `isCompleted` : `true` si `donneesModifiees !== null`
 
 #### PUT `/api/menuiseries/[id]`
 
@@ -300,37 +339,9 @@ Valide définitivement une menuiserie.
 
 ### Navigation
 
-#### GET `/api/projets/[projetId]/menuiseries/navigation`
+**Note** : Les métadonnées de navigation sont désormais incluses directement dans la réponse de `GET /api/menuiseries/[id]` (voir ci-dessus).
 
-Informations de navigation entre menuiseries d'un projet.
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "menuiseries": [
-      {
-        "id": "clxyz456...",
-        "repere": "Salon",
-        "intitule": "Coulissant",
-        "validee": true
-      },
-      {
-        "id": "clxyz789...",
-        "repere": null,
-        "intitule": "Châssis fixe",
-        "validee": false
-      }
-    ],
-    "current": 0,
-    "total": 3,
-    "nextId": "clxyz789...",
-    "previousId": null
-  }
-}
-```
+L'endpoint dédié `/api/projets/[projetId]/menuiseries/navigation` n'est plus nécessaire.
 
 ---
 

@@ -6,6 +6,7 @@ import {
   AIParsingError,
   AILowConfidenceError,
 } from "@/lib/pdf/ai-parser";
+import { extractImagesFromPDF } from "@/lib/pdf/image-extractor";
 
 /**
  * POST /api/upload/pdf
@@ -49,20 +50,31 @@ export async function POST(request: NextRequest) {
     const pdfBase64 = await pdfToBase64(file);
     console.log(`[Upload] PDF converted to base64`);
 
-    // 3. Parse with AI
+    // 3. Extract images from PDF
+    let extractedImages: string[] = [];
+    try {
+      extractedImages = await extractImagesFromPDF(pdfBase64);
+      console.log(`[Upload] Extracted ${extractedImages.length} images from PDF`);
+    } catch (error) {
+      console.error("[Upload] Image extraction failed:", error);
+      // Continue without images if extraction fails
+    }
+
+    // 4. Parse with AI
     const parsed = await parsePDFWithAI(pdfBase64);
     console.log(`[Upload] AI parsing complete`);
     console.log(`[Upload] Found ${parsed.menuiseries.length} menuiseries`);
 
-    // 4. Generate project reference
+    // 5. Generate project reference
     const clientName = parsed.metadata.clientInfo?.nom || "UNKNOWN";
     const reference = generateReference(clientName);
 
-    // 5. TODO: Upload PDF to storage (Uploadthing/Vercel Blob)
+    // 6. TODO: Upload PDF to storage (Uploadthing/Vercel Blob)
     // For now, we'll use a placeholder URL
     const pdfUrl = `placeholder://pdf/${file.name}`;
 
-    // 6. Create project in database
+    // 7. Create project in database
+    // Associate images with menuiseries based on order
     const projet = await prisma.projet.create({
       data: {
         reference,
@@ -76,6 +88,8 @@ export async function POST(request: NextRequest) {
           create: parsed.menuiseries.map((m, index) => ({
             repere: m.repere || `M${index + 1}`,
             intitule: m.intitule,
+            // Try to use AI-extracted image first, then fallback to extracted images by index
+            imageBase64: m.imageBase64 || extractedImages[index] || null,
             donneesOriginales: m as any, // Prisma Json type
             ordre: index,
           })),

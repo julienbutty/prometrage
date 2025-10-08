@@ -79,6 +79,8 @@
 - [x] API route GET /api/menuiseries/[id] avec infos projet
 - [x] API route PUT /api/menuiseries/[id] avec validation
 - [x] Fonction `calculateEcarts` avec niveaux d'alerte (faible/moyen/élevé)
+- [x] Métadonnées de navigation (total, position, hasNext/hasPrevious, nextId/previousId)
+- [x] Statut de complétion des menuiseries (isCompleted basé sur donneesModifiees)
 
 #### Formulaire Mobile
 
@@ -86,27 +88,52 @@
 - [x] Formulaire dynamique pour TOUS les champs du PDF
 - [x] Inputs numériques optimisés mobile (h-14, inputMode)
 - [x] Labels français automatiques pour tous les champs
+- [x] **UX Optimisée** : Progressive Disclosure (réduction 56% scroll)
+- [x] Composant `FieldWithDiff` avec calcul écart en temps réel
 - [x] Badges d'écarts colorés selon niveau (vert/orange/rouge)
+- [x] Sections collapsibles (Détails additionnels, Observations)
 - [x] Alerte visuelle si écarts détectés
 - [x] Sauvegarde avec TanStack Query mutation
 - [x] Toast notifications succès/erreur
-- [ ] Hook `useAutoSave` avec debounce (optionnel)
+- [ ] Hook `useAutoSave` avec debounce (optionnel - En attente)
 
 #### Composants formulaire
 
-- [ ] Input numérique mobile-optimisé
-- [ ] Select avec grandes options tactiles
-- [ ] Switch/Toggle pour options binaires
-- [ ] Composant `EcartAlert` avec couleurs
-- [ ] Boutons fixes en bas (mobile pattern)
+- [x] Input numérique mobile-optimisé (FieldWithDiff)
+- [x] Boutons fixes en bas (mobile pattern)
+- [x] Composant `FieldWithDiff` avec diff inline
+- [ ] Select avec grandes options tactiles (En attente)
+- [ ] Switch/Toggle pour options binaires (En attente)
 
-#### Navigation menuiseries
+#### Navigation menuiseries - ✅ COMPLÉTÉE
 
-- [ ] Swipe entre menuiseries (mobile)
-- [ ] Progress indicator (1/5, 2/5, etc.)
-- [ ] Boutons Précédent/Suivant
-- [ ] Marquage menuiseries complétées
-- [ ] Retour au projet avec confirmation si modifications
+- [x] **NavigationBar** : Composant avec Previous/Next buttons
+- [x] **Progress indicator** : Position actuelle (1/5, 2/5, etc.) dans header
+- [x] **Boutons Précédent/Suivant** avec disabled states
+- [x] **Marquage menuiseries complétées** :
+  - Cercles de progression visuels (vert = complété, bleu = actuel, gris = non fait)
+  - Compteur "X ✓" dans NavigationBar
+  - Badge "Complété" sur page projet
+  - Bordure verte sur cards complétées
+- [x] **Retour au projet** avec confirmation si modifications non sauvegardées
+- [x] **Tests** : 11 tests unitaires NavigationBar (PASS)
+- [ ] Swipe entre menuiseries (mobile - Bonus future)
+
+### 🖼️ Phase 3.5 : Extraction Images PDF - EN ATTENTE
+
+#### Infrastructure préparée (schema + API prêts)
+
+- [x] Champ `imageBase64` dans schema Prisma
+- [x] Migration DB appliquée
+- [x] API upload modifiée pour stocker images
+- [x] UI prête pour afficher images (Card "Schéma technique")
+- [x] Validation Zod mise à jour
+- [ ] **Extraction images** : Fonction retourne [] (TODO futur)
+  - Option A : pdf.js pour render pages en PNG
+  - Option B : pdf-lib pour extraire images embarquées
+  - Option C : Service externe
+
+**Décision** : Feature mise en pause, infrastructure prête pour implémentation future
 
 ### 🎨 Phase 4 : UI/UX Mobile (Semaine 4)
 

@@ -51,6 +51,7 @@ interface Menuiserie {
   id: string;
   repere: string | null;
   intitule: string;
+  imageBase64?: string | null;
   donneesOriginales: Record<string, any>;
   donneesModifiees?: Record<string, any>;
   ecarts?: Record<string, any>;
@@ -269,6 +270,26 @@ export default function MenuiseriePage() {
       </div>
 
       <div className="p-4 space-y-4">
+        {/* Image de la menuiserie */}
+        {menuiserie.imageBase64 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                🖼️ Schéma technique
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="relative w-full aspect-[4/3] bg-gray-50 rounded-lg overflow-hidden">
+                <img
+                  src={menuiserie.imageBase64}
+                  alt={`Schéma ${menuiserie.repere || menuiserie.intitule}`}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Dimensions principales (toujours visibles) */}
         <Card>
           <CardHeader>

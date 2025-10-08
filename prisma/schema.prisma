@@ -50,6 +50,9 @@ model Menuiserie {
   repere    String?  // ex: "Salon", "Chambre 1"
   intitule  String   // ex: "Coulissant 2 vantaux"
 
+  // Image de la menuiserie
+  imageBase64 String? @db.Text // Image extraite du PDF en base64
+
   // Données flexibles stockées en JSON
   // Permet d'ajouter des champs sans migration
   donneesOriginales Json  // Données extraites du PDF
