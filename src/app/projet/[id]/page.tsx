@@ -94,10 +94,10 @@ export default function ProjetDetailPage() {
   ).length;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Header Mobile */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header - Responsive */}
       <div className="bg-white border-b sticky top-0 z-10">
-        <div className="p-4 flex items-center gap-4">
+        <div className="max-w-7xl mx-auto p-4 lg:px-8 flex items-center gap-4">
           <Button
             variant="ghost"
             size="icon"
@@ -107,85 +107,122 @@ export default function ProjetDetailPage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-bold truncate">{data.reference}</h1>
-            <p className="text-sm text-gray-600 truncate">{data.clientNom}</p>
+            <h1 className="text-lg lg:text-2xl font-bold truncate">
+              {data.reference}
+            </h1>
+            <p className="text-sm lg:text-base text-gray-600 truncate">
+              {data.clientNom}
+            </p>
           </div>
+          <Badge
+            variant={
+              completedCount === data.menuiseries.length
+                ? "default"
+                : "secondary"
+            }
+            className="text-sm lg:text-base px-3 py-1"
+          >
+            {completedCount} / {data.menuiseries.length} ✓
+          </Badge>
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
-        {/* Client Info Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Informations client</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-start gap-3">
-              <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium">Adresse</p>
-                <p className="text-sm text-gray-600">
-                  {data.clientAdresse || "Non renseignée"}
-                </p>
-              </div>
+      {/* Main Content - Responsive Layout */}
+      <div className="max-w-7xl mx-auto p-4 lg:p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Sidebar Client Info - Desktop: sticky, Mobile: normal */}
+          <div className="lg:col-span-4 xl:col-span-3">
+            <div className="lg:sticky lg:top-24 space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base lg:text-lg">
+                    Informations client
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-1">
+                    <p className="text-xs text-gray-500 uppercase tracking-wide">
+                      Nom
+                    </p>
+                    <p className="text-sm font-medium">{data.clientNom}</p>
+                  </div>
+
+                  {data.clientAdresse && (
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        Adresse
+                      </p>
+                      <p className="text-sm">{data.clientAdresse}</p>
+                    </div>
+                  )}
+
+                  {data.clientTel && (
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide flex items-center gap-1">
+                        <Phone className="h-3 w-3" />
+                        Téléphone
+                      </p>
+                      <p className="text-sm">{data.clientTel}</p>
+                    </div>
+                  )}
+
+                  <div className="space-y-1 pt-2 border-t">
+                    <p className="text-xs text-gray-500 uppercase tracking-wide flex items-center gap-1">
+                      <FileText className="h-3 w-3" />
+                      PDF original
+                    </p>
+                    <p className="text-sm truncate" title={data.pdfOriginalNom}>
+                      {data.pdfOriginalNom}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* CTA Desktop */}
+              <Button
+                className="w-full h-12 text-base hidden lg:flex"
+                onClick={() => {
+                  if (data.menuiseries.length > 0) {
+                    router.push(`/menuiserie/${data.menuiseries[0].id}`);
+                  }
+                }}
+                disabled={data.menuiseries.length === 0}
+              >
+                Commencer la prise de côtes
+              </Button>
             </div>
-
-            {data.clientTel && (
-              <div className="flex items-start gap-3">
-                <Phone className="h-5 w-5 text-gray-500 mt-0.5" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">Téléphone</p>
-                  <p className="text-sm text-gray-600">{data.clientTel}</p>
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-start gap-3">
-              <FileText className="h-5 w-5 text-gray-500 mt-0.5" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium">PDF original</p>
-                <p className="text-sm text-gray-600 truncate">
-                  {data.pdfOriginalNom}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Menuiseries List */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold">
-              Menuiseries ({data.menuiseries.length})
-            </h2>
-            <Badge
-              variant={
-                completedCount === data.menuiseries.length
-                  ? "default"
-                  : "secondary"
-              }
-              className="text-sm"
-            >
-              {completedCount} / {data.menuiseries.length} ✓
-            </Badge>
           </div>
 
-          <div className="space-y-3">
-            {data.menuiseries.map((menuiserie) => {
-              const isCompleted = menuiserie.donneesModifiees !== null && menuiserie.donneesModifiees !== undefined;
+          {/* Menuiseries Grid - Responsive */}
+          <div className="lg:col-span-8 xl:col-span-9">
+            <div className="mb-4">
+              <h2 className="text-lg lg:text-xl font-semibold">
+                Menuiseries ({data.menuiseries.length})
+              </h2>
+              <p className="text-sm text-gray-600 mt-1">
+                Cliquez sur une menuiserie pour démarrer la prise de côtes
+              </p>
+            </div>
 
-              return (
-                <Card
-                  key={menuiserie.id}
-                  className={`cursor-pointer hover:shadow-md transition-shadow ${
-                    isCompleted ? "border-green-500 border-2" : ""
-                  }`}
-                  onClick={() => router.push(`/menuiserie/${menuiserie.id}`)}
-                >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
+            {/* Grid responsive: 1 col mobile, 2 cols tablet, 3 cols desktop */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {data.menuiseries.map((menuiserie) => {
+                const isCompleted =
+                  menuiserie.donneesModifiees !== null &&
+                  menuiserie.donneesModifiees !== undefined;
+
+                return (
+                  <Card
+                    key={menuiserie.id}
+                    className={`cursor-pointer hover:shadow-lg transition-all hover:-translate-y-1 ${
+                      isCompleted ? "border-green-500 border-2" : ""
+                    }`}
+                    onClick={() => router.push(`/menuiserie/${menuiserie.id}`)}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="space-y-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           {menuiserie.repere && (
                             <Badge variant="outline" className="text-xs">
                               {menuiserie.repere}
@@ -196,50 +233,52 @@ export default function ProjetDetailPage() {
                               {menuiserie.donneesOriginales.gamme}
                             </Badge>
                           )}
-                          {isCompleted && (
-                            <Badge
-                              variant="default"
-                              className="text-xs bg-green-600 hover:bg-green-700"
-                            >
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              Complété
-                            </Badge>
-                          )}
                         </div>
-                        <CardTitle className="text-base truncate">
+                        <CardTitle className="text-base line-clamp-2">
                           {menuiserie.intitule}
                         </CardTitle>
+                        {isCompleted && (
+                          <Badge
+                            variant="default"
+                            className="text-xs bg-green-600 hover:bg-green-700 w-fit"
+                          >
+                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            Complété
+                          </Badge>
+                        )}
                       </div>
-                    </div>
-                  </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>
-                      <p className="text-gray-600">Dimensions</p>
-                      <p className="font-medium">
-                        {menuiserie.donneesOriginales.largeur} ×{" "}
-                        {menuiserie.donneesOriginales.hauteur} mm
-                      </p>
-                    </div>
-                    {menuiserie.donneesOriginales.pose && (
-                      <div>
-                        <p className="text-gray-600">Pose</p>
-                        <p className="font-medium capitalize">
-                          {menuiserie.donneesOriginales.pose}
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="space-y-1">
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                          Dimensions
+                        </p>
+                        <p className="text-sm font-medium">
+                          {menuiserie.donneesOriginales.largeur} ×{" "}
+                          {menuiserie.donneesOriginales.hauteur} mm
                         </p>
                       </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-              );
-            })}
+                      {menuiserie.donneesOriginales.pose && (
+                        <div className="space-y-1">
+                          <p className="text-xs text-gray-500 uppercase tracking-wide">
+                            Pose
+                          </p>
+                          <p className="text-sm font-medium capitalize">
+                            {menuiserie.donneesOriginales.pose}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Fixed Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
+      {/* Fixed Bottom Button - Mobile Only */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
         <Button
           className="w-full h-14 text-lg"
           onClick={() => {
@@ -252,6 +291,9 @@ export default function ProjetDetailPage() {
           Commencer la prise de côtes
         </Button>
       </div>
+
+      {/* Bottom padding for mobile fixed button */}
+      <div className="lg:hidden h-24" />
     </div>
   );
 }
