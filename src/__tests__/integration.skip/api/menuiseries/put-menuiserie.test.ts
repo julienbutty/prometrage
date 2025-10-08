@@ -55,7 +55,7 @@ describe("PUT /api/menuiseries/[id]", () => {
     };
 
     const response = await fetch(
-      `http://localhost:3000/api/menuiseries/${menuiserieId}`,
+      `http://localhost:3001/api/menuiseries/${menuiserieId}`,
       {
         method: "PUT",
         headers: {
@@ -91,7 +91,7 @@ describe("PUT /api/menuiseries/[id]", () => {
 
   it("should return 404 for non-existent menuiserie", async () => {
     const response = await fetch(
-      "http://localhost:3000/api/menuiseries/fake-id-123",
+      "http://localhost:3001/api/menuiseries/fake-id-123",
       {
         method: "PUT",
         headers: {
@@ -112,7 +112,7 @@ describe("PUT /api/menuiseries/[id]", () => {
 
   it("should validate input data", async () => {
     const response = await fetch(
-      `http://localhost:3000/api/menuiseries/${menuiserieId}`,
+      `http://localhost:3001/api/menuiseries/${menuiserieId}`,
       {
         method: "PUT",
         headers: {

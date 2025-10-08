@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, FileText, MapPin, Phone } from "lucide-react";
+import { ArrowLeft, FileText, MapPin, Phone, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,6 +24,7 @@ interface Menuiserie {
     pose?: string;
     [key: string]: any;
   };
+  donneesModifiees?: Record<string, any> | null;
   ordre: number;
 }
 
@@ -87,6 +88,10 @@ export default function ProjetDetailPage() {
       </div>
     );
   }
+
+  const completedCount = data.menuiseries.filter(
+    (m) => m.donneesModifiees !== null && m.donneesModifiees !== undefined
+  ).length;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -153,36 +158,60 @@ export default function ProjetDetailPage() {
             <h2 className="text-lg font-semibold">
               Menuiseries ({data.menuiseries.length})
             </h2>
+            <Badge
+              variant={
+                completedCount === data.menuiseries.length
+                  ? "default"
+                  : "secondary"
+              }
+              className="text-sm"
+            >
+              {completedCount} / {data.menuiseries.length} ✓
+            </Badge>
           </div>
 
           <div className="space-y-3">
-            {data.menuiseries.map((menuiserie) => (
-              <Card
-                key={menuiserie.id}
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => router.push(`/menuiserie/${menuiserie.id}`)}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        {menuiserie.repere && (
-                          <Badge variant="outline" className="text-xs">
-                            {menuiserie.repere}
-                          </Badge>
-                        )}
-                        {menuiserie.donneesOriginales.gamme && (
-                          <Badge className="text-xs">
-                            {menuiserie.donneesOriginales.gamme}
-                          </Badge>
-                        )}
+            {data.menuiseries.map((menuiserie) => {
+              const isCompleted = menuiserie.donneesModifiees !== null && menuiserie.donneesModifiees !== undefined;
+
+              return (
+                <Card
+                  key={menuiserie.id}
+                  className={`cursor-pointer hover:shadow-md transition-shadow ${
+                    isCompleted ? "border-green-500 border-2" : ""
+                  }`}
+                  onClick={() => router.push(`/menuiserie/${menuiserie.id}`)}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          {menuiserie.repere && (
+                            <Badge variant="outline" className="text-xs">
+                              {menuiserie.repere}
+                            </Badge>
+                          )}
+                          {menuiserie.donneesOriginales.gamme && (
+                            <Badge className="text-xs">
+                              {menuiserie.donneesOriginales.gamme}
+                            </Badge>
+                          )}
+                          {isCompleted && (
+                            <Badge
+                              variant="default"
+                              className="text-xs bg-green-600 hover:bg-green-700"
+                            >
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              Complété
+                            </Badge>
+                          )}
+                        </div>
+                        <CardTitle className="text-base truncate">
+                          {menuiserie.intitule}
+                        </CardTitle>
                       </div>
-                      <CardTitle className="text-base truncate">
-                        {menuiserie.intitule}
-                      </CardTitle>
                     </div>
-                  </div>
-                </CardHeader>
+                  </CardHeader>
                 <CardContent className="pt-0">
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
@@ -203,7 +232,8 @@ export default function ProjetDetailPage() {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

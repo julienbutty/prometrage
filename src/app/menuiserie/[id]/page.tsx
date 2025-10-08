@@ -22,6 +22,13 @@ import {
 import { FieldWithDiff } from "@/components/forms/FieldWithDiff";
 import { NavigationBar } from "@/components/menuiseries/NavigationBar";
 
+interface MenuiserieStatus {
+  id: string;
+  repere: string | null;
+  intitule: string;
+  isCompleted: boolean;
+}
+
 interface NavigationInfo {
   total: number;
   currentIndex: number;
@@ -37,6 +44,7 @@ interface NavigationInfo {
     ordre: number;
     donneesModifiees: any;
   }>;
+  menuiseriesStatus: MenuiserieStatus[];
 }
 
 interface Menuiserie {
@@ -395,6 +403,7 @@ export default function MenuiseriePage() {
             currentPosition={menuiserie.navigation.currentPosition}
             total={menuiserie.navigation.total}
             disabled={updateMutation.isPending}
+            menuiseriesStatus={menuiserie.navigation.menuiseriesStatus}
           />
 
           {/* Save Button */}

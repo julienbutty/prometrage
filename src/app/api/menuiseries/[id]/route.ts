@@ -64,6 +64,14 @@ export async function GET(
     // Find current index
     const currentIndex = allMenuiseries.findIndex((m) => m.id === id);
 
+    // Map menuiseries to status format with completion flag
+    const menuiseriesStatus = allMenuiseries.map((m) => ({
+      id: m.id,
+      repere: m.repere,
+      intitule: m.intitule,
+      isCompleted: m.donneesModifiees !== null && Object.keys(m.donneesModifiees as Record<string, any>).length > 0,
+    }));
+
     return NextResponse.json({
       success: true,
       data: {
@@ -77,6 +85,7 @@ export async function GET(
           nextId: currentIndex < allMenuiseries.length - 1 ? allMenuiseries[currentIndex + 1].id : null,
           previousId: currentIndex > 0 ? allMenuiseries[currentIndex - 1].id : null,
           allMenuiseries: allMenuiseries,
+          menuiseriesStatus: menuiseriesStatus,
         },
       },
     });
