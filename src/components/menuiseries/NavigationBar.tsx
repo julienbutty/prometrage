@@ -31,15 +31,15 @@ export function NavigationBar({
 
   return (
     <div className="space-y-3">
-      {/* Progress Dots */}
+      {/* Progress Dots - hauteur fixe pour éviter le décalage */}
       {menuiseriesStatus.length > 0 && (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex h-8 items-center justify-center gap-2">
           {menuiseriesStatus.map((menuiserie, index) => {
             const isCurrent = index + 1 === currentPosition;
             const isCompleted = menuiserie.isCompleted;
 
             return (
-              <div key={menuiserie.id} className="flex flex-col items-center">
+              <div key={menuiserie.id} className="relative flex h-8 items-center">
                 {isCompleted ? (
                   <CheckCircle2
                     className={`h-6 w-6 ${
@@ -57,8 +57,9 @@ export function NavigationBar({
                     }`}
                   />
                 )}
+                {/* Point indicateur positionné en absolu pour ne pas décaler */}
                 {isCurrent && (
-                  <div className="mt-1 h-1 w-1 rounded-full bg-blue-600" />
+                  <div className="absolute left-1/2 bottom-0 h-1 w-1 -translate-x-1/2 rounded-full bg-blue-600" />
                 )}
               </div>
             );
@@ -73,16 +74,16 @@ export function NavigationBar({
           size="lg"
           onClick={onPrevious}
           disabled={!hasPrevious || disabled}
-          className="flex-1 h-14"
+          className="h-14 flex-1"
         >
           <ArrowLeft className="mr-2 h-5 w-5" />
           Précédente
         </Button>
 
-        <div className="px-4 py-2 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 whitespace-nowrap">
+        <div className="flex flex-col items-center whitespace-nowrap rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700">
           <div className="text-center">{currentPosition} / {total}</div>
           {menuiseriesStatus.length > 0 && (
-            <div className="text-xs text-green-600 font-semibold">
+            <div className="text-xs font-semibold text-green-600">
               {completedCount} ✓
             </div>
           )}
@@ -93,7 +94,7 @@ export function NavigationBar({
           size="lg"
           onClick={onNext}
           disabled={!hasNext || disabled}
-          className="flex-1 h-14"
+          className="h-14 flex-1"
         >
           Suivante
           <ArrowRight className="ml-2 h-5 w-5" />

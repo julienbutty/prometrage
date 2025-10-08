@@ -8,12 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Collapsible,
   CollapsibleContent,
@@ -194,8 +189,8 @@ export default function MenuiseriePage() {
     return (
       <div className="min-h-screen p-4">
         <div className="animate-pulse space-y-4">
-          <div className="h-10 w-32 bg-gray-200 rounded" />
-          <div className="h-64 bg-gray-200 rounded" />
+          <div className="h-10 w-32 rounded bg-gray-200" />
+          <div className="h-64 rounded bg-gray-200" />
         </div>
       </div>
     );
@@ -203,7 +198,7 @@ export default function MenuiseriePage() {
 
   if (!menuiserie) {
     return (
-      <div className="min-h-screen p-4 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Erreur</CardTitle>
@@ -234,208 +229,248 @@ export default function MenuiseriePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Header Mobile */}
-      <div className="bg-white border-b sticky top-0 z-10 shadow-sm">
-        <div className="p-4 flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              if (hasUnsavedChanges) {
-                const confirm = window.confirm(
-                  "Vous avez des modifications non sauvegardées. Voulez-vous continuer sans sauvegarder ?"
-                );
-                if (!confirm) return;
-              }
-              router.push(`/projet/${menuiserie.projet.id}`);
-            }}
-            className="h-10 w-10"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg font-bold truncate">
-                {menuiserie.repere || "Menuiserie"}
-              </h1>
-              <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded whitespace-nowrap">
-                {menuiserie.navigation.currentPosition}/{menuiserie.navigation.total}
-              </span>
+      {/* Header Responsive */}
+      <div className="sticky top-0 z-10 border-b bg-white shadow-sm">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex items-center gap-4 p-4 lg:px-8">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                if (hasUnsavedChanges) {
+                  const confirm = window.confirm(
+                    "Vous avez des modifications non sauvegardées. Voulez-vous continuer sans sauvegarder ?"
+                  );
+                  if (!confirm) return;
+                }
+                router.push(`/projet/${menuiserie.projet.id}`);
+              }}
+              className="h-10 w-10 lg:h-12 lg:w-12"
+            >
+              <ArrowLeft className="h-5 w-5 lg:h-6 lg:w-6" />
+            </Button>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 lg:gap-3">
+                <h1 className="truncate text-lg font-bold lg:text-2xl">
+                  {menuiserie.repere || "Menuiserie"}
+                </h1>
+                <span className="rounded bg-gray-100 px-2 py-1 text-xs font-medium whitespace-nowrap text-gray-500 lg:px-3 lg:py-1.5 lg:text-sm">
+                  {menuiserie.navigation.currentPosition}/
+                  {menuiserie.navigation.total}
+                </span>
+              </div>
+              <p className="truncate text-sm text-gray-600 lg:text-base lg:mt-1">
+                {menuiserie.intitule}
+              </p>
             </div>
-            <p className="text-sm text-gray-600 truncate">
-              {menuiserie.intitule}
-            </p>
           </div>
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
-        {/* Image de la menuiserie */}
-        {menuiserie.imageBase64 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                🖼️ Schéma technique
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="relative w-full aspect-[4/3] bg-gray-50 rounded-lg overflow-hidden">
-                <img
-                  src={menuiserie.imageBase64}
-                  alt={`Schéma ${menuiserie.repere || menuiserie.intitule}`}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Dimensions principales (toujours visibles) */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              📏 Dimensions principales
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {criticalNumericFields.map((key) => (
-              <FieldWithDiff
-                key={key}
-                id={key}
-                label={FIELD_LABELS[key] || key}
-                value={formData[key] ?? ""}
-                originalValue={menuiserie.donneesOriginales[key]}
-                onChange={(value) => handleFieldChange(key, value)}
-                type="number"
-                unit="mm"
-              />
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Détails additionnels (collapsed) */}
-        {(otherNumericFields.length > 0 || textFields.length > 0) && (
-          <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
-            <Card>
-              <CollapsibleTrigger asChild>
-                <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      📋 Détails additionnels
-                      <span className="text-xs text-gray-500 font-normal">
-                        ({otherNumericFields.length + textFields.length} champs)
-                      </span>
-                    </CardTitle>
-                    {detailsOpen ? (
-                      <ChevronUp className="h-5 w-5 text-gray-500" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-gray-500" />
-                    )}
-                  </div>
+      <div className="mx-auto max-w-7xl space-y-4 p-4 lg:p-8">
+        {/* Layout Desktop : 2 colonnes (Image | Formulaires) */}
+        <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+          {/* Colonne gauche : Image (sticky sur desktop) */}
+          {menuiserie.imageBase64 && (
+            <div className="lg:col-span-5">
+              <Card className="lg:sticky lg:top-24">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+                    🖼️ Schéma technique
+                  </CardTitle>
                 </CardHeader>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <CardContent className="space-y-4 pt-0">
-                  {/* Other numeric fields */}
-                  {otherNumericFields.map((key) => (
-                    <FieldWithDiff
-                      key={key}
-                      id={key}
-                      label={FIELD_LABELS[key] || key}
-                      value={formData[key] ?? ""}
-                      originalValue={menuiserie.donneesOriginales[key]}
-                      onChange={(value) => handleFieldChange(key, value)}
-                      type="number"
-                      unit="mm"
-                    />
-                  ))}
+                <CardContent>
+                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-gray-50">
+                    {/* <img
+                      src={menuiserie.imageBase64}
+                      alt={`Schéma ${menuiserie.repere || menuiserie.intitule}`}
+                      className="w-full h-full object-contain"
+                    /> */}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
-                  {/* Text fields */}
-                  {textFields.map((key) => (
-                    <div key={key} className="space-y-2">
-                      <Label htmlFor={key} className="text-base font-medium">
-                        {FIELD_LABELS[key] || key}
-                      </Label>
-                      <div className="text-xs text-gray-600 mb-1">
-                        PDF: {String(menuiserie.donneesOriginales[key])}
-                      </div>
-                      <Input
+          {/* Colonne droite : Formulaires */}
+          <div className={`space-y-4 ${menuiserie.imageBase64 ? 'lg:col-span-7' : 'lg:col-span-12'} mt-4 lg:mt-0`}>
+            {/* Dimensions principales (toujours visibles) */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+                  📏 Dimensions principales
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 lg:space-y-6">
+                {/* Grille responsive pour les champs */}
+                <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
+                  {criticalNumericFields.map((key) => (
+                    <div key={key} className="lg:col-span-1">
+                      <FieldWithDiff
                         id={key}
+                        label={FIELD_LABELS[key] || key}
                         value={formData[key] ?? ""}
-                        onChange={(e) => handleFieldChange(key, e.target.value)}
-                        className="h-14"
-                        placeholder={String(menuiserie.donneesOriginales[key])}
+                        originalValue={menuiserie.donneesOriginales[key]}
+                        onChange={(value) => handleFieldChange(key, value)}
+                        type="number"
+                        unit="mm"
                       />
                     </div>
                   ))}
-                </CardContent>
-              </CollapsibleContent>
-            </Card>
-          </Collapsible>
-        )}
-
-        {/* Observations (collapsed) */}
-        <Collapsible
-          open={observationsOpen}
-          onOpenChange={setObservationsOpen}
-        >
-          <Card>
-            <CollapsibleTrigger asChild>
-              <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    💬 Observations
-                    <span className="text-xs text-gray-500 font-normal">
-                      (optionnel)
-                    </span>
-                  </CardTitle>
-                  {observationsOpen ? (
-                    <ChevronUp className="h-5 w-5 text-gray-500" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-500" />
-                  )}
                 </div>
-              </CardHeader>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <CardContent className="pt-0">
-                <Input
-                  id="observations"
-                  value={observations}
-                  onChange={(e) => setObservations(e.target.value)}
-                  className="h-14"
-                  placeholder="Remarques particulières, problèmes constatés..."
-                />
               </CardContent>
-            </CollapsibleContent>
-          </Card>
-        </Collapsible>
+            </Card>
+
+            {/* Détails additionnels (collapsed) */}
+            {(otherNumericFields.length > 0 || textFields.length > 0) && (
+              <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
+                <Card>
+                  <CollapsibleTrigger asChild>
+                    <CardHeader className="cursor-pointer transition-colors hover:bg-gray-50">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+                          📋 Détails additionnels
+                          <span className="text-xs font-normal text-gray-500 lg:text-sm">
+                            ({otherNumericFields.length + textFields.length} champs)
+                          </span>
+                        </CardTitle>
+                        {detailsOpen ? (
+                          <ChevronUp className="h-5 w-5 text-gray-500" />
+                        ) : (
+                          <ChevronDown className="h-5 w-5 text-gray-500" />
+                        )}
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <CardContent className="space-y-4 pt-0 lg:space-y-6">
+                      {/* Grille responsive */}
+                      <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
+                        {/* Other numeric fields */}
+                        {otherNumericFields.map((key) => (
+                          <div key={key} className="lg:col-span-1">
+                            <FieldWithDiff
+                              id={key}
+                              label={FIELD_LABELS[key] || key}
+                              value={formData[key] ?? ""}
+                              originalValue={menuiserie.donneesOriginales[key]}
+                              onChange={(value) => handleFieldChange(key, value)}
+                              type="number"
+                              unit="mm"
+                            />
+                          </div>
+                        ))}
+
+                        {/* Text fields */}
+                        {textFields.map((key) => (
+                          <div key={key} className="space-y-2 lg:col-span-1">
+                            <Label htmlFor={key} className="text-base font-medium">
+                              {FIELD_LABELS[key] || key}
+                            </Label>
+                            <div className="mb-1 text-xs text-gray-600">
+                              PDF: {String(menuiserie.donneesOriginales[key])}
+                            </div>
+                            <Input
+                              id={key}
+                              value={formData[key] ?? ""}
+                              onChange={(e) => handleFieldChange(key, e.target.value)}
+                              className="h-14"
+                              placeholder={String(menuiserie.donneesOriginales[key])}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+            )}
+
+            {/* Observations (collapsed) */}
+            <Collapsible open={observationsOpen} onOpenChange={setObservationsOpen}>
+              <Card>
+                <CollapsibleTrigger asChild>
+                  <CardHeader className="cursor-pointer transition-colors hover:bg-gray-50">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+                        💬 Observations
+                        <span className="text-xs font-normal text-gray-500 lg:text-sm">
+                          (optionnel)
+                        </span>
+                      </CardTitle>
+                      {observationsOpen ? (
+                        <ChevronUp className="h-5 w-5 text-gray-500" />
+                      ) : (
+                        <ChevronDown className="h-5 w-5 text-gray-500" />
+                      )}
+                    </div>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent className="pt-0">
+                    <Input
+                      id="observations"
+                      value={observations}
+                      onChange={(e) => setObservations(e.target.value)}
+                      className="h-14"
+                      placeholder="Remarques particulières, problèmes constatés..."
+                    />
+                  </CardContent>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>
+          </div>
+        </div>
       </div>
 
       {/* Fixed Bottom Navigation + Save */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
-        <div className="p-4 space-y-3">
-          {/* Navigation Bar */}
-          <NavigationBar
-            hasNext={menuiserie.navigation.hasNext}
-            hasPrevious={menuiserie.navigation.hasPrevious}
-            onNext={handleNext}
-            onPrevious={handlePrevious}
-            currentPosition={menuiserie.navigation.currentPosition}
-            total={menuiserie.navigation.total}
-            disabled={updateMutation.isPending}
-            menuiseriesStatus={menuiserie.navigation.menuiseriesStatus}
-          />
+      <div className="fixed right-0 bottom-0 left-0 border-t bg-white shadow-lg">
+        <div className="mx-auto max-w-7xl px-4 py-4 lg:px-8 lg:py-6">
+          {/* Mobile : Stack vertical */}
+          <div className="flex flex-col gap-3 lg:hidden">
+            <NavigationBar
+              hasNext={menuiserie.navigation.hasNext}
+              hasPrevious={menuiserie.navigation.hasPrevious}
+              onNext={handleNext}
+              onPrevious={handlePrevious}
+              currentPosition={menuiserie.navigation.currentPosition}
+              total={menuiserie.navigation.total}
+              disabled={updateMutation.isPending}
+              menuiseriesStatus={menuiserie.navigation.menuiseriesStatus}
+            />
+            <Button
+              className="h-14 w-full text-lg"
+              onClick={handleSave}
+              disabled={updateMutation.isPending}
+            >
+              <Save className="mr-2 h-5 w-5" />
+              {updateMutation.isPending ? "Enregistrement..." : "Enregistrer"}
+            </Button>
+          </div>
 
-          {/* Save Button */}
-          <Button
-            className="w-full h-14 text-lg"
-            onClick={handleSave}
-            disabled={updateMutation.isPending}
-          >
-            <Save className="mr-2 h-5 w-5" />
-            {updateMutation.isPending ? "Enregistrement..." : "Enregistrer"}
-          </Button>
+          {/* Desktop : Layout horizontal aligné */}
+          <div className="hidden lg:flex lg:items-end lg:gap-6">
+            <div className="flex-1">
+              <NavigationBar
+                hasNext={menuiserie.navigation.hasNext}
+                hasPrevious={menuiserie.navigation.hasPrevious}
+                onNext={handleNext}
+                onPrevious={handlePrevious}
+                currentPosition={menuiserie.navigation.currentPosition}
+                total={menuiserie.navigation.total}
+                disabled={updateMutation.isPending}
+                menuiseriesStatus={menuiserie.navigation.menuiseriesStatus}
+              />
+            </div>
+            <Button
+              className="h-14 whitespace-nowrap px-8 text-lg"
+              onClick={handleSave}
+              disabled={updateMutation.isPending}
+            >
+              <Save className="mr-2 h-5 w-5" />
+              {updateMutation.isPending ? "Enregistrement..." : "Enregistrer"}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
