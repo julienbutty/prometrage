@@ -70,6 +70,41 @@
 - [x] Navigation vers menuiserie individuelle
 - [x] Bouton CTA fixe en bas "Commencer la prise de côtes"
 
+### 🏗️ Phase 2.5 : Gestion Clients - NOUVELLE PHASE
+
+#### Refactoring Base de Données
+
+- [ ] Migration Prisma : Création table `Client`
+- [ ] Migration Prisma : Refactoring table `Projet` (ajout `clientId`, suppression champs client)
+- [ ] Mise à jour seed data avec clients
+- [ ] Tests : Relations Client -> Projet (cascade delete)
+
+#### API Clients
+
+- [ ] **TDD** : Tests API GET /api/clients
+- [ ] **TDD** : Tests API GET /api/clients/[id]
+- [ ] **TDD** : Tests API PUT /api/clients/[id]
+- [ ] API route GET /api/clients (liste avec pagination)
+- [ ] API route GET /api/clients/[id] (détail + tous projets)
+- [ ] API route PUT /api/clients/[id] (mise à jour infos)
+- [ ] Fonction `findOrCreateClient` (détection par email)
+
+#### Refactoring Upload PDF
+
+- [ ] Mise à jour prompt IA : extraction clientInfo + projetInfo séparés
+- [ ] Mise à jour validation Zod : metadata.clientInfo + metadata.projetInfo
+- [ ] Logique upsert client lors upload (findOrCreateClient)
+- [ ] API upload retourne client (avec flag `isNew`)
+- [ ] Tests parsing avec infos client détectées
+
+#### UI Clients
+
+- [ ] Page `/clients` : Liste des clients
+- [ ] Page `/clients/[id]` : Détail client avec tous ses projets
+- [ ] Formulaire édition client
+- [ ] Navigation client -> projets -> menuiseries
+- [ ] Badge "Nouveau client" si détecté à l'upload
+
 ### 📝 Phase 3 : Formulaire Prise de Côtes (Semaine 3) - COMPLÉTÉE ✅
 
 #### API Menuiseries

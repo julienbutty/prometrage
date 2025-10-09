@@ -29,14 +29,10 @@ POST /api/upload/pdf
 Content-Type: multipart/form-data
 
 {
-  "file": <PDF file>,
-  "client": {
-    "nom": "KOMPANIETZ",
-    "adresse": "37 Chemin du Cuvier",
-    "tel": "06 25 91 01 48",
-    "email": "paul.kompanietz@gmail.com"
-  }
+  "file": <PDF file>
 }
+
+Note: Les infos client et adresse sont extraites automatiquement du PDF par l'IA
 ```
 
 **Response Success (201):**
@@ -45,9 +41,20 @@ Content-Type: multipart/form-data
 {
   "success": true,
   "data": {
-    "projetId": "clxyz123...",
-    "reference": "KOMP-2024-001",
-    "pdfUrl": "https://storage.../file.pdf",
+    "client": {
+      "id": "clxyz000...",
+      "nom": "DUPONT",
+      "email": "jean.dupont@example.com",
+      "tel": "06 12 34 56 78",
+      "isNew": false  // true si créé, false si existant (détecté par email)
+    },
+    "projet": {
+      "id": "clxyz123...",
+      "reference": "DUPO-2024-001",
+      "clientId": "clxyz000...",
+      "adresse": "15 Rue des Lilas",
+      "pdfUrl": "https://storage.../file.pdf"
+    },
     "menuiseries": [
       {
         "id": "clxyz456...",
@@ -67,7 +74,7 @@ Content-Type: multipart/form-data
       "success": 3,
       "errors": [],
       "aiMetadata": {
-        "model": "claude-sonnet-4-20250514",  // Claude Sonnet 4 (pas 4.5)
+        "model": "claude-sonnet-4-20250514",
         "confidence": 0.95,
         "tokensUsed": 1250,
         "warnings": [],
@@ -97,6 +104,113 @@ Content-Type: multipart/form-data
 
 ---
 
+### Clients
+
+#### GET `/api/clients`
+
+Liste tous les clients avec nombre de projets.
+
+**Query Parameters:**
+
+- `page` (number): Page courante (défaut: 1)
+- `limit` (number): Nombre par page (défaut: 20)
+- `search` (string): Recherche dans nom ou email
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "clxyz000...",
+      "nom": "DUPONT",
+      "email": "jean.dupont@example.com",
+      "tel": "06 12 34 56 78",
+      "projetsCount": 3,
+      "lastProjet": "2024-01-15T10:00:00Z"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 15,
+    "totalPages": 1
+  }
+}
+```
+
+#### GET `/api/clients/[id]`
+
+Détail d'un client avec tous ses projets.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "clxyz000...",
+    "nom": "DUPONT",
+    "email": "jean.dupont@example.com",
+    "tel": "06 12 34 56 78",
+    "projets": [
+      {
+        "id": "clxyz123...",
+        "reference": "DUPO-2024-001",
+        "adresse": "15 Rue des Lilas",
+        "statut": "EN_COURS",
+        "menuiseriesCount": 3,
+        "dateUpload": "2024-01-15T10:00:00Z"
+      },
+      {
+        "id": "clxyz789...",
+        "reference": "DUPO-2024-002",
+        "adresse": "42 Avenue des Fleurs",
+        "statut": "VALIDE",
+        "menuiseriesCount": 5,
+        "dateUpload": "2024-02-10T14:30:00Z"
+      }
+    ],
+    "stats": {
+      "totalProjets": 2,
+      "projetsEnCours": 1,
+      "projetsValides": 1
+    }
+  }
+}
+```
+
+#### PUT `/api/clients/[id]`
+
+Mise à jour des infos client.
+
+**Request:**
+
+```json
+{
+  "nom": "DUPONT Jean",
+  "email": "jean.dupont@example.com",
+  "tel": "06 12 34 56 78"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "clxyz000...",
+    "nom": "DUPONT Jean",
+    "email": "jean.dupont@example.com",
+    "tel": "06 12 34 56 78"
+  }
+}
+```
+
+---
+
 ### Projets
 
 #### GET `/api/projets`
@@ -118,9 +232,12 @@ Liste tous les projets avec pagination.
   "data": [
     {
       "id": "clxyz123...",
-      "reference": "KOMP-2024-001",
+      "reference": "DUPO-2024-001",
+      "adresse": "15 Rue des Lilas",
       "client": {
-        "nom": "KOMPANIETZ"
+        "id": "clxyz000...",
+        "nom": "DUPONT",
+        "email": "jean.dupont@example.com"
       },
       "statut": "EN_COURS",
       "menuiseriesCount": 3,
@@ -148,12 +265,13 @@ Détail d'un projet avec ses menuiseries.
   "success": true,
   "data": {
     "id": "clxyz123...",
-    "reference": "KOMP-2024-001",
+    "reference": "DUPO-2024-001",
+    "adresse": "15 Rue des Lilas",
     "client": {
-      "nom": "KOMPANIETZ",
-      "adresse": "37 Chemin du Cuvier",
-      "tel": "06 25 91 01 48",
-      "email": "paul.kompanietz@gmail.com"
+      "id": "clxyz000...",
+      "nom": "DUPONT",
+      "email": "jean.dupont@example.com",
+      "tel": "06 12 34 56 78"
     },
     "pdfUrl": "https://storage.../file.pdf",
     "statut": "EN_COURS",
@@ -184,7 +302,8 @@ Mise à jour du statut d'un projet.
 
 ```json
 {
-  "statut": "VALIDE"
+  "statut": "VALIDE",
+  "adresse": "15 Rue des Lilas (modifiée)"  // Optionnel - mise à jour adresse chantier
 }
 ```
 
@@ -355,7 +474,7 @@ Génère un PDF avec toutes les données du projet.
 
 ```
 Content-Type: application/pdf
-Content-Disposition: attachment; filename="KOMP-2024-001.pdf"
+Content-Disposition: attachment; filename="DUPO-2024-001.pdf"
 
 [Binary PDF data]
 ```
@@ -368,7 +487,7 @@ Export Excel avec comparaison original/modifié.
 
 ```
 Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-Content-Disposition: attachment; filename="KOMP-2024-001.xlsx"
+Content-Disposition: attachment; filename="DUPO-2024-001.xlsx"
 
 [Binary Excel data]
 ```

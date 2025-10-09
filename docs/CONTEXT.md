@@ -34,15 +34,36 @@ generator client {
   output   = "../src/generated/prisma"
 }
 
+// Client - Centralisation des infos client
+// Un client peut avoir plusieurs projets (domiciles différents)
+model Client {
+  id       String    @id @default(cuid())
+  nom      String
+  email    String?   @unique
+  tel      String?
+
+  // Relations
+  projets  Projet[]
+
+  // Métadonnées
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([nom])
+  @@index([email])
+}
+
+// Projet - Un projet = un chantier à une adresse donnée
 model Projet {
   id        String   @id @default(cuid())
-  reference String   @unique // ex: "KOMP-2024-001"
+  reference String   @unique // ex: "DUPO-2024-001"
 
-  // Informations client
-  clientNom     String
-  clientAdresse String?
-  clientTel     String?
-  clientEmail   String?
+  // Relation client
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  // Adresse du chantier (spécifique à ce projet)
+  adresse   String?  // ex: "15 Rue des Lilas"
 
   // Fichier PDF original
   pdfUrl        String?
@@ -55,8 +76,8 @@ model Projet {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([clientId])
   @@index([reference])
-  @@index([clientNom])
   @@index([createdAt])
 }
 
@@ -105,20 +126,25 @@ model Menuiserie {
 
 ```mermaid
 graph TD
-    A[Upload PDF] --> B[Parsing automatique]
-    B --> C[Création projet]
-    C --> D[Liste menuiseries]
-    D --> E[Sélection menuiserie]
-    E --> F[Formulaire prise de côtes]
-    F --> G{Modifications?}
-    G -->|Oui| H[Calcul écarts]
-    G -->|Non| I[Validation]
-    H --> J[Alertes visuelles]
-    J --> I
-    I --> K[Sauvegarde]
-    K --> L{Autres menuiseries?}
-    L -->|Oui| E
-    L -->|Non| M[Projet complété]
+    A[Upload PDF] --> B[Parsing automatique IA]
+    B --> C[Extraction infos client + menuiseries]
+    C --> D{Client existe?}
+    D -->|Email trouvé| E[Récupérer client existant]
+    D -->|Nouveau| F[Créer nouveau client]
+    E --> G[Créer projet + adresse chantier]
+    F --> G
+    G --> H[Liste menuiseries]
+    H --> I[Sélection menuiserie]
+    I --> J[Formulaire prise de côtes]
+    J --> K{Modifications?}
+    K -->|Oui| L[Calcul écarts]
+    K -->|Non| M[Validation]
+    L --> N[Alertes visuelles]
+    N --> M
+    M --> O[Sauvegarde]
+    O --> P{Autres menuiseries?}
+    P -->|Oui| I
+    P -->|Non| Q[Projet complété]
 ```
 
 ### 📝 Données à extraire du PDF
@@ -231,7 +257,16 @@ async function parsePDFWithAI(pdfFile: File): Promise<ParsedData> {
     throw new Error("AI_LOW_CONFIDENCE - Vérification manuelle requise");
   }
 
-  return validated;
+  // 5. Extraction infos client
+  const clientInfo = validated.metadata.clientInfo;
+  const projetInfo = validated.metadata.projetInfo;
+
+  return {
+    menuiseries: validated.menuiseries,
+    client: clientInfo,
+    adresse: projetInfo.adresse,
+    metadata: validated.metadata
+  };
 }
 ```
 

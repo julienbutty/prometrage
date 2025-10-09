@@ -20,13 +20,13 @@ async function main() {
 
   const projet1 = await prisma.projet.create({
     data: {
-      reference: "KOMP-2024-001",
-      clientNom: "KOMPANIETZ",
-      clientAdresse: "37 Chemin du Cuvier, 06800 Cagnes-sur-Mer",
-      clientTel: "06 25 91 01 48",
-      clientEmail: "paul.kompanietz@gmail.com",
-      pdfUrl: "https://storage.example.com/komp-2024-001.pdf",
-      pdfOriginalNom: "fiche-metreur-kompanietz.pdf",
+      reference: "DUPO-2024-001",
+      clientNom: "DUPONT",
+      clientAdresse: "15 Rue des Lilas, 75018 Paris",
+      clientTel: "06 12 34 56 78",
+      clientEmail: "jean.dupont@example.com",
+      pdfUrl: "https://storage.example.com/dupo-2024-001.pdf",
+      pdfOriginalNom: "fiche-metreur-dupont.pdf",
       menuiseries: {
         create: [
           {

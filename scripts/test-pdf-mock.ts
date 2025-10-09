@@ -48,9 +48,9 @@ const mockAIResponse = {
     confidence: 0.92,
     warnings: [],
     clientInfo: {
-      nom: "KOMPANIETZ",
-      adresse: "37 Chemin du Cuvier",
-      tel: "06 25 91 01 48",
+      nom: "DUPONT",
+      adresse: "15 Rue des Lilas",
+      tel: "06 12 34 56 78",
     },
   },
 };

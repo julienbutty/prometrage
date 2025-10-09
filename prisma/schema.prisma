@@ -11,16 +11,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Modèle Projet - Représente un projet client avec ses menuiseries
+// Modèle Client - Représente un client qui peut avoir plusieurs projets
+model Client {
+  id       String    @id @default(cuid())
+  nom      String
+  email    String?   @unique
+  tel      String?
+
+  // Relations
+  projets  Projet[]
+
+  // Métadonnées
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([nom])
+  @@index([email])
+}
+
+// Modèle Projet - Représente un projet/chantier à une adresse donnée
 model Projet {
   id        String   @id @default(cuid())
-  reference String   @unique // ex: "KOMP-2024-001"
+  reference String   @unique // ex: "DUPO-2024-001"
 
-  // Informations client
-  clientNom     String
-  clientAdresse String?
-  clientTel     String?
-  clientEmail   String?
+  // Relation client
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  // Adresse du chantier (spécifique à ce projet)
+  adresse   String?  // ex: "15 Rue des Lilas"
 
   // Fichier PDF original
   pdfUrl        String?
@@ -33,8 +52,8 @@ model Projet {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([clientId])
   @@index([reference])
-  @@index([clientNom])
   @@index([createdAt])
 }
 

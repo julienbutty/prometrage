@@ -17,11 +17,12 @@ Application web **mobile-first** permettant aux artisans de faire des prises de 
 
 #### 1.3 Workflow principal
 
-1. **Upload PDF** → Parsing automatique des données
-2. **Création projet** → Association client/menuiseries
-3. **Prise de côtes** → Validation/modification sur site
-4. **Alertes visuelles** → Signalement des écarts
-5. **Sauvegarde** → Possibilité d'édition ultérieure
+1. **Upload PDF** → Parsing automatique des données (menuiseries + infos client)
+2. **Création/Liaison client** → Détection client existant (email) ou création nouveau
+3. **Création projet** → Association client/menuiseries/adresse chantier
+4. **Prise de côtes** → Validation/modification sur site
+5. **Alertes visuelles** → Signalement des écarts
+6. **Sauvegarde** → Possibilité d'édition ultérieure
 
 ### 2. Stack technique
 
@@ -58,16 +59,41 @@ const breakpoints = {
 ### 3. Modèle de données
 
 ```prisma
+model Client {
+  id       String    @id @default(cuid())
+  nom      String
+  email    String?   @unique
+  tel      String?
+
+  projets  Projet[]  // Un client peut avoir plusieurs projets
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([nom])
+  @@index([email])
+}
+
 model Projet {
   id          String      @id @default(cuid())
   reference   String      @unique
-  client      Json        // {nom, adresse, tel, email}
+
+  // Relation client (obligatoire)
+  clientId    String
+  client      Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  // Adresse du projet (spécifique à ce chantier)
+  adresse     String?     // Ex: "15 Rue des Lilas"
+
   pdfUrl      String      // URL du PDF uploadé
   dateUpload  DateTime    @default(now())
   statut      Status      @default(EN_COURS)
   menuiseries Menuiserie[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+
+  @@index([clientId])
+  @@index([reference])
 }
 
 model Menuiserie {
@@ -227,10 +253,10 @@ Pour chaque menuiserie, extrais les données suivantes au format JSON strict :
     "confidence": 0.95,  // Score de confiance global (0-1)
     "warnings": ["Dimension hauteur peu lisible pour menuiserie #2"],
     "clientInfo": {
-      "nom": "KOMPANIETZ",
-      "adresse": "37 Chemin du Cuvier",
-      "tel": "06 25 91 01 48",
-      "email": "paul.kompanietz@gmail.com"
+      "nom": "DUPONT",
+      "adresse": "15 Rue des Lilas",
+      "tel": "06 12 34 56 78",
+      "email": "jean.dupont@example.com"
     }
   }
 }
@@ -242,6 +268,8 @@ RÈGLES STRICTES:
 4. Normalise les poses en minuscules (tunnel, applique, renovation)
 5. Extrais TOUTES les menuiseries, même partiellement remplies
 6. Conserve les descriptions exactes pour couleurs et options
+7. Extrais obligatoirement les infos client (nom, email, tel) dans metadata.clientInfo
+8. Extrais l'adresse du chantier dans metadata.projetInfo.adresse
 
 Réponds UNIQUEMENT avec le JSON, sans texte additionnel.
 `;
@@ -485,7 +513,12 @@ const useBusinessRules = (data: DonneesMenuiserie) => {
 ```typescript
 // Upload & Parsing
 POST   /api/upload/pdf       // Upload et parse PDF
-GET    /api/parse/status/:id // Statut du parsing
+
+// Clients
+GET    /api/clients          // Liste des clients
+GET    /api/clients/:id      // Détail client avec ses projets
+PUT    /api/clients/:id      // Mise à jour infos client
+DELETE /api/clients/:id      // Supprimer client (cascade projets)
 
 // Projets
 GET    /api/projets          // Liste des projets

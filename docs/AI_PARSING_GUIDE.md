@@ -126,10 +126,10 @@ Pour chaque menuiserie, extrais les données suivantes au format JSON strict :
     "confidence": 0.95,  // Score de confiance global (0-1)
     "warnings": ["Dimension hauteur peu lisible pour menuiserie #2"],
     "clientInfo": {
-      "nom": "KOMPANIETZ",
-      "adresse": "37 Chemin du Cuvier",
-      "tel": "06 25 91 01 48",
-      "email": "paul.kompanietz@gmail.com"
+      "nom": "DUPONT",
+      "adresse": "15 Rue des Lilas",
+      "tel": "06 12 34 56 78",
+      "email": "jean.dupont@example.com"
     }
   }
 }
