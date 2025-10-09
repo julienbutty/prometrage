@@ -64,6 +64,46 @@ const NUMERIC_CRITICAL_FIELDS = ["largeur", "hauteur", "hauteurAllege"];
 // Autres champs numériques (dans collapsed)
 const NUMERIC_OTHER_FIELDS = ["largeurTableau", "hauteurTableau"];
 
+// Ordre des champs selon la logique métier du PDF
+const FIELD_ORDER = [
+  // Dimensions (section principale - déjà affichées)
+  "largeur",
+  "hauteur",
+  "hauteurAllege",
+  "largeurTableau",
+  "hauteurTableau",
+
+  // Informations produit (ordre PDF - noms réels de la BDD)
+  "gamme",
+  "couleurInt", // couleurInterieure dans le PDF
+  "couleurExt", // couleurExterieure dans le PDF
+  "pose",
+  "dimensions",
+  "dormant",
+  "habillageInt", // habillageInterieur dans le PDF
+  "fixation",
+  "habillageExt", // habillageExterieur dans le PDF
+  "dormantGorge",
+  "traverseBasse",
+  "vitrage",
+  "doubleVitrage", // Ajout champ manquant
+  "intercalaire",
+  "ouvrant",
+  "ouvrantPrincipal", // Ajout champ manquant
+  "fermeture",
+  "poignee", // poigneeVantailPrincipal dans le PDF
+  "poigneeVantailPrincipal",
+  "poigneeVantailSecondaire",
+  "rails",
+  "couleurJoints",
+  "couleurQuincaillerie",
+  "couleurPareTempete",
+  "couleur", // fallback ancien champ
+  "volet",
+  "serrure",
+  "intitule", // Ajout champ manquant
+];
+
 // Labels français pour les champs
 const FIELD_LABELS: Record<string, string> = {
   largeur: "Largeur",
@@ -72,11 +112,37 @@ const FIELD_LABELS: Record<string, string> = {
   largeurTableau: "Largeur tableau",
   hauteurTableau: "Hauteur tableau",
   gamme: "Gamme",
+  couleurInt: "Couleur intérieure",
+  couleurExt: "Couleur extérieure",
+  couleurInterieure: "Couleur intérieure", // Ancien nom (fallback)
+  couleurExterieure: "Couleur extérieure", // Ancien nom (fallback)
   pose: "Type de pose",
-  volet: "Volet",
-  couleur: "Couleur",
+  dimensions: "Dimensions",
+  dormant: "Dormant",
+  habillageInt: "Habillage intérieur",
+  habillageExt: "Habillage extérieur",
+  habillageInterieur: "Habillage intérieur", // Ancien nom (fallback)
+  habillageExterieur: "Habillage extérieur", // Ancien nom (fallback)
+  fixation: "Fixation",
+  dormantGorge: "Dormant avec gorge",
+  traverseBasse: "Traverse basse",
   vitrage: "Vitrage",
+  doubleVitrage: "Double vitrage",
+  intercalaire: "Intercalaire",
+  ouvrant: "Ouvrant",
+  ouvrantPrincipal: "Ouvrant principal",
+  fermeture: "Fermeture",
+  poignee: "Poignée",
+  poigneeVantailPrincipal: "Poignée vantail principal",
+  poigneeVantailSecondaire: "Poignée vantail secondaire",
+  rails: "Rails",
+  couleurJoints: "Couleur des joints",
+  couleurQuincaillerie: "Couleur quincaillerie",
+  couleurPareTempete: "Couleur pare-tempête",
+  couleur: "Couleur",
+  volet: "Volet",
   serrure: "Serrure",
+  intitule: "Intitulé",
 };
 
 export default function MenuiseriePage() {
@@ -227,6 +293,27 @@ export default function MenuiseriePage() {
       menuiserie.donneesOriginales[key] !== undefined
   );
 
+  // Fonction pour trier selon FIELD_ORDER
+  const sortByFieldOrder = (fields: string[]) => {
+    return fields.sort((a, b) => {
+      const indexA = FIELD_ORDER.indexOf(a);
+      const indexB = FIELD_ORDER.indexOf(b);
+
+      // Si un champ n'est pas dans FIELD_ORDER, le mettre à la fin
+      if (indexA === -1 && indexB === -1) return 0;
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+
+      return indexA - indexB;
+    });
+  };
+
+  // Combiner tous les champs additionnels et trier selon l'ordre du PDF
+  const allAdditionalFields = sortByFieldOrder([
+    ...otherNumericFields,
+    ...textFields,
+  ]);
+
   return (
     <div className="min-h-screen bg-gray-50 pb-64 lg:pb-40">
       {/* Header Responsive */}
@@ -322,7 +409,7 @@ export default function MenuiseriePage() {
             </Card>
 
             {/* Détails additionnels (collapsed) */}
-            {(otherNumericFields.length > 0 || textFields.length > 0) && (
+            {allAdditionalFields.length > 0 && (
               <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
                 <Card>
                   <CollapsibleTrigger asChild>
@@ -331,7 +418,7 @@ export default function MenuiseriePage() {
                         <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
                           📋 Détails additionnels
                           <span className="text-xs font-normal text-gray-500 lg:text-sm">
-                            ({otherNumericFields.length + textFields.length} champs)
+                            ({allAdditionalFields.length} champs)
                           </span>
                         </CardTitle>
                         {detailsOpen ? (
@@ -344,41 +431,47 @@ export default function MenuiseriePage() {
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <CardContent className="space-y-4 pt-0 lg:space-y-6">
-                      {/* Grille responsive */}
+                      {/* Grille responsive - tous les champs triés selon l'ordre PDF */}
                       <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
-                        {/* Other numeric fields */}
-                        {otherNumericFields.map((key) => (
-                          <div key={key} className="lg:col-span-1">
-                            <FieldWithDiff
-                              id={key}
-                              label={FIELD_LABELS[key] || key}
-                              value={formData[key] ?? ""}
-                              originalValue={menuiserie.donneesOriginales[key]}
-                              onChange={(value) => handleFieldChange(key, value)}
-                              type="number"
-                              unit="mm"
-                            />
-                          </div>
-                        ))}
+                        {allAdditionalFields.map((key) => {
+                          const isNumeric = otherNumericFields.includes(key);
 
-                        {/* Text fields */}
-                        {textFields.map((key) => (
-                          <div key={key} className="space-y-2 lg:col-span-1">
-                            <Label htmlFor={key} className="text-base font-medium">
-                              {FIELD_LABELS[key] || key}
-                            </Label>
-                            <div className="mb-1 text-xs text-gray-600">
-                              PDF: {String(menuiserie.donneesOriginales[key])}
+                          // Champs numériques avec calcul d'écart
+                          if (isNumeric) {
+                            return (
+                              <div key={key} className="lg:col-span-1">
+                                <FieldWithDiff
+                                  id={key}
+                                  label={FIELD_LABELS[key] || key}
+                                  value={formData[key] ?? ""}
+                                  originalValue={menuiserie.donneesOriginales[key]}
+                                  onChange={(value) => handleFieldChange(key, value)}
+                                  type="number"
+                                  unit="mm"
+                                />
+                              </div>
+                            );
+                          }
+
+                          // Champs texte
+                          return (
+                            <div key={key} className="space-y-2 lg:col-span-1">
+                              <Label htmlFor={key} className="text-base font-medium">
+                                {FIELD_LABELS[key] || key}
+                              </Label>
+                              <div className="mb-1 text-xs text-gray-600">
+                                PDF: {String(menuiserie.donneesOriginales[key])}
+                              </div>
+                              <Input
+                                id={key}
+                                value={formData[key] ?? ""}
+                                onChange={(e) => handleFieldChange(key, e.target.value)}
+                                className="h-14"
+                                placeholder={String(menuiserie.donneesOriginales[key])}
+                              />
                             </div>
-                            <Input
-                              id={key}
-                              value={formData[key] ?? ""}
-                              onChange={(e) => handleFieldChange(key, e.target.value)}
-                              className="h-14"
-                              placeholder={String(menuiserie.donneesOriginales[key])}
-                            />
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </CardContent>
                   </CollapsibleContent>
