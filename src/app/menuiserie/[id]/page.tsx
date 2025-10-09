@@ -228,7 +228,7 @@ export default function MenuiseriePage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 pb-64 lg:pb-40">
       {/* Header Responsive */}
       <div className="sticky top-0 z-10 border-b bg-white shadow-sm">
         <div className="mx-auto max-w-7xl">
