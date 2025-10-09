@@ -60,8 +60,9 @@ RÈGLES STRICTES:
 5. Extrais TOUTES les menuiseries du document, même partiellement remplies
 6. Conserve les descriptions exactes pour couleurs et options
 7. Le score de confiance doit refléter la qualité globale de l'extraction (0-1)
-8. Si le repère n'est pas explicite, utilise null
-9. Pour les champs optionnels absents, utilise null (ne les omets pas)
-10. **EXTRACTION D'IMAGES** : Pour chaque menuiserie, extrais l'image/schéma technique associé et fournis-le en base64 avec le préfixe data URI complet (ex: "data:image/png;base64,...")
+8. **IMPORTANT REPÈRE** : Si l'intitulé contient deux points ":" (ex: "Variante coulissant : Coulissant 2 vantaux"), NE MODIFIE PAS l'intitulé, conserve-le tel quel. Le backend se chargera d'extraire le repère.
+9. Si le repère est explicitement mentionné séparément du titre, extrais-le dans le champ "repere", sinon utilise null
+10. Pour les champs optionnels absents, utilise null (ne les omets pas)
+11. **EXTRACTION D'IMAGES** : Pour chaque menuiserie, extrais l'image/schéma technique associé et fournis-le en base64 avec le préfixe data URI complet (ex: "data:image/png;base64,...")
 
 Réponds UNIQUEMENT avec le JSON, sans texte additionnel avant ou après.`;

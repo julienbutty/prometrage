@@ -85,14 +85,19 @@ export async function POST(request: NextRequest) {
         pdfOriginalNom: file.name,
         pdfUrl,
         menuiseries: {
-          create: parsed.menuiseries.map((m, index) => ({
-            repere: m.repere || `M${index + 1}`,
-            intitule: m.intitule,
-            // Try to use AI-extracted image first, then fallback to extracted images by index
-            imageBase64: m.imageBase64 || extractedImages[index] || null,
-            donneesOriginales: m as any, // Prisma Json type
-            ordre: index,
-          })),
+          create: parsed.menuiseries.map((m, index) => {
+            // Extract repere from intitule if it contains ":"
+            const { repere: extractedRepere, cleanedIntitule } = extractRepereFromIntitule(m.intitule);
+
+            return {
+              repere: m.repere || extractedRepere || `R${index + 1}`,
+              intitule: extractedRepere ? cleanedIntitule : m.intitule,
+              // Try to use AI-extracted image first, then fallback to extracted images by index
+              imageBase64: m.imageBase64 || extractedImages[index] || null,
+              donneesOriginales: m as any, // Prisma Json type
+              ordre: index,
+            };
+          }),
         },
       },
       include: {
@@ -182,6 +187,25 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+/**
+ * Extract repere from intitule if format "Repere : Intitule"
+ * Example: "Salon : Coulissant 2 vantaux" -> repere: "Salon", intitule: "Coulissant 2 vantaux"
+ */
+function extractRepereFromIntitule(intitule: string): {
+  repere: string | null;
+  cleanedIntitule: string;
+} {
+  const colonIndex = intitule.indexOf(":");
+  if (colonIndex === -1) {
+    return { repere: null, cleanedIntitule: intitule };
+  }
+
+  const repere = intitule.substring(0, colonIndex).trim();
+  const cleanedIntitule = intitule.substring(colonIndex + 1).trim();
+
+  return { repere, cleanedIntitule };
 }
 
 /**

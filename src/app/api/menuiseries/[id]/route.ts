@@ -8,6 +8,7 @@ const updateMenuiserieSchema = z.object({
     z.string(),
     z.union([z.string(), z.number(), z.boolean(), z.null()])
   ),
+  repere: z.string().optional(),
 });
 
 /**
@@ -150,12 +151,19 @@ export async function PUT(
     );
 
     // Update menuiserie
+    const updateData: any = {
+      donneesModifiees: validated.donneesModifiees as any,
+      ecarts: ecarts as any, // Prisma Json type
+    };
+
+    // Update repere if provided
+    if (validated.repere !== undefined) {
+      updateData.repere = validated.repere;
+    }
+
     const updated = await prisma.menuiserie.update({
       where: { id },
-      data: {
-        donneesModifiees: validated.donneesModifiees as any,
-        ecarts: ecarts as any, // Prisma Json type
-      },
+      data: updateData,
     });
 
     return NextResponse.json({

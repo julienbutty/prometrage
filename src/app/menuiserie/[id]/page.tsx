@@ -153,6 +153,7 @@ export default function MenuiseriePage() {
 
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [observations, setObservations] = useState("");
+  const [repere, setRepere] = useState("");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [observationsOpen, setObservationsOpen] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -181,11 +182,14 @@ export default function MenuiseriePage() {
       if (!observations && modified?.observations) {
         setObservations(String(modified.observations));
       }
+      if (!repere) {
+        setRepere(menuiserie.repere || "");
+      }
     }
-  }, [menuiserie, formData, observations]);
+  }, [menuiserie, formData, observations, repere]);
 
   const updateMutation = useMutation({
-    mutationFn: async (data: { donneesModifiees: Record<string, any> }) => {
+    mutationFn: async (data: { donneesModifiees: Record<string, any>; repere?: string }) => {
       const response = await fetch(`/api/menuiseries/${menuiserieId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -223,7 +227,10 @@ export default function MenuiseriePage() {
       observations,
     };
 
-    updateMutation.mutate({ donneesModifiees });
+    updateMutation.mutate({
+      donneesModifiees,
+      repere: repere || undefined,
+    });
     setHasUnsavedChanges(false);
   };
 
@@ -381,6 +388,35 @@ export default function MenuiseriePage() {
 
           {/* Colonne droite : Formulaires */}
           <div className={`space-y-4 ${menuiserie.imageBase64 ? 'lg:col-span-7' : 'lg:col-span-12'} mt-4 lg:mt-0`}>
+            {/* Repère éditable */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+                  🏷️ Repère
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Label htmlFor="repere" className="text-base font-medium">
+                    Identifiant de la menuiserie
+                  </Label>
+                  <Input
+                    id="repere"
+                    value={repere}
+                    onChange={(e) => {
+                      setRepere(e.target.value);
+                      setHasUnsavedChanges(true);
+                    }}
+                    className="h-14 text-lg font-semibold"
+                    placeholder="Ex: Salon, R1, Fenêtre cuisine..."
+                  />
+                  <p className="text-xs text-gray-500">
+                    Ce repère sera utilisé pour identifier la menuiserie dans la navigation
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Dimensions principales (toujours visibles) */}
             <Card>
               <CardHeader>
