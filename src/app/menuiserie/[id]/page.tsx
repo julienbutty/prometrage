@@ -15,6 +15,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { FieldWithDiff } from "@/components/forms/FieldWithDiff";
+import { TextFieldWithDiff } from "@/components/forms/TextFieldWithDiff";
 import { NavigationBar } from "@/components/menuiseries/NavigationBar";
 
 interface MenuiserieStatus {
@@ -489,21 +490,15 @@ export default function MenuiseriePage() {
                             );
                           }
 
-                          // Champs texte
+                          // Champs texte avec indicateur de modification
                           return (
-                            <div key={key} className="space-y-2 lg:col-span-1">
-                              <Label htmlFor={key} className="text-base font-medium">
-                                {FIELD_LABELS[key] || key}
-                              </Label>
-                              <div className="mb-1 text-xs text-gray-600">
-                                PDF: {String(menuiserie.donneesOriginales[key])}
-                              </div>
-                              <Input
+                            <div key={key} className="lg:col-span-1">
+                              <TextFieldWithDiff
                                 id={key}
+                                label={FIELD_LABELS[key] || key}
                                 value={formData[key] ?? ""}
-                                onChange={(e) => handleFieldChange(key, e.target.value)}
-                                className="h-14"
-                                placeholder={String(menuiserie.donneesOriginales[key])}
+                                originalValue={String(menuiserie.donneesOriginales[key])}
+                                onChange={(value) => handleFieldChange(key, value)}
                               />
                             </div>
                           );
