@@ -37,7 +37,10 @@ Tu DOIS extraire cette image et la fournir en base64 dans le champ "imageBase64"
       "couleurJoints": "RAL...",
       "couleurQuincaillerie": "Description",
       "couleurPareTempete": "RAL...",
-      "couleurPetitsBois": "Description"
+      "petitsBoisType": "Petits-bois collés 2 faces plat de 30mm avec faux intercalaire",
+      "petitsBoisConfiguration": "1 petit bois vertical par vitrage",
+      "petitsBoisCouleur": "2 faces RAL hors standard : 8001",
+      "ventilation": "Description ou vide"
     }
   ],
   "metadata": {

@@ -38,7 +38,10 @@ export const AIMenuiserieSchema = z.object({
   couleurJoints: z.string().optional().nullable(),
   couleurQuincaillerie: z.string().optional().nullable(),
   couleurPareTempete: z.string().optional().nullable(),
-  couleurPetitsBois: z.string().optional().nullable(),
+  petitsBoisType: z.string().optional().nullable(),
+  petitsBoisConfiguration: z.string().optional().nullable(),
+  petitsBoisCouleur: z.string().optional().nullable(),
+  ventilation: z.string().optional().nullable(),
 });
 
 // Metadata from AI response

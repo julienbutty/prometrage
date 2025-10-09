@@ -100,6 +100,10 @@ const FIELD_ORDER = [
   "couleurQuincaillerie",
   "couleurPareTempete",
   "couleur", // fallback ancien champ
+  "petitsBoisType",
+  "petitsBoisConfiguration",
+  "petitsBoisCouleur",
+  "ventilation",
   "volet",
   "serrure",
   "intitule", // Ajout champ manquant
@@ -141,6 +145,10 @@ const FIELD_LABELS: Record<string, string> = {
   couleurQuincaillerie: "Couleur quincaillerie",
   couleurPareTempete: "Couleur pare-tempête",
   couleur: "Couleur",
+  petitsBoisType: "Type de petits-bois",
+  petitsBoisConfiguration: "Configuration petits-bois",
+  petitsBoisCouleur: "Couleur petits-bois",
+  ventilation: "Ventilation",
   volet: "Volet",
   serrure: "Serrure",
   intitule: "Intitulé",
