@@ -17,6 +17,7 @@ import {
 import { FieldWithDiff } from "@/components/forms/FieldWithDiff";
 import { TextFieldWithDiff } from "@/components/forms/TextFieldWithDiff";
 import { NavigationBar } from "@/components/menuiseries/NavigationBar";
+import HelpIcon from "@/components/forms/HelpIcon";
 
 interface MenuiserieStatus {
   id: string;
@@ -499,6 +500,14 @@ export default function MenuiseriePage() {
                           }
 
                           // Champs texte avec indicateur de modification
+                          // Déterminer si on doit afficher l'icône d'aide pour le champ "dormant"
+                          const isDormantField = key === "dormant";
+                          const typePose = formData.pose || menuiserie.donneesOriginales.pose;
+                          const dormantHelpPdf =
+                            typePose?.toLowerCase().includes("tunnel")
+                              ? "/docs/dormant-tunnel.pdf"
+                              : "/docs/dormant-applique.pdf";
+
                           return (
                             <div key={key} className="lg:col-span-1">
                               <TextFieldWithDiff
@@ -507,6 +516,11 @@ export default function MenuiseriePage() {
                                 value={formData[key] ?? ""}
                                 originalValue={String(menuiserie.donneesOriginales[key])}
                                 onChange={(value) => handleFieldChange(key, value)}
+                                helpIcon={
+                                  isDormantField ? (
+                                    <HelpIcon pdfUrl={dormantHelpPdf} />
+                                  ) : undefined
+                                }
                               />
                             </div>
                           );

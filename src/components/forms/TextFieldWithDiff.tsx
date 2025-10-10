@@ -11,6 +11,7 @@ interface TextFieldWithDiffProps {
   originalValue: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  helpIcon?: React.ReactNode;
 }
 
 /**
@@ -24,6 +25,7 @@ export function TextFieldWithDiff({
   originalValue,
   onChange,
   placeholder,
+  helpIcon,
 }: TextFieldWithDiffProps) {
   // Check if value has been modified
   const isModified = value !== originalValue && value !== "";
@@ -32,9 +34,12 @@ export function TextFieldWithDiff({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <Label htmlFor={id} className="text-base font-medium">
-          {label}
-        </Label>
+        <div className="flex items-center gap-2">
+          <Label htmlFor={id} className="text-base font-medium">
+            {label}
+          </Label>
+          {helpIcon}
+        </div>
         {isModified && (
           <Badge variant="default" className="bg-blue-500 text-xs">
             Modifié
