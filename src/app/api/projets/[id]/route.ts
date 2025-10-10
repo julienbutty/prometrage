@@ -15,6 +15,14 @@ export async function GET(
     const projet = await prisma.projet.findUnique({
       where: { id },
       include: {
+        client: {
+          select: {
+            id: true,
+            nom: true,
+            email: true,
+            tel: true,
+          },
+        },
         menuiseries: {
           orderBy: {
             ordre: "asc",

@@ -549,6 +549,14 @@ export async function PUT(
 
 ### 📊 État actuel du projet (Janvier 2025)
 
+**Phase 2.5 - Gestion Clients** : ✅ **COMPLÉTÉE**
+- Architecture 3 tables : Client → Projet → Menuiserie
+- API Clients complète : GET list, GET detail, PUT update
+- Détection automatique clients existants (via email)
+- Pages frontend responsive : `/clients` et `/clients/[id]`
+- Navigation bidirectionnelle Clients ↔ Projets
+- 15 nouveaux tests API clients ✅
+
 **Phase 3 - Formulaire Prise de Côtes** : ✅ **COMPLÉTÉE**
 - API menuiseries GET/PUT avec validation Zod
 - Formulaire dynamique mobile-optimisé avec tous les champs PDF
@@ -564,10 +572,11 @@ export async function PUT(
 - Options futures : pdf.js render, pdf-lib extract, ou service externe
 
 **Tests** :
-- 64/64 tests unitaires et composants ✅
-- 5 tests intégration échouent (Prisma timing - configuration connue)
+- 86/86 tests unitaires et composants ✅ (+15 nouveaux tests API clients)
+- 12 tests intégration échouent (Prisma timing - configuration connue, fichiers .skip)
 
 **Features implémentées** :
+- **Gestion Clients complète** : Liste, détail, update, relations
 - Upload PDF et parsing AI avec Claude Sonnet 4.5
 - Retry automatique avec backoff exponentiel
 - Métadonnées AI (confidence, warnings, tokens)
@@ -575,6 +584,7 @@ export async function PUT(
 - Indicateurs de progression (position, complétion)
 - Calcul écarts avec niveaux d'alerte
 - Progressive Disclosure (sections collapsibles)
+- **findOrCreateClient** : Détection clients existants par email
 
 ### 📚 Ressources clés
 

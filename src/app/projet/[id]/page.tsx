@@ -31,12 +31,15 @@ interface Menuiserie {
 interface Projet {
   id: string;
   reference: string;
-  clientNom: string;
-  clientAdresse?: string;
-  clientTel?: string;
-  clientEmail?: string;
+  adresse: string | null;
   pdfOriginalNom: string;
   pdfUrl: string;
+  client: {
+    id: string;
+    nom: string;
+    email: string | null;
+    tel: string | null;
+  };
   menuiseries: Menuiserie[];
   createdAt: string;
 }
@@ -110,9 +113,15 @@ export default function ProjetDetailPage() {
             <h1 className="text-lg lg:text-2xl font-bold truncate">
               {data.reference}
             </h1>
-            <p className="text-sm lg:text-base text-gray-600 truncate">
-              {data.clientNom}
-            </p>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push(`/clients/${data.client.id}`);
+              }}
+              className="text-sm lg:text-base text-blue-600 hover:underline truncate text-left"
+            >
+              {data.client.nom}
+            </button>
           </div>
           <Badge
             variant={
@@ -144,26 +153,36 @@ export default function ProjetDetailPage() {
                     <p className="text-xs text-gray-500 uppercase tracking-wide">
                       Nom
                     </p>
-                    <p className="text-sm font-medium">{data.clientNom}</p>
+                    <button
+                      onClick={() => router.push(`/clients/${data.client.id}`)}
+                      className="text-sm font-medium text-blue-600 hover:underline text-left"
+                    >
+                      {data.client.nom}
+                    </button>
                   </div>
 
-                  {data.clientAdresse && (
+                  {data.adresse && (
                     <div className="space-y-1">
                       <p className="text-xs text-gray-500 uppercase tracking-wide flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
-                        Adresse
+                        Adresse chantier
                       </p>
-                      <p className="text-sm">{data.clientAdresse}</p>
+                      <p className="text-sm">{data.adresse}</p>
                     </div>
                   )}
 
-                  {data.clientTel && (
+                  {data.client.tel && (
                     <div className="space-y-1">
                       <p className="text-xs text-gray-500 uppercase tracking-wide flex items-center gap-1">
                         <Phone className="h-3 w-3" />
                         Téléphone
                       </p>
-                      <p className="text-sm">{data.clientTel}</p>
+                      <a
+                        href={`tel:${data.client.tel}`}
+                        className="text-sm text-blue-600 hover:underline"
+                      >
+                        {data.client.tel}
+                      </a>
                     </div>
                   )}
 

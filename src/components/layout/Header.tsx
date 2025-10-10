@@ -14,6 +14,12 @@ export function Header() {
           >
             Projets
           </Link>
+          <Link
+            href="/clients"
+            className="text-sm sm:text-base font-medium hover:underline"
+          >
+            Mes Clients
+          </Link>
         </nav>
       </div>
     </header>
