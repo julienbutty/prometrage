@@ -55,6 +55,12 @@ Tu DOIS extraire cette image et la fournir en base64 dans le champ "imageBase64"
   }
 }
 
+**IMPORTANT pour clientInfo.nom** :
+- Extrais UNIQUEMENT le NOM DE FAMILLE en MAJUSCULES
+- Exemples : "Jean DUPONT" → "DUPONT", "Marie Martin" → "MARTIN", "M. Paul DURAND" → "DURAND"
+- Ne jamais inclure le prénom, civilité (M., Mme), ou titre
+- Si plusieurs noms de famille (ex: "DUPONT-MARTIN"), conserve-les tous avec le tiret
+
 RÈGLES STRICTES:
 1. Toutes les dimensions DOIVENT être des nombres en millimètres (pas de string)
 2. Si une valeur est illisible ou absente, utilise null et ajoute un warning dans metadata.warnings

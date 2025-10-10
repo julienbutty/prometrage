@@ -8,14 +8,23 @@ describe("GET /api/projets/[id]", () => {
     // Clean database
     await prisma.menuiserie.deleteMany();
     await prisma.projet.deleteMany();
+    await prisma.client.deleteMany();
+
+    // Create test client
+    const client = await prisma.client.create({
+      data: {
+        nom: "Test Client",
+        email: "test-projet@example.com",
+        tel: "0123456789",
+      },
+    });
 
     // Create test project with menuiseries
     const projet = await prisma.projet.create({
       data: {
         reference: "TEST-001",
-        clientNom: "Test Client",
-        clientAdresse: "123 Test Street",
-        clientTel: "0123456789",
+        clientId: client.id,
+        adresse: "123 Test Street",
         pdfOriginalNom: "test.pdf",
         pdfUrl: "test://pdf/test.pdf",
         menuiseries: {

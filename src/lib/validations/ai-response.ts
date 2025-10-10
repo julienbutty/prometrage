@@ -30,11 +30,20 @@ export const AIMenuiserieSchema = z.object({
   habillageInt: z.string().optional().nullable(),
   habillageExt: z.string().optional().nullable(),
   doubleVitrage: z.string().optional().nullable(),
-  intercalaire: z.enum(["blanc", "noir"]).optional().nullable(),
-  ouvrantPrincipal: z.enum(["droite", "gauche"]).optional().nullable(),
+  intercalaire: z.preprocess(
+    (val) => (typeof val === "string" ? val.toLowerCase() : val),
+    z.enum(["blanc", "noir"]).optional().nullable()
+  ),
+  ouvrantPrincipal: z.preprocess(
+    (val) => (typeof val === "string" ? val.toLowerCase() : val),
+    z.enum(["droite", "gauche"]).optional().nullable()
+  ),
   fermeture: z.string().optional().nullable(),
   poignee: z.string().optional().nullable(),
-  rails: z.enum(["inox", "alu"]).optional().nullable(),
+  rails: z.preprocess(
+    (val) => (typeof val === "string" ? val.toLowerCase() : val),
+    z.enum(["inox", "alu"]).optional().nullable()
+  ),
   couleurJoints: z.string().optional().nullable(),
   couleurQuincaillerie: z.string().optional().nullable(),
   couleurPareTempete: z.string().optional().nullable(),

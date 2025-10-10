@@ -12,9 +12,14 @@ import { UploadProgress } from "@/components/UploadProgress";
 interface Projet {
   id: string;
   reference: string;
-  clientNom: string;
-  clientAdresse?: string;
+  adresse: string | null;
   createdAt: string;
+  client: {
+    id: string;
+    nom: string;
+    email: string | null;
+    tel: string | null;
+  };
   _count: {
     menuiseries: number;
   };
@@ -77,8 +82,8 @@ export default function Home() {
 
   const projects = projets.map((p) => ({
     id: p.id,
-    nomClient: p.clientNom,
-    adresse: p.clientAdresse || "",
+    nomClient: p.client.nom,
+    adresse: p.adresse || "",
     createdAt: new Date(p.createdAt),
   }));
 

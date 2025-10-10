@@ -9,6 +9,14 @@ export async function GET() {
   try {
     const projets = await prisma.projet.findMany({
       include: {
+        client: {
+          select: {
+            id: true,
+            nom: true,
+            email: true,
+            tel: true,
+          },
+        },
         _count: {
           select: {
             menuiseries: true,

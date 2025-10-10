@@ -7,6 +7,7 @@ import {
   AILowConfidenceError,
 } from "@/lib/pdf/ai-parser";
 import { extractImagesFromPDF } from "@/lib/pdf/image-extractor";
+import { findOrCreateClient } from "@/lib/clients";
 
 /**
  * POST /api/upload/pdf
@@ -65,23 +66,29 @@ export async function POST(request: NextRequest) {
     console.log(`[Upload] AI parsing complete`);
     console.log(`[Upload] Found ${parsed.menuiseries.length} menuiseries`);
 
-    // 5. Generate project reference
-    const clientName = parsed.metadata.clientInfo?.nom || "UNKNOWN";
-    const reference = generateReference(clientName);
+    // 5. Find or create client
+    const { client, isNew } = await findOrCreateClient({
+      nom: parsed.metadata.clientInfo?.nom || "Client inconnu",
+      email: parsed.metadata.clientInfo?.email || null,
+      tel: parsed.metadata.clientInfo?.tel || null,
+    });
 
-    // 6. TODO: Upload PDF to storage (Uploadthing/Vercel Blob)
+    console.log(`[Upload] ${isNew ? "Created new" : "Found existing"} client: ${client.nom} (${client.email || "no email"})`);
+
+    // 6. Generate project reference
+    const reference = generateReference(client.nom);
+
+    // 7. TODO: Upload PDF to storage (Uploadthing/Vercel Blob)
     // For now, we'll use a placeholder URL
     const pdfUrl = `placeholder://pdf/${file.name}`;
 
-    // 7. Create project in database
+    // 8. Create project in database
     // Associate images with menuiseries based on order
     const projet = await prisma.projet.create({
       data: {
         reference,
-        clientNom: parsed.metadata.clientInfo?.nom || "Client inconnu",
-        clientAdresse: parsed.metadata.clientInfo?.adresse || "",
-        clientTel: parsed.metadata.clientInfo?.tel || "",
-        clientEmail: parsed.metadata.clientInfo?.email || "",
+        clientId: client.id,
+        adresse: parsed.metadata.clientInfo?.adresse || null,
         pdfOriginalNom: file.name,
         pdfUrl,
         menuiseries: {
@@ -101,6 +108,7 @@ export async function POST(request: NextRequest) {
         },
       },
       include: {
+        client: true,
         menuiseries: {
           orderBy: {
             ordre: "asc",
@@ -111,7 +119,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Upload] Created projet ${projet.id} with ${projet.menuiseries.length} menuiseries`);
 
-    // 7. Return success response
+    // 9. Return success response
     return NextResponse.json(
       {
         success: true,
@@ -119,6 +127,13 @@ export async function POST(request: NextRequest) {
           projetId: projet.id,
           reference: projet.reference,
           pdfUrl: projet.pdfUrl,
+          client: {
+            id: projet.client.id,
+            nom: projet.client.nom,
+            email: projet.client.email,
+            tel: projet.client.tel,
+            isNew,
+          },
           menuiseries: projet.menuiseries,
           parseStatus: {
             total: parsed.menuiseries.length,
@@ -210,9 +225,15 @@ function extractRepereFromIntitule(intitule: string): {
 
 /**
  * Generate project reference from client name
+ * Prend les 4 premières lettres du dernier mot (nom de famille)
+ * Ex: "Jean DUPONT" → "DUPO-123456", "MARTIN" → "MART-123456"
  */
 function generateReference(clientName: string): string {
-  const prefix = clientName
+  // Extraire le dernier mot (généralement le nom de famille)
+  const words = clientName.trim().split(/\s+/);
+  const lastName = words[words.length - 1];
+
+  const prefix = lastName
     .substring(0, 4)
     .toUpperCase()
     .replace(/[^A-Z]/g, "")

@@ -6,12 +6,21 @@ describe("GET /api/menuiseries/[id]", () => {
   let projetId: string;
 
   beforeAll(async () => {
+    // Créer un client de test
+    const client = await prisma.client.create({
+      data: {
+        nom: "Test Client",
+        email: "test@example.com",
+        tel: "06 12 34 56 78",
+      },
+    });
+
     // Créer un projet de test avec 3 menuiseries
     const projet = await prisma.projet.create({
       data: {
         reference: "TEST-GET-001",
-        clientNom: "Test Client",
-        clientAdresse: "1 rue Test",
+        clientId: client.id,
+        adresse: "1 rue Test",
         pdfOriginalNom: "test.pdf",
         pdfUrl: "test://pdf",
         menuiseries: {

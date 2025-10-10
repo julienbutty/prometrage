@@ -29,8 +29,15 @@ export async function GET(
           select: {
             id: true,
             reference: true,
-            clientNom: true,
-            clientAdresse: true,
+            adresse: true,
+            client: {
+              select: {
+                id: true,
+                nom: true,
+                email: true,
+                tel: true,
+              },
+            },
           },
         },
       },

@@ -14,17 +14,46 @@ async function main() {
   console.log("🗑️  Nettoyage des données existantes...");
   await prisma.menuiserie.deleteMany();
   await prisma.projet.deleteMany();
+  await prisma.client.deleteMany();
+
+  // Créer des clients de test
+  console.log("👤 Création des clients de test...");
+
+  const client1 = await prisma.client.create({
+    data: {
+      nom: "DUPONT",
+      email: "jean.dupont@example.com",
+      tel: "06 12 34 56 78",
+    },
+  });
+
+  const client2 = await prisma.client.create({
+    data: {
+      nom: "MARTIN",
+      email: "marie.martin@example.com",
+      tel: "06 98 76 54 32",
+    },
+  });
+
+  const client3 = await prisma.client.create({
+    data: {
+      nom: "DURAND",
+      email: "paul.durand@example.com",
+      tel: "01 42 38 76 54",
+    },
+  });
+
+  console.log("✅ Clients créés:", client1.nom, client2.nom, client3.nom);
 
   // Créer des projets de test
   console.log("📋 Création des projets de test...");
 
+  // Projet 1 : DUPONT à Paris
   const projet1 = await prisma.projet.create({
     data: {
       reference: "DUPO-2024-001",
-      clientNom: "DUPONT",
-      clientAdresse: "15 Rue des Lilas, 75018 Paris",
-      clientTel: "06 12 34 56 78",
-      clientEmail: "jean.dupont@example.com",
+      clientId: client1.id,
+      adresse: "15 Rue des Lilas, 75018 Paris",
       pdfUrl: "https://storage.example.com/dupo-2024-001.pdf",
       pdfOriginalNom: "fiche-metreur-dupont.pdf",
       menuiseries: {
@@ -81,18 +110,95 @@ async function main() {
     },
     include: {
       menuiseries: true,
+      client: true,
     },
   });
 
-  console.log(`✅ Projet créé: ${projet1.reference} (${projet1.menuiseries.length} menuiseries)`);
+  console.log(
+    `✅ Projet créé: ${projet1.reference} - Client: ${projet1.client.nom} (${projet1.menuiseries.length} menuiseries)`
+  );
 
+  // Projet 2 : DUPONT à Lyon (deuxième domicile)
   const projet2 = await prisma.projet.create({
     data: {
-      reference: "DURAND-2024-002",
-      clientNom: "DURAND",
-      clientAdresse: "15 Avenue de la République, 75011 Paris",
-      clientTel: "01 42 38 76 54",
-      clientEmail: "marie.durand@example.fr",
+      reference: "DUPO-2024-002",
+      clientId: client1.id,
+      adresse: "42 Avenue des Fleurs, 69001 Lyon",
+      pdfUrl: "https://storage.example.com/dupo-2024-002.pdf",
+      pdfOriginalNom: "fiche-metreur-dupont-2.pdf",
+      menuiseries: {
+        create: [
+          {
+            ordre: 0,
+            repere: "Cuisine",
+            intitule: "Fenêtre fixe",
+            donneesOriginales: {
+              largeur: 1200,
+              hauteur: 1500,
+              gamme: "OPTIMAX",
+              pose: "renovation",
+              dormant: "sans aile",
+              intercalaire: "blanc",
+            },
+            validee: false,
+          },
+        ],
+      },
+    },
+    include: {
+      menuiseries: true,
+      client: true,
+    },
+  });
+
+  console.log(
+    `✅ Projet créé: ${projet2.reference} - Client: ${projet2.client.nom} (${projet2.menuiseries.length} menuiseries)`
+  );
+
+  // Projet 3 : MARTIN à Marseille
+  const projet3 = await prisma.projet.create({
+    data: {
+      reference: "MART-2024-001",
+      clientId: client2.id,
+      adresse: "8 Rue du Commerce, 13001 Marseille",
+      pdfUrl: "https://storage.example.com/mart-2024-001.pdf",
+      pdfOriginalNom: "fiche-metreur-martin.pdf",
+      menuiseries: {
+        create: [
+          {
+            ordre: 0,
+            intitule: "Porte-fenêtre coulissante",
+            donneesOriginales: {
+              largeur: 2400,
+              hauteur: 2150,
+              gamme: "PERFORMAX",
+              pose: "tunnel",
+              dormant: "avec aile",
+              intercalaire: "noir",
+            },
+            validee: false,
+          },
+        ],
+      },
+    },
+    include: {
+      menuiseries: true,
+      client: true,
+    },
+  });
+
+  console.log(
+    `✅ Projet créé: ${projet3.reference} - Client: ${projet3.client.nom} (${projet3.menuiseries.length} menuiseries)`
+  );
+
+  // Projet 4 : DURAND à Paris (avec menuiserie validée)
+  const projet4 = await prisma.projet.create({
+    data: {
+      reference: "DURA-2024-001",
+      clientId: client3.id,
+      adresse: "15 Avenue de la République, 75011 Paris",
+      pdfUrl: "https://storage.example.com/dura-2024-001.pdf",
+      pdfOriginalNom: "fiche-metreur-durand.pdf",
       menuiseries: {
         create: [
           {
@@ -122,7 +228,7 @@ async function main() {
                 valeurOriginale: 4200,
                 valeurModifiee: 4250,
                 pourcentage: 1.19,
-                niveau: "info",
+                niveau: "faible",
               },
             ],
             validee: false,
@@ -146,74 +252,26 @@ async function main() {
     },
     include: {
       menuiseries: true,
+      client: true,
     },
   });
 
-  console.log(`✅ Projet créé: ${projet2.reference} (${projet2.menuiseries.length} menuiseries)`);
-
-  const projet3 = await prisma.projet.create({
-    data: {
-      reference: "MARTIN-2024-003",
-      clientNom: "MARTIN",
-      clientAdresse: "8 Rue des Lilas, 69006 Lyon",
-      clientTel: "+33 4 72 83 45 67",
-      menuiseries: {
-        create: [
-          {
-            ordre: 0,
-            repere: "Bureau",
-            intitule: "Porte-fenêtre 1 vantail",
-            donneesOriginales: {
-              largeur: 900,
-              hauteur: 2150,
-              gamme: "OPTIMAX",
-              pose: "tunnel",
-            },
-            donneesModifiees: {
-              largeur: 920,
-              hauteur: 2200,
-              pose: "applique",
-            },
-            ecarts: [
-              {
-                champ: "largeur",
-                valeurOriginale: 900,
-                valeurModifiee: 920,
-                pourcentage: 2.22,
-                niveau: "info",
-              },
-              {
-                champ: "hauteur",
-                valeurOriginale: 2150,
-                valeurModifiee: 2200,
-                pourcentage: 2.33,
-                niveau: "info",
-              },
-              {
-                champ: "pose",
-                valeurOriginale: "tunnel",
-                valeurModifiee: "applique",
-                niveau: "warning",
-              },
-            ],
-            validee: false,
-          },
-        ],
-      },
-    },
-    include: {
-      menuiseries: true,
-    },
-  });
-
-  console.log(`✅ Projet créé: ${projet3.reference} (${projet3.menuiseries.length} menuiseries)`);
+  console.log(
+    `✅ Projet créé: ${projet4.reference} - Client: ${projet4.client.nom} (${projet4.menuiseries.length} menuiseries)`
+  );
 
   // Récapitulatif
+  const totalClients = await prisma.client.count();
   const totalProjets = await prisma.projet.count();
   const totalMenuiseries = await prisma.menuiserie.count();
 
   console.log("\n🎉 Seed terminé avec succès !");
-  console.log(`📊 Total: ${totalProjets} projets, ${totalMenuiseries} menuiseries`);
+  console.log(
+    `📊 Total: ${totalClients} clients, ${totalProjets} projets, ${totalMenuiseries} menuiseries`
+  );
+  console.log(
+    `\n💡 Exemple : Le client "${client1.nom}" a ${projet1.menuiseries.length + projet2.menuiseries.length} menuiseries réparties sur 2 projets (adresses différentes)`
+  );
 }
 
 main()
