@@ -57,10 +57,7 @@ describe("DormantHelpIcon Integration", () => {
 
   it("should default to applique PDF when pose type is undefined", async () => {
     const user = userEvent.setup();
-    const typePose = undefined;
-    const dormantHelpPdf = typePose?.toLowerCase().includes("tunnel")
-      ? "/docs/dormant-tunnel.pdf"
-      : "/docs/dormant-applique.pdf";
+    const dormantHelpPdf = "/docs/dormant-applique.pdf";
 
     render(
       <TextFieldWithDiff

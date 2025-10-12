@@ -18,6 +18,8 @@ import { FieldWithDiff } from "@/components/forms/FieldWithDiff";
 import { TextFieldWithDiff } from "@/components/forms/TextFieldWithDiff";
 import { NavigationBar } from "@/components/menuiseries/NavigationBar";
 import HelpIcon from "@/components/forms/HelpIcon";
+import PhotoUpload from "@/components/forms/PhotoUpload";
+import type { PhotoObservation } from "@/lib/validations/photo-observation";
 
 interface MenuiserieStatus {
   id: string;
@@ -163,6 +165,7 @@ export default function MenuiseriePage() {
 
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [observations, setObservations] = useState("");
+  const [photosObservations, setPhotosObservations] = useState<PhotoObservation[]>([]);
   const [repere, setRepere] = useState("");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [observationsOpen, setObservationsOpen] = useState(false);
@@ -192,11 +195,14 @@ export default function MenuiseriePage() {
       if (!observations && modified?.observations) {
         setObservations(String(modified.observations));
       }
+      if (photosObservations.length === 0 && modified?.photosObservations) {
+        setPhotosObservations(modified.photosObservations as PhotoObservation[]);
+      }
       if (!repere) {
         setRepere(menuiserie.repere || "");
       }
     }
-  }, [menuiserie, formData, observations, repere]);
+  }, [menuiserie, formData, observations, photosObservations, repere]);
 
   const updateMutation = useMutation({
     mutationFn: async (data: { donneesModifiees: Record<string, any>; repere?: string }) => {
@@ -235,6 +241,7 @@ export default function MenuiseriePage() {
     const donneesModifiees = {
       ...formData,
       observations,
+      photosObservations: photosObservations.length > 0 ? photosObservations : undefined,
     };
 
     updateMutation.mutate({
@@ -553,14 +560,37 @@ export default function MenuiseriePage() {
                   </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <CardContent className="pt-0">
-                    <Input
-                      id="observations"
-                      value={observations}
-                      onChange={(e) => setObservations(e.target.value)}
-                      className="h-14"
-                      placeholder="Remarques particulières, problèmes constatés..."
-                    />
+                  <CardContent className="space-y-4 pt-0">
+                    {/* Texte des observations */}
+                    <div>
+                      <Label htmlFor="observations" className="text-sm font-medium mb-2 block">
+                        Remarques écrites
+                      </Label>
+                      <Input
+                        id="observations"
+                        value={observations}
+                        onChange={(e) => {
+                          setObservations(e.target.value);
+                          setHasUnsavedChanges(true);
+                        }}
+                        className="h-14"
+                        placeholder="Remarques particulières, problèmes constatés..."
+                      />
+                    </div>
+
+                    {/* Photos d'observations */}
+                    <div>
+                      <Label className="text-sm font-medium mb-2 block">
+                        Photos d'observation
+                      </Label>
+                      <PhotoUpload
+                        photos={photosObservations}
+                        onChange={(photos) => {
+                          setPhotosObservations(photos);
+                          setHasUnsavedChanges(true);
+                        }}
+                      />
+                    </div>
                   </CardContent>
                 </CollapsibleContent>
               </Card>

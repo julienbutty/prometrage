@@ -2,11 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { calculateEcarts } from "@/lib/utils/ecarts";
+import { PhotosObservationsSchema } from "@/lib/validations/photo-observation";
 
 const updateMenuiserieSchema = z.object({
   donneesModifiees: z.record(
     z.string(),
-    z.union([z.string(), z.number(), z.boolean(), z.null()])
+    z.union([
+      z.string(),
+      z.number(),
+      z.boolean(),
+      z.null(),
+      z.array(z.any()), // Pour photosObservations
+    ])
   ),
   repere: z.string().optional(),
 });
@@ -128,6 +135,25 @@ export async function PUT(
 
     // Validate input
     const validated = updateMenuiserieSchema.parse(body);
+
+    // Validate photos if present
+    if (validated.donneesModifiees.photosObservations) {
+      try {
+        PhotosObservationsSchema.parse(validated.donneesModifiees.photosObservations);
+      } catch (error) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: "VALIDATION_ERROR",
+              message: "Invalid photos format",
+              details: error instanceof z.ZodError ? error.issues : "Invalid photos",
+            },
+          },
+          { status: 400 }
+        );
+      }
+    }
 
     // Get current menuiserie
     const menuiserie = await prisma.menuiserie.findUnique({
