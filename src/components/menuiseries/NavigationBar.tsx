@@ -1,9 +1,11 @@
-import { ArrowLeft, ArrowRight, CheckCircle2, Circle } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Circle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { StatutMenuiserie } from "@/lib/types/menuiserie-status";
 
 interface MenuiserieStatus {
   id: string;
-  isCompleted: boolean;
+  statut?: StatutMenuiserie;
+  isCompleted: boolean; // Compatibilité legacy (= statut VALIDEE)
 }
 
 interface NavigationBarProps {
@@ -36,27 +38,48 @@ export function NavigationBar({
         <div className="flex h-8 items-center justify-center gap-2">
           {menuiseriesStatus.map((menuiserie, index) => {
             const isCurrent = index + 1 === currentPosition;
-            const isCompleted = menuiserie.isCompleted;
+            const statut = menuiserie.statut || (menuiserie.isCompleted ? StatutMenuiserie.VALIDEE : StatutMenuiserie.IMPORTEE);
+
+            // Rendu selon le statut
+            let icon;
+            if (statut === StatutMenuiserie.VALIDEE) {
+              // ✅ Validée : Cercle vert avec checkmark
+              icon = (
+                <CheckCircle2
+                  className={`h-6 w-6 ${
+                    isCurrent
+                      ? "text-green-600 fill-green-100"
+                      : "text-green-500"
+                  }`}
+                />
+              );
+            } else if (statut === StatutMenuiserie.EN_COURS) {
+              // 🔵 En cours : Cercle orange/bleu
+              icon = (
+                <AlertCircle
+                  className={`h-6 w-6 ${
+                    isCurrent
+                      ? "text-orange-600 fill-orange-100"
+                      : "text-orange-400"
+                  }`}
+                />
+              );
+            } else {
+              // ⚪ Importée : Cercle gris vide
+              icon = (
+                <Circle
+                  className={`h-6 w-6 ${
+                    isCurrent
+                      ? "text-gray-500 fill-gray-100"
+                      : "text-gray-300"
+                  }`}
+                />
+              );
+            }
 
             return (
               <div key={menuiserie.id} className="relative flex h-8 items-center">
-                {isCompleted ? (
-                  <CheckCircle2
-                    className={`h-6 w-6 ${
-                      isCurrent
-                        ? "text-green-600 fill-green-100"
-                        : "text-green-500"
-                    }`}
-                  />
-                ) : (
-                  <Circle
-                    className={`h-6 w-6 ${
-                      isCurrent
-                        ? "text-blue-600 fill-blue-100"
-                        : "text-gray-300"
-                    }`}
-                  />
-                )}
+                {icon}
                 {/* Point indicateur positionné en absolu pour ne pas décaler */}
                 {isCurrent && (
                   <div className="absolute left-1/2 bottom-0 h-1 w-1 -translate-x-1/2 rounded-full bg-blue-600" />

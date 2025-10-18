@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { calculateEcarts } from "@/lib/utils/ecarts";
 import { PhotosObservationsSchema } from "@/lib/validations/photo-observation";
+import { getMenuiserieStatut, StatutMenuiserie } from "@/lib/types/menuiserie-status";
 
 const updateMenuiserieSchema = z.object({
   donneesModifiees: z.record(
@@ -72,6 +73,7 @@ export async function GET(
         intitule: true,
         ordre: true,
         donneesModifiees: true,
+        validee: true, // Ajout pour calcul du statut
       },
       orderBy: { ordre: "asc" },
     });
@@ -79,13 +81,18 @@ export async function GET(
     // Find current index
     const currentIndex = allMenuiseries.findIndex((m) => m.id === id);
 
-    // Map menuiseries to status format with completion flag
-    const menuiseriesStatus = allMenuiseries.map((m) => ({
-      id: m.id,
-      repere: m.repere,
-      intitule: m.intitule,
-      isCompleted: m.donneesModifiees !== null && Object.keys(m.donneesModifiees as Record<string, any>).length > 0,
-    }));
+    // Map menuiseries to status format with statut calculation
+    const menuiseriesStatus = allMenuiseries.map((m) => {
+      const statut = getMenuiserieStatut(m.donneesModifiees, m.validee);
+      return {
+        id: m.id,
+        repere: m.repere,
+        intitule: m.intitule,
+        statut,
+        // Compatibilité avec l'ancien code (isCompleted = VALIDEE)
+        isCompleted: statut === StatutMenuiserie.VALIDEE,
+      };
+    });
 
     return NextResponse.json({
       success: true,

@@ -162,8 +162,25 @@
   - Badge "Complété" sur page projet
   - Bordure verte sur cards complétées
 - [x] **Retour au projet** avec confirmation si modifications non sauvegardées
-- [x] **Tests** : 11 tests unitaires NavigationBar (PASS)
+- [x] **Tests** : 16 tests unitaires NavigationBar (PASS)
 - [ ] Swipe entre menuiseries (mobile - Bonus future)
+
+#### 3 Statuts menuiseries - ✅ COMPLÉTÉE (Janvier 2025)
+
+- [x] **Enum TypeScript** : `StatutMenuiserie` (IMPORTEE, EN_COURS, VALIDEE)
+- [x] **Fonction helper** : `getMenuiserieStatut(donneesModifiees, validee)` + tests (16 tests PASS)
+- [x] **API GET /api/menuiseries/[id]** : Calcul et retour du statut dans `menuiseriesStatus`
+- [x] **API POST /api/menuiseries/[id]/valider** : Endpoint de validation avec vérifications
+- [x] **NavigationBar** : 3 états visuels distincts
+  - ⚪ IMPORTEE : Cercle gris (jamais modifiée)
+  - 🔵 EN_COURS : Cercle orange (modifiée mais pas validée)
+  - ✅ VALIDEE : Cercle vert avec checkmark (validée et terminée)
+- [x] **Formulaire menuiserie** : Bouton "Valider" (vert) distinct du bouton "Enregistrer"
+- [x] **Navigation auto** : Après validation, redirection vers menuiserie suivante (ou retour projet si dernière)
+- [x] **Confirmation** : Alerte avant validation pour éviter validation accidentelle
+- [x] **Gestion modifications non sauvegardées** : Propose de sauvegarder avant validation
+- [x] **Documentation** : API_SPEC.md, CONTEXT.md, TODO_LIST.md mis à jour
+- [x] **Tests intégration** : Tests API endpoint `/valider` (7 tests)
 
 ### 🖼️ Phase 3.5 : Extraction Images PDF - EN ATTENTE
 

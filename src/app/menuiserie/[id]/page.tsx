@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Save, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Save, ChevronDown, ChevronUp, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,7 @@ import { TextFieldWithDiff } from "@/components/forms/TextFieldWithDiff";
 import { NavigationBar } from "@/components/menuiseries/NavigationBar";
 import HelpIcon from "@/components/forms/HelpIcon";
 import PhotoUpload from "@/components/forms/PhotoUpload";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { PhotoObservation } from "@/lib/validations/photo-observation";
 
 interface MenuiserieStatus {
@@ -171,6 +172,13 @@ export default function MenuiseriePage() {
   const [observationsOpen, setObservationsOpen] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
+  // États pour les modales de confirmation
+  const [confirmSaveBeforeValidate, setConfirmSaveBeforeValidate] = useState(false);
+  const [confirmValidate, setConfirmValidate] = useState(false);
+  const [confirmNavigation, setConfirmNavigation] = useState(false);
+  const [confirmBackToProject, setConfirmBackToProject] = useState(false);
+  const [pendingNavigationId, setPendingNavigationId] = useState<string | null>(null);
+
   const { data: menuiserie, isLoading } = useQuery({
     queryKey: ["menuiserie", menuiserieId],
     queryFn: async (): Promise<Menuiserie> => {
@@ -223,6 +231,34 @@ export default function MenuiseriePage() {
     },
   });
 
+  const validerMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/menuiseries/${menuiserieId}/valider`, {
+        method: "POST",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error?.message || "Failed to validate");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success("Menuiserie validée !");
+      queryClient.invalidateQueries({ queryKey: ["menuiserie", menuiserieId] });
+
+      // Navigation automatique vers la menuiserie suivante (ou retour projet)
+      if (menuiserie?.navigation.hasNext && menuiserie.navigation.nextId) {
+        router.push(`/menuiserie/${menuiserie.navigation.nextId}`);
+      } else {
+        // Dernière menuiserie : retour au projet
+        router.push(`/projet/${menuiserie?.projet.id}`);
+      }
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Erreur lors de la validation");
+    },
+  });
+
   const handleFieldChange = (key: string, value: string) => {
     setHasUnsavedChanges(true);
     setFormData((prev) => {
@@ -251,16 +287,44 @@ export default function MenuiseriePage() {
     setHasUnsavedChanges(false);
   };
 
+  const handleValider = () => {
+    if (!menuiserie) return;
+
+    // Si des modifications non sauvegardées existent, demander de sauvegarder d'abord
+    if (hasUnsavedChanges) {
+      setConfirmSaveBeforeValidate(true);
+      return;
+    }
+
+    // Sinon, demander confirmation de validation
+    setConfirmValidate(true);
+  };
+
+  const handleConfirmSaveAndValidate = () => {
+    handleSave();
+    // Attendre que la sauvegarde soit terminée avant de valider
+    setTimeout(() => {
+      validerMutation.mutate();
+    }, 500);
+  };
+
   const handleNavigate = (targetId: string) => {
     if (hasUnsavedChanges) {
-      const confirm = window.confirm(
-        "Vous avez des modifications non sauvegardées. Voulez-vous continuer sans sauvegarder ?"
-      );
-      if (!confirm) return;
+      setPendingNavigationId(targetId);
+      setConfirmNavigation(true);
+      return;
     }
 
     router.push(`/menuiserie/${targetId}`);
     setHasUnsavedChanges(false);
+  };
+
+  const handleConfirmNavigation = () => {
+    if (pendingNavigationId) {
+      router.push(`/menuiserie/${pendingNavigationId}`);
+      setHasUnsavedChanges(false);
+      setPendingNavigationId(null);
+    }
   };
 
   const handleNext = () => {
@@ -349,10 +413,8 @@ export default function MenuiseriePage() {
               size="icon"
               onClick={() => {
                 if (hasUnsavedChanges) {
-                  const confirm = window.confirm(
-                    "Vous avez des modifications non sauvegardées. Voulez-vous continuer sans sauvegarder ?"
-                  );
-                  if (!confirm) return;
+                  setConfirmBackToProject(true);
+                  return;
                 }
                 router.push(`/projet/${menuiserie.projet.id}`);
               }}
@@ -611,17 +673,28 @@ export default function MenuiseriePage() {
               onPrevious={handlePrevious}
               currentPosition={menuiserie.navigation.currentPosition}
               total={menuiserie.navigation.total}
-              disabled={updateMutation.isPending}
+              disabled={updateMutation.isPending || validerMutation.isPending}
               menuiseriesStatus={menuiserie.navigation.menuiseriesStatus}
             />
-            <Button
-              className="h-14 w-full text-lg"
-              onClick={handleSave}
-              disabled={updateMutation.isPending}
-            >
-              <Save className="mr-2 h-5 w-5" />
-              {updateMutation.isPending ? "Enregistrement..." : "Enregistrer"}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                className="h-14 flex-1 text-lg"
+                onClick={handleSave}
+                disabled={updateMutation.isPending || validerMutation.isPending}
+                variant="outline"
+              >
+                <Save className="mr-2 h-5 w-5" />
+                {updateMutation.isPending ? "Enregistrement..." : "Enregistrer"}
+              </Button>
+              <Button
+                className="h-14 flex-1 bg-green-600 text-lg hover:bg-green-700"
+                onClick={handleValider}
+                disabled={updateMutation.isPending || validerMutation.isPending || !menuiserie.donneesModifiees}
+              >
+                <CheckCircle className="mr-2 h-5 w-5" />
+                {validerMutation.isPending ? "Validation..." : "Valider"}
+              </Button>
+            </div>
           </div>
 
           {/* Desktop : Layout horizontal aligné */}
@@ -634,21 +707,85 @@ export default function MenuiseriePage() {
                 onPrevious={handlePrevious}
                 currentPosition={menuiserie.navigation.currentPosition}
                 total={menuiserie.navigation.total}
-                disabled={updateMutation.isPending}
+                disabled={updateMutation.isPending || validerMutation.isPending}
                 menuiseriesStatus={menuiserie.navigation.menuiseriesStatus}
               />
             </div>
             <Button
               className="h-14 whitespace-nowrap px-8 text-lg"
               onClick={handleSave}
-              disabled={updateMutation.isPending}
+              disabled={updateMutation.isPending || validerMutation.isPending}
+              variant="outline"
             >
               <Save className="mr-2 h-5 w-5" />
               {updateMutation.isPending ? "Enregistrement..." : "Enregistrer"}
             </Button>
+            <Button
+              className="h-14 whitespace-nowrap bg-green-600 px-8 text-lg hover:bg-green-700"
+              onClick={handleValider}
+              disabled={updateMutation.isPending || validerMutation.isPending || !menuiserie.donneesModifiees}
+            >
+              <CheckCircle className="mr-2 h-5 w-5" />
+              {validerMutation.isPending ? "Validation..." : "Valider"}
+            </Button>
           </div>
         </div>
       </div>
+
+      {/* Modales de confirmation */}
+      <ConfirmDialog
+        open={confirmSaveBeforeValidate}
+        onOpenChange={setConfirmSaveBeforeValidate}
+        onConfirm={handleConfirmSaveAndValidate}
+        title="Enregistrer avant validation ?"
+        description="Vous avez des modifications non sauvegardées. Voulez-vous les enregistrer avant de valider cette menuiserie ?"
+        confirmText="Oui, enregistrer et valider"
+        cancelText="Annuler"
+        variant="default"
+      />
+
+      <ConfirmDialog
+        open={confirmValidate}
+        onOpenChange={setConfirmValidate}
+        onConfirm={() => validerMutation.mutate()}
+        title="Valider cette menuiserie ?"
+        description={
+          <>
+            <span className="block">Êtes-vous sûr de vouloir valider cette menuiserie ?</span>
+            <span className="mt-2 block font-medium text-gray-700">
+              Elle sera marquée comme terminée et vous passerez automatiquement à la suivante.
+            </span>
+          </>
+        }
+        confirmText="Oui, valider"
+        cancelText="Annuler"
+        variant="default"
+      />
+
+      <ConfirmDialog
+        open={confirmNavigation}
+        onOpenChange={setConfirmNavigation}
+        onConfirm={handleConfirmNavigation}
+        title="Modifications non sauvegardées"
+        description="Vous avez des modifications non sauvegardées. Voulez-vous vraiment changer de menuiserie sans les enregistrer ?"
+        confirmText="Oui, continuer sans sauvegarder"
+        cancelText="Annuler"
+        variant="destructive"
+      />
+
+      <ConfirmDialog
+        open={confirmBackToProject}
+        onOpenChange={setConfirmBackToProject}
+        onConfirm={() => {
+          router.push(`/projet/${menuiserie?.projet.id}`);
+          setHasUnsavedChanges(false);
+        }}
+        title="Retour au projet"
+        description="Vous avez des modifications non sauvegardées. Voulez-vous vraiment revenir au projet sans les enregistrer ?"
+        confirmText="Oui, retourner au projet"
+        cancelText="Annuler"
+        variant="destructive"
+      />
     </div>
   );
 }

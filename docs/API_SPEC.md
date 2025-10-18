@@ -366,18 +366,21 @@ Détail complet d'une menuiserie avec analyse des écarts et métadonnées de na
           "id": "clxyz123...",
           "repere": "Entrée",
           "intitule": "Porte-fenêtre",
+          "statut": "VALIDEE",
           "isCompleted": true
         },
         {
           "id": "clxyz456...",
           "repere": "Salon",
           "intitule": "Coulissant 2 vantaux",
-          "isCompleted": true
+          "statut": "EN_COURS",
+          "isCompleted": false
         },
         {
           "id": "clxyz789...",
           "repere": null,
           "intitule": "Châssis fixe",
+          "statut": "IMPORTEE",
           "isCompleted": false
         }
       ]
@@ -392,7 +395,11 @@ Détail complet d'une menuiserie avec analyse des écarts et métadonnées de na
 - `hasNext` / `hasPrevious` : Booléens pour états des boutons
 - `nextId` / `previousId` : IDs pour navigation (null si pas de suivant/précédent)
 - `menuiseriesStatus` : Liste complète avec statuts de complétion
-  - `isCompleted` : `true` si `donneesModifiees !== null`
+  - `statut` : Enum `"IMPORTEE" | "EN_COURS" | "VALIDEE"`
+    - `IMPORTEE` : Importée du PDF, jamais modifiée (`donneesModifiees === null`)
+    - `EN_COURS` : Modifiée mais pas validée (`donneesModifiees !== null && validee === false`)
+    - `VALIDEE` : Validée et terminée (`validee === true`)
+  - `isCompleted` : `true` uniquement si `statut === "VALIDEE"` (compatibilité legacy)
 
 #### PUT `/api/menuiseries/[id]`
 
@@ -437,11 +444,23 @@ Sauvegarde des modifications d'une menuiserie.
 }
 ```
 
-#### POST `/api/menuiseries/[id]/validate`
+#### POST `/api/menuiseries/[id]/valider`
 
-Valide définitivement une menuiserie.
+Valide définitivement une menuiserie (marque comme terminée).
 
-**Response:**
+**Comportement** :
+- Requiert que `donneesModifiees` existe (impossible de valider une menuiserie jamais modifiée)
+- Met `validee` à `true`
+- Enregistre `dateValidation` à l'instant actuel
+- Change le statut de `EN_COURS` → `VALIDEE`
+
+**Request:**
+
+```http
+POST /api/menuiseries/clxyz456/valider
+```
+
+**Response Success (200):**
 
 ```json
 {
@@ -449,7 +468,32 @@ Valide définitivement une menuiserie.
   "data": {
     "id": "clxyz456...",
     "validee": true,
-    "dateValidation": "2024-01-15T15:00:00Z"
+    "dateValidation": "2025-01-12T11:06:00Z"
+  }
+}
+```
+
+**Response Error (400 - pas de modifications):**
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Cannot validate menuiserie without modifications",
+    "details": "Please save modifications before validating"
+  }
+}
+```
+
+**Response Error (404 - menuiserie introuvable):**
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Menuiserie not found"
   }
 }
 ```

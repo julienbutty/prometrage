@@ -103,12 +103,17 @@ model Menuiserie {
   // Analyse des écarts
   ecarts    Json?    // Liste des écarts calculés
 
-  // Validation
-  validee   Boolean  @default(false)
-  dateValidation DateTime?
+  // Validation et statut
+  validee   Boolean  @default(false)  // true = menuiserie terminée et validée
+  dateValidation DateTime?            // Date de validation
 
   // Ordre d'affichage
   ordre     Int      @default(0)
+
+  // 3 STATUTS POSSIBLES (calculés dynamiquement) :
+  // 1. IMPORTEE   : donneesModifiees === null (jamais modifiée)
+  // 2. EN_COURS   : donneesModifiees !== null && validee === false (modifiée mais pas validée)
+  // 3. VALIDEE    : validee === true (terminée et validée)
 
   // Métadonnées
   createdAt DateTime @default(now())
@@ -414,7 +419,8 @@ La navigation entre menuiseries est implémentée via les métadonnées retourn�
           "id": "clxyz123...",
           "repere": "Salon",
           "intitule": "Coulissant 2 vantaux",
-          "isCompleted": true  // Basé sur donneesModifiees !== null
+          "statut": "VALIDEE",      // Enum: IMPORTEE | EN_COURS | VALIDEE
+          "isCompleted": true       // true uniquement si statut === VALIDEE
         },
         // ... autres menuiseries
       ]
