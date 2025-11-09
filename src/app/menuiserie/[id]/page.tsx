@@ -924,7 +924,10 @@ export default function MenuiseriePage() {
       </div>
 
       {/* Fixed Bottom Navigation + Save */}
-      <div className="fixed right-0 bottom-0 left-0 border-t bg-white shadow-lg">
+      <div
+        className="fixed inset-x-0 bottom-0 z-50 border-t bg-white shadow-lg"
+        style={{ transform: 'translateZ(0)' }}
+      >
         <div className="mx-auto max-w-7xl px-4 py-4 lg:px-8 lg:py-6">
           {/* Mobile : Stack vertical */}
           <div className="flex flex-col gap-3 lg:hidden">
