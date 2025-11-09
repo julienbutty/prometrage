@@ -130,7 +130,9 @@ export function ComboboxField({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          onOpenAutoFocus={(e) => e.preventDefault}
+          onOpenAutoFocus={(e) => {
+            e.preventDefault();
+          }}
           className="w-full max-w-[calc(100vw-2rem)] p-0"
           align="start"
         >
@@ -139,7 +141,6 @@ export function ComboboxField({
               placeholder="Rechercher..."
               value={search}
               onValueChange={setSearch}
-              autoFocus={false}
             />
             <CommandList>
               <CommandEmpty>Aucune option trouvée.</CommandEmpty>
