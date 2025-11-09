@@ -1,0 +1,282 @@
+{
+  "pack": {
+    "label": "Pack",
+    "type": "combobox",
+    "options": ["Tradition", "Confort", "Initial", "Poignée décentrée"],
+    "allowCustom": true
+  },
+  "gamme": {
+    "label": "Gamme",
+    "type": "select",
+    "options": ["OPTIMAX", "INNOVAX", "PERFORMAX"]
+  },
+  "packDimensions": {
+    "label": "Pack dimensions",
+    "type": "combobox",
+    "options": ["30mm", "40mm"],
+    "allowCustom": true,
+    "placeholder": "Ex: 35mm"
+  },
+  "modeColoris": {
+    "label": "Mode coloris",
+    "type": "combobox",
+    "options": ["Monocolore", "Bicolore", "Autres"],
+    "allowCustom": true
+  },
+  "couleurInt": {
+    "label": "Teinte RAL intérieure",
+    "type": "combobox",
+    "options": ["Blanc", "Noir", "F9"],
+    "allowCustom": true,
+    "placeholder": "Ex: RAL 7016"
+  },
+  "couleurExt": {
+    "label": "Teinte RAL extérieure",
+    "type": "combobox",
+    "options": ["Blanc", "Noir", "F9"],
+    "allowCustom": true,
+    "placeholder": "Ex: RAL 7016"
+  },
+  "typeChassis": {
+    "label": "Type de châssis",
+    "type": "combobox",
+    "options": ["Galando 2 rails", "Galando 3 rails", "Ouvrant Fixe (OF)", "Portée Fenêtre (PF)"],
+    "allowCustom": false
+  },
+  "typeExecution": {
+    "label": "Type d'exécution",
+    "type": "combobox",
+    "options": ["Exécution", "Clair de bois", "Ailes comprises", "Seuil PMR"],
+    "allowCustom": true
+  },
+  "typeDormant": {
+    "label": "Type de dormant",
+    "type": "combobox",
+    "options": [
+      "Aile intégrée droite 25mm",
+      "Aile intégrée droite 44mm",
+      "Aile reconstituée pose façade",
+      "Sans aile double gorges",
+      "Sans gorge int./ext.",
+      "Pièce d'appui"
+    ],
+    "allowCustom": true,
+    "placeholder": "Ex: Aile 30mm"
+  },
+  "fixation": {
+    "label": "Fixation",
+    "type": "select",
+    "options": ["Pattes std", "Pattes PRDT", "Vis"]
+  },
+  "pose": {
+    "label": "Type de pose",
+    "type": "combobox",
+    "options": ["en feuillure", "en applique", "en tunnel (tableau)", "sous coffre tunnel"],
+    "allowCustom": true
+  },
+  "dimensions": {
+    "label": "Dimensions / Type",
+    "type": "combobox",
+    "options": ["Exécution", "Tableau Fini", "clair de bois", "Ailes comprises"],
+    "allowCustom": true
+  },
+  "soubassement": {
+    "label": "Soubassement",
+    "type": "combobox",
+    "options": [
+      "Vitré",
+      "Plein (2 faces alu lisses)",
+      "Plate-bande traditionnelle",
+      "½ linteau"
+    ],
+    "allowCustom": true,
+    "placeholder": "Ex: Hauteur traverse à l'axe"
+  },
+  "habillageInt": {
+    "label": "Habillage intérieur",
+    "type": "combobox",
+    "options": [
+      "Standard",
+      "Sans",
+      "Haut",
+      "Bas",
+      "Montants",
+      "25mm (3090121)",
+      "45mm (3090122)",
+      "65mm (3090221)",
+      "80mm (3090123)",
+      "25mm déport 15mm (3090160)",
+      "49mm déport 15mm (3790028)",
+      "A clipper 4 côtés",
+      "A clipper 3 côtés",
+      "gauche",
+      "droite"
+    ],
+    "allowCustom": true,
+    "placeholder": "Ex: Ref: XF302"
+  },
+  "habillageExt": {
+    "label": "Habillage extérieur",
+    "type": "combobox",
+    "options": ["Standard", "Sans", "Haut", "Bas", "Montants"],
+    "allowCustom": true
+  },
+  "epaisseurVitrage": {
+    "label": "Épaisseur vitrage",
+    "type": "select",
+    "options": ["18 mm", "26 mm", "45 mm"]
+  },
+  "doubleVitrage": {
+    "label": "Double vitrage",
+    "type": "combobox",
+    "options": [
+      "4/16/4",
+      "4/20/4",
+      "44.2.16w Argon 4 PTR+ (Ug=1.1)",
+      "Standard"
+    ],
+    "allowCustom": true,
+    "placeholder": "Ex: 44.2.16w Argon 4 PTR+"
+  },
+  "couleurVitrage": {
+    "label": "Couleur vitrage",
+    "type": "combobox",
+    "options": ["blanc", "noir", "PTR+ (Plats collés)", "PTR (Plats collés)"],
+    "allowCustom": true
+  },
+  "intercalaire": {
+    "label": "Intercalaire",
+    "type": "combobox",
+    "options": ["Blanc", "Noir"],
+    "allowCustom": true,
+    "placeholder": "Ex: warm edge"
+  },
+  "petitsBoisType": {
+    "label": "Type de petits-bois",
+    "type": "combobox",
+    "options": ["10 mm", "Faux intercalaires", "schéma / VTL"],
+    "allowCustom": true
+  },
+  "petitsBoisCouleur": {
+    "label": "Couleur petits-bois",
+    "type": "combobox",
+    "options": ["Blanc Laiton", "Argent", "Plomb", "Bronze", "blanc", "noir"],
+    "allowCustom": true
+  },
+  "petitsBoisConfiguration": {
+    "label": "Configuration petits-bois",
+    "type": "combobox",
+    "options": [
+      "1 petit bois vertical par vitrage",
+      "2 petits bois verticaux par vitrage",
+      "Croisillons",
+      "Schéma personnalisé"
+    ],
+    "allowCustom": true,
+    "placeholder": "Ex: 1 petit bois vertical par vitrage"
+  },
+  "couleurQuincaillerie": {
+    "label": "Couleur quincaillerie",
+    "type": "select",
+    "options": ["blanc", "noir"]
+  },
+  "couleurJoints": {
+    "label": "Couleur des joints",
+    "type": "combobox",
+    "options": ["blanc", "noir", "gris", "Blanc", "Noir", "Gris"],
+    "allowCustom": true
+  },
+  "quincaillerie": {
+    "label": "Quincaillerie",
+    "type": "combobox",
+    "options": [
+      "Fermeture 1 point",
+      "Poignée ext + serrure à clé",
+      "Poignée plate sur semi-fixe",
+      "Serrure 3 points T1",
+      "Serrure 3 points sécurité T3",
+      "Béquille plate",
+      "Vérins",
+      "Pattes dépose totale PRDT"
+    ],
+    "allowCustom": true,
+    "placeholder": "Ex: Serrure custom"
+  },
+  "ventilation": {
+    "label": "Ventilation",
+    "type": "combobox",
+    "options": [
+      "22m3/h - 34db",
+      "22m3/h - 37db",
+      "22m3/h - 39db",
+      "22m3/h - 41db",
+      "30m3/h - 34db",
+      "30m3/h - 37db",
+      "30m3/h - 39db",
+      "30m3/h - 41db",
+      "45m3/h - 37db",
+      "45m3/h - 39db",
+      "Hygroréglable 5-45m3/h - 34db",
+      "Hygroréglable 5-45m3/h - 37db",
+      "Hygroréglable 5-45m3/h - 39db",
+      "Hygroréglable 5-45m3/h - 41db",
+      "Grille dans coffre VRI"
+    ],
+    "allowCustom": true
+  },
+  "voletType": {
+    "label": "Type VRI",
+    "type": "combobox",
+    "options": ["Optimax (o. visible)", "Innovax (o. caché)"],
+    "allowCustom": false
+  },
+  "voletLames": {
+    "label": "Type de lames VRI",
+    "type": "combobox",
+    "options": ["PVC 44", "Alu Rs52", "Alu Rs41", "Alu BIO"],
+    "allowCustom": true
+  },
+  "voletCouleurCoffre": {
+    "label": "Couleur coffre VRI",
+    "type": "combobox",
+    "options": ["Blanc", "Noir", "RAL", "laqué"],
+    "allowCustom": true,
+    "placeholder": "Préciser couleur"
+  },
+  "voletManoeuvre": {
+    "label": "Manœuvre VRI",
+    "type": "combobox",
+    "options": ["Sangle", "Treuil", "Tirage direct", "Electrique", "Electronique", "Radio (monté)", "Solaire io (non monté)"],
+    "allowCustom": false
+  },
+  "voletSortie": {
+    "label": "Sortie manœuvre",
+    "type": "select",
+    "options": ["Gauche", "Droite", "Dessous", "Côté"]
+  },
+  "voletPanneauSolaire": {
+    "label": "Panneau solaire",
+    "type": "select",
+    "options": ["monté", "non monté"]
+  },
+  "hauteurAllege": {
+    "label": "Hauteur d'allège",
+    "type": "number",
+    "unit": "mm"
+  },
+  "hauteurPoignee": {
+    "label": "Hauteur poignée",
+    "type": "number",
+    "unit": "mm"
+  },
+  "ouvrantPrincipal": {
+    "label": "Ouvrant principal",
+    "type": "combobox",
+    "options": ["Gauche", "Droite", "OP"],
+    "allowCustom": true
+  },
+  "commentaires": {
+    "label": "Commentaires et options",
+    "type": "text"
+  }
+}

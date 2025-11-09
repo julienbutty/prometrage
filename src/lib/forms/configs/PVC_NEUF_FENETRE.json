@@ -1,0 +1,117 @@
+{
+  "gamme": {
+    "label": "Gamme",
+    "type": "select",
+    "options": ["SOFTLINE", "SWINGLINE", "KIETISLINE"]
+  },
+  "finition": {
+    "label": "Finition",
+    "type": "combobox",
+    "options": ["Contemporaine", "Moulurée", "WOODLINE (softline uniquement)"],
+    "allowCustom": false
+  },
+  "pack": {
+    "label": "Pack",
+    "type": "select",
+    "options": ["Tradition", "Confort", "Optimum", "InitialPC", "Renfort intégral"]
+  },
+  "modeColoris": {
+    "label": "Mode coloris",
+    "type": "select",
+    "options": ["MONOCOLORE", "BICOLORE - Filmé", "BICOLORE - Laqué", "Teinte masse"]
+  },
+  "couleurInt": {
+    "label": "Couleur intérieure",
+    "type": "combobox",
+    "options": ["Blanc", "Beige", "Gris"],
+    "allowCustom": true,
+    "placeholder": "Ex: Filmé INT, RAL 7016"
+  },
+  "couleurExt": {
+    "label": "Couleur extérieure",
+    "type": "combobox",
+    "options": ["Blanc", "Beige", "Gris"],
+    "allowCustom": true,
+    "placeholder": "Ex: Filmé EXT, RAL 7016"
+  },
+  "typeMenuiserie": {
+    "label": "Type de menuiserie",
+    "type": "select",
+    "options": ["OF (Ouvrant Fixe)", "PF (Portée Fenêtre)", "PF serrure"]
+  },
+  "typeExecution": {
+    "label": "Type d'exécution",
+    "type": "select",
+    "options": ["Exécution", "Tableau Fini"]
+  },
+  "typeDormant": {
+    "label": "Type de dormant",
+    "type": "combobox",
+    "options": [
+      "sans aile (101249)",
+      "101214 (101246)",
+      "101215 (101247 double clip)",
+      "avec aile (101240 aile 17)",
+      "Dt réno"
+    ],
+    "allowCustom": true,
+    "placeholder": "Ex: Aile 20mm"
+  },
+  "repriseDoublage": {
+    "label": "Reprise de doublage",
+    "type": "select",
+    "options": ["Dt. Monobloc(2)", "Tapée rapportée"]
+  },
+  "pose": {
+    "label": "Type de pose",
+    "type": "select",
+    "options": ["en feuillure", "en applique", "en tunnel (tableau)", "sous coffre tunnel"]
+  },
+  "fixation": {
+    "label": "Fixation",
+    "type": "select",
+    "options": ["Vis", "Pattes std", "Pattes PRDT"]
+  },
+  "seuil": {
+    "label": "Seuil",
+    "type": "combobox",
+    "options": ["Seuil Alu", "20mm (PMR)", "40mm", "Protection"],
+    "allowCustom": false
+  },
+  "soubassement": {
+    "label": "Soubassement",
+    "type": "combobox",
+    "options": ["Vitré", "Plein lisse", "Plein rainuré (blanc)", "Traditionnelles", "Double congés", "Congés", "Cimaise", "Coin mouchoir"],
+    "allowCustom": true,
+    "placeholder": "Ex: Hauteur traverse à l'axe"
+  },
+  "epaisseurVitrage": {
+    "label": "Épaisseur vitrage",
+    "type": "select",
+    "options": ["26 mm", "18 mm", "45 mm"]
+  },
+  "vitrageStandard": {
+    "label": "Vitrage standard",
+    "type": "select",
+    "options": ["Std : 4/20/4 PTR+", "4/20/4 PTR"]
+  },
+  "intercalaire": {
+    "label": "Intercalaire",
+    "type": "select",
+    "options": ["blanc", "noir"]
+  },
+  "hauteurAllege": {
+    "label": "Hauteur d'allège",
+    "type": "number",
+    "unit": "mm"
+  },
+  "hauteurPoignee": {
+    "label": "Hauteur poignée",
+    "type": "number",
+    "unit": "mm"
+  },
+  "commentaires": {
+    "label": "Commentaires et options",
+    "type": "text"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "gamme": {
+    "label": "Gamme",
+    "type": "select",
+    "options": ["WISIO"]
+  },
+  "finition": {
+    "label": "Finition",
+    "type": "combobox",
+    "options": ["Contemporaine", "Moulurée"],
+    "allowCustom": false
+  },
+  "pack": {
+    "label": "Pack",
+    "type": "select",
+    "options": ["Tradition", "Confort"]
+  },
+  "modeColoris": {
+    "label": "Mode coloris",
+    "type": "select",
+    "options": ["MONOCOLORE", "BICOLORE - Filmé", "BICOLORE - Laqué"]
+  },
+  "couleurInt": {
+    "label": "Couleur intérieure",
+    "type": "combobox",
+    "options": ["Blanc", "Beige", "Gris"],
+    "allowCustom": true,
+    "placeholder": "Ex: Filmé INT, RAL 7016"
+  },
+  "couleurExt": {
+    "label": "Couleur extérieure",
+    "type": "combobox",
+    "options": ["Blanc", "Beige", "Gris"],
+    "allowCustom": true,
+    "placeholder": "Ex: Filmé EXT, RAL 7016"
+  },
+  "typeOuvrant": {
+    "label": "Type d'ouvrant",
+    "type": "select",
+    "options": ["2 rails", "3 rails", "4 rails"]
+  },
+  "nombreVantaux": {
+    "label": "Nombre de vantaux",
+    "type": "number"
+  },
+  "typeExecution": {
+    "label": "Type d'exécution",
+    "type": "select",
+    "options": ["Exécution", "Tableau Fini"]
+  },
+  "typeDormant": {
+    "label": "Type de dormant",
+    "type": "combobox",
+    "options": ["Standard WISIO", "Avec aile"],
+    "allowCustom": true
+  },
+  "pose": {
+    "label": "Type de pose",
+    "type": "select",
+    "options": ["en feuillure", "en applique", "en tunnel (tableau)"]
+  },
+  "seuil": {
+    "label": "Seuil",
+    "type": "combobox",
+    "options": ["Seuil Alu", "20mm (PMR)", "40mm"],
+    "allowCustom": false
+  },
+  "epaisseurVitrage": {
+    "label": "Épaisseur vitrage",
+    "type": "select",
+    "options": ["26 mm", "18 mm", "45 mm"]
+  },
+  "intercalaire": {
+    "label": "Intercalaire",
+    "type": "select",
+    "options": ["blanc", "noir"]
+  },
+  "hauteurAllege": {
+    "label": "Hauteur d'allège",
+    "type": "number",
+    "unit": "mm"
+  },
+  "commentaires": {
+    "label": "Commentaires et options",
+    "type": "text"
+  }
+}

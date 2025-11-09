@@ -1,0 +1,122 @@
+{
+  "gamme": {
+    "label": "Gamme",
+    "type": "select",
+    "options": ["OPTIMAX", "Porte Lourde"]
+  },
+  "pack": {
+    "label": "Pack",
+    "type": "select",
+    "options": ["Tradition", "Confort", "Initial", "Poignée décentrée"]
+  },
+  "packDimensions": {
+    "label": "Pack dimensions",
+    "type": "select",
+    "options": ["30mm", "40mm"]
+  },
+  "modeColoris": {
+    "label": "Mode coloris",
+    "type": "select",
+    "options": ["Monocolore", "Bicolore", "Autres"]
+  },
+  "couleurInt": {
+    "label": "Teinte RAL intérieure",
+    "type": "combobox",
+    "options": ["Blanc", "Noir", "F9"],
+    "allowCustom": true,
+    "placeholder": "Ex: RAL 7016"
+  },
+  "couleurExt": {
+    "label": "Teinte RAL extérieure",
+    "type": "combobox",
+    "options": ["Blanc", "Noir", "F9"],
+    "allowCustom": true,
+    "placeholder": "Ex: RAL 7016"
+  },
+  "couleurQuincaillerie": {
+    "label": "Couleur quincaillerie",
+    "type": "select",
+    "options": ["Blanc", "F9", "Noir"]
+  },
+  "typePorte": {
+    "label": "Type de porte",
+    "type": "select",
+    "options": [
+      "PE1 INT (Porte Entrée 1 vantail Intérieur)",
+      "PE1 EXT (Porte Entrée 1 vantail Extérieur)",
+      "PE2 INT (Porte Entrée 2 vantaux Intérieur)",
+      "PE2 EXT (Porte Entrée 2 vantaux Extérieur)"
+    ]
+  },
+  "typeExecution": {
+    "label": "Type d'exécution",
+    "type": "select",
+    "options": ["Exécution", "Clair de bois", "Tableau Fini"]
+  },
+  "typeDormant": {
+    "label": "Type de dormant",
+    "type": "combobox",
+    "options": [
+      "Aile intégrée droite 25mm Optimax",
+      "Aile intégrée droite 44mm Optimax",
+      "Aile reconstituée pose façade",
+      "Sans aile double gorges",
+      "Sans gorge int./ext."
+    ],
+    "allowCustom": false
+  },
+  "repriseDoublage": {
+    "label": "Reprise de doublage",
+    "type": "combobox",
+    "options": [
+      "Monobloc",
+      "Tapées : 100mm",
+      "Tapées : 120mm",
+      "Tapées : 140mm",
+      "Tapées : 160mm",
+      "Tapées : 180mm",
+      "Tapées : 200mm"
+    ],
+    "allowCustom": true
+  },
+  "pose": {
+    "label": "Type de pose",
+    "type": "combobox",
+    "options": [
+      "Seuil PMR",
+      "Sans Seuil",
+      "En rénovation (Vis Vérins)",
+      "Entre tableau ou tunnel (Vis Vérins)",
+      "En applique (Pattes)",
+      "Pattes dépose totale PRDT 3 côtés",
+      "Pose sous coffre tunnel"
+    ],
+    "allowCustom": false
+  },
+  "soubassement": {
+    "label": "Soubassement",
+    "type": "combobox",
+    "options": [
+      "Vitré",
+      "Plein (2 faces alu lisses)",
+      "Plate-bande traditionnelle",
+      "½ linteau"
+    ],
+    "allowCustom": true,
+    "placeholder": "Ex: Hauteur traverse à l'axe"
+  },
+  "hauteurAllege": {
+    "label": "Hauteur d'allège",
+    "type": "number",
+    "unit": "mm"
+  },
+  "hauteurPoignee": {
+    "label": "Hauteur poignée",
+    "type": "number",
+    "unit": "mm"
+  },
+  "commentaires": {
+    "label": "Commentaires et options",
+    "type": "text"
+  }
+}

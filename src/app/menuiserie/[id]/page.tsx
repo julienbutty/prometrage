@@ -16,11 +16,16 @@ import {
 } from "@/components/ui/collapsible";
 import { FieldWithDiff } from "@/components/forms/FieldWithDiff";
 import { TextFieldWithDiff } from "@/components/forms/TextFieldWithDiff";
+import { DynamicField } from "@/components/forms/DynamicField";
 import { NavigationBar } from "@/components/menuiseries/NavigationBar";
 import HelpIcon from "@/components/forms/HelpIcon";
 import PhotoUpload from "@/components/forms/PhotoUpload";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { Badge } from "@/components/ui/badge";
 import type { PhotoObservation } from "@/lib/validations/photo-observation";
+import { getFormConfigKey, detectMateriau, detectPose, detectTypeProduit } from "@/lib/utils/menuiserie-type";
+import { loadFormConfig } from "@/lib/forms/config-loader";
+import { useMemo } from "react";
 
 interface MenuiserieStatus {
   id: string;
@@ -63,11 +68,23 @@ interface Menuiserie {
   navigation: NavigationInfo;
 }
 
-// Champs numériques critiques (toujours visibles)
-const NUMERIC_CRITICAL_FIELDS = ["largeur", "hauteur", "hauteurAllege"];
+// Champs critiques (toujours visibles) : Dimensions + Caractéristiques produit
+const CRITICAL_FIELDS = [
+  // Dimensions
+  "largeur",
+  "hauteur",
+  "hauteurAllege",
+  // Caractéristiques produit (gérées dynamiquement par config)
+  "gamme",
+  "pack",
+  "couleurInt",
+  "couleurExt",
+  // Note: typeOuvrant retiré car pas dans les configs actuelles
+  // Note: nombreVantaux seulement pour coulissants (affiché automatiquement si config existe)
+];
 
-// Autres champs numériques (dans collapsed)
-const NUMERIC_OTHER_FIELDS = ["largeurTableau", "hauteurTableau"];
+// Champs numériques (pour conversion)
+const NUMERIC_FIELDS = ["largeur", "hauteur", "hauteurAllege", "largeurTableau", "hauteurTableau", "nombreVantaux"];
 
 // Ordre des champs selon la logique métier du PDF
 const FIELD_ORDER = [
@@ -189,6 +206,20 @@ export default function MenuiseriePage() {
     },
   });
 
+  // Détection automatique du type de menuiserie et chargement de la config
+  const detectedInfo = useMemo(() => {
+    if (!menuiserie) return null;
+
+    const data = menuiserie.donneesOriginales;
+    const materiau = detectMateriau(data);
+    const pose = detectPose(data);
+    const typeProduit = detectTypeProduit(data);
+    const configKey = getFormConfigKey(data);
+    const formConfig = loadFormConfig(configKey);
+
+    return { materiau, pose, typeProduit, configKey, formConfig };
+  }, [menuiserie]);
+
   // Initialize form when data loads
   useEffect(() => {
     if (menuiserie && Object.keys(formData).length === 0) {
@@ -259,13 +290,13 @@ export default function MenuiseriePage() {
     },
   });
 
-  const handleFieldChange = (key: string, value: string) => {
+  const handleFieldChange = (key: string, value: any) => {
     setHasUnsavedChanges(true);
     setFormData((prev) => {
       const newData = { ...prev, [key]: value };
       // Convert to number if it's a numeric field
-      if ([...NUMERIC_CRITICAL_FIELDS, ...NUMERIC_OTHER_FIELDS].includes(key)) {
-        newData[key] = parseInt(value) || 0;
+      if (NUMERIC_FIELDS.includes(key)) {
+        newData[key] = typeof value === 'string' ? (parseInt(value) || 0) : value;
       }
       return newData;
     });
@@ -365,18 +396,20 @@ export default function MenuiseriePage() {
     );
   }
 
-  // Filter fields
-  const criticalNumericFields = NUMERIC_CRITICAL_FIELDS.filter(
-    (key) => menuiserie.donneesOriginales[key] !== undefined
-  );
+  // Filter fields : séparer champs critiques et additionnels
+  // NOUVEAU : Afficher TOUS les champs critiques qui ont une config dynamique (même si vides dans PDF)
+  const criticalFields = CRITICAL_FIELDS.filter((key) => {
+    // Si le champ a une config dynamique, toujours l'afficher
+    if (detectedInfo?.formConfig[key]) {
+      return true;
+    }
+    // Sinon, afficher seulement si présent dans le PDF
+    return menuiserie.donneesOriginales[key] !== undefined;
+  });
 
-  const otherNumericFields = NUMERIC_OTHER_FIELDS.filter(
-    (key) => menuiserie.donneesOriginales[key] !== undefined
-  );
-
-  const textFields = Object.keys(menuiserie.donneesOriginales).filter(
+  const additionalFields = Object.keys(menuiserie.donneesOriginales).filter(
     (key) =>
-      ![...NUMERIC_CRITICAL_FIELDS, ...NUMERIC_OTHER_FIELDS].includes(key) &&
+      !CRITICAL_FIELDS.includes(key) &&
       menuiserie.donneesOriginales[key] !== null &&
       menuiserie.donneesOriginales[key] !== undefined
   );
@@ -396,11 +429,8 @@ export default function MenuiseriePage() {
     });
   };
 
-  // Combiner tous les champs additionnels et trier selon l'ordre du PDF
-  const allAdditionalFields = sortByFieldOrder([
-    ...otherNumericFields,
-    ...textFields,
-  ]);
+  // Trier les champs additionnels selon l'ordre du PDF
+  const sortedAdditionalFields = sortByFieldOrder(additionalFields);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-64 lg:pb-40">
@@ -496,35 +526,98 @@ export default function MenuiseriePage() {
               </CardContent>
             </Card>
 
-            {/* Dimensions principales (toujours visibles) */}
+            {/* Détection automatique du type */}
+            {detectedInfo && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+                    🔍 Type détecté
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="text-sm">
+                      {detectedInfo.materiau}
+                    </Badge>
+                    <Badge variant="secondary" className="text-sm">
+                      {detectedInfo.pose}
+                    </Badge>
+                    <Badge variant="secondary" className="text-sm">
+                      {detectedInfo.typeProduit}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      Config: {detectedInfo.configKey}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Type de formulaire chargé automatiquement selon les données du PDF
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Champs critiques : Dimensions + Caractéristiques (toujours visibles) */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
-                  📏 Dimensions principales
+                  📏 Informations principales
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 lg:space-y-6">
                 {/* Grille responsive pour les champs */}
                 <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
-                  {criticalNumericFields.map((key) => (
-                    <div key={key} className="lg:col-span-1">
-                      <FieldWithDiff
-                        id={key}
-                        label={FIELD_LABELS[key] || key}
-                        value={formData[key] ?? ""}
-                        originalValue={menuiserie.donneesOriginales[key]}
-                        onChange={(value) => handleFieldChange(key, value)}
-                        type="number"
-                        unit="mm"
-                      />
-                    </div>
-                  ))}
+                  {criticalFields.map((key) => {
+                    // Si le champ a une config dynamique, utiliser DynamicField
+                    if (detectedInfo?.formConfig[key]) {
+                      return (
+                        <div key={key} className="lg:col-span-1">
+                          <DynamicField
+                            fieldKey={key}
+                            config={detectedInfo.formConfig[key]}
+                            value={formData[key] ?? ""}
+                            originalValue={menuiserie.donneesOriginales[key]}
+                            onChange={(value) => handleFieldChange(key, value)}
+                          />
+                        </div>
+                      );
+                    }
+
+                    // Sinon, utiliser FieldWithDiff pour les champs numériques
+                    if (NUMERIC_FIELDS.includes(key)) {
+                      return (
+                        <div key={key} className="lg:col-span-1">
+                          <FieldWithDiff
+                            id={key}
+                            label={FIELD_LABELS[key] || key}
+                            value={formData[key] ?? ""}
+                            originalValue={menuiserie.donneesOriginales[key]}
+                            onChange={(value) => handleFieldChange(key, value)}
+                            type="number"
+                            unit="mm"
+                          />
+                        </div>
+                      );
+                    }
+
+                    // Fallback : champ texte
+                    return (
+                      <div key={key} className="lg:col-span-1">
+                        <TextFieldWithDiff
+                          id={key}
+                          label={FIELD_LABELS[key] || key}
+                          value={formData[key] ?? ""}
+                          originalValue={String(menuiserie.donneesOriginales[key])}
+                          onChange={(value) => handleFieldChange(key, value)}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
 
             {/* Détails additionnels (collapsed) */}
-            {allAdditionalFields.length > 0 && (
+            {sortedAdditionalFields.length > 0 && (
               <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
                 <Card>
                   <CollapsibleTrigger asChild>
@@ -533,7 +626,7 @@ export default function MenuiseriePage() {
                         <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
                           📋 Détails additionnels
                           <span className="text-xs font-normal text-gray-500 lg:text-sm">
-                            ({allAdditionalFields.length} champs)
+                            ({sortedAdditionalFields.length} champs)
                           </span>
                         </CardTitle>
                         {detailsOpen ? (
@@ -548,11 +641,24 @@ export default function MenuiseriePage() {
                     <CardContent className="space-y-4 pt-0 lg:space-y-6">
                       {/* Grille responsive - tous les champs triés selon l'ordre PDF */}
                       <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
-                        {allAdditionalFields.map((key) => {
-                          const isNumeric = otherNumericFields.includes(key);
+                        {sortedAdditionalFields.map((key) => {
+                          // Si le champ a une config dynamique, utiliser DynamicField
+                          if (detectedInfo?.formConfig[key]) {
+                            return (
+                              <div key={key} className="lg:col-span-1">
+                                <DynamicField
+                                  fieldKey={key}
+                                  config={detectedInfo.formConfig[key]}
+                                  value={formData[key] ?? ""}
+                                  originalValue={menuiserie.donneesOriginales[key]}
+                                  onChange={(value) => handleFieldChange(key, value)}
+                                />
+                              </div>
+                            );
+                          }
 
                           // Champs numériques avec calcul d'écart
-                          if (isNumeric) {
+                          if (NUMERIC_FIELDS.includes(key)) {
                             return (
                               <div key={key} className="lg:col-span-1">
                                 <FieldWithDiff

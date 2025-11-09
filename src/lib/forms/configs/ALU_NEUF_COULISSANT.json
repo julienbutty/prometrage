@@ -1,0 +1,114 @@
+{
+  "pack": {
+    "label": "Pack",
+    "type": "combobox",
+    "options": ["Tradition", "Confort", "Initial"],
+    "allowCustom": true
+  },
+  "gamme": {
+    "label": "Gamme",
+    "type": "select",
+    "options": ["PERFORMAX"]
+  },
+  "modeColoris": {
+    "label": "Mode coloris",
+    "type": "combobox",
+    "options": ["Monocolore", "Bicolore"],
+    "allowCustom": true
+  },
+  "couleurInt": {
+    "label": "Teinte RAL intérieure",
+    "type": "combobox",
+    "options": ["Blanc", "Noir", "F9"],
+    "allowCustom": true,
+    "placeholder": "Ex: RAL 7016"
+  },
+  "couleurExt": {
+    "label": "Teinte RAL extérieure",
+    "type": "combobox",
+    "options": ["Blanc", "Noir", "F9"],
+    "allowCustom": true,
+    "placeholder": "Ex: RAL 7016"
+  },
+  "typeChassis": {
+    "label": "Type de châssis",
+    "type": "combobox",
+    "options": ["Galando 2 rails", "Galando 3 rails"],
+    "allowCustom": false
+  },
+  "nombreVantaux": {
+    "label": "Nombre de vantaux",
+    "type": "number"
+  },
+  "typeExecution": {
+    "label": "Type d'exécution",
+    "type": "combobox",
+    "options": ["Exécution", "Tableau Fini"],
+    "allowCustom": true
+  },
+  "typeDormant": {
+    "label": "Type de dormant",
+    "type": "combobox",
+    "options": ["Dormant coulissant standard", "Sans aile", "Avec reprise doublage"],
+    "allowCustom": true
+  },
+  "fixation": {
+    "label": "Fixation",
+    "type": "select",
+    "options": ["Pattes std", "Pattes PRDT", "Vis"]
+  },
+  "pose": {
+    "label": "Type de pose",
+    "type": "combobox",
+    "options": ["en applique", "en tunnel"],
+    "allowCustom": true
+  },
+  "seuil": {
+    "label": "Seuil",
+    "type": "combobox",
+    "options": ["Seuil Alu standard", "PMR 20mm", "40mm"],
+    "allowCustom": true
+  },
+  "rails": {
+    "label": "Rails",
+    "type": "select",
+    "options": ["2 rails", "3 rails"]
+  },
+  "epaisseurVitrage": {
+    "label": "Épaisseur vitrage",
+    "type": "select",
+    "options": ["18 mm", "26 mm", "45 mm"]
+  },
+  "couleurVitrage": {
+    "label": "Couleur vitrage",
+    "type": "combobox",
+    "options": ["blanc", "noir", "PTR+"],
+    "allowCustom": true
+  },
+  "intercalaire": {
+    "label": "Intercalaire",
+    "type": "combobox",
+    "options": ["Blanc", "Noir"],
+    "allowCustom": true
+  },
+  "couleurQuincaillerie": {
+    "label": "Couleur quincaillerie",
+    "type": "select",
+    "options": ["blanc", "noir"]
+  },
+  "quincaillerie": {
+    "label": "Quincaillerie",
+    "type": "combobox",
+    "options": ["Fermeture 1 point", "Poignée + serrure", "Standard"],
+    "allowCustom": true
+  },
+  "hauteurAllege": {
+    "label": "Hauteur d'allège",
+    "type": "number",
+    "unit": "mm"
+  },
+  "commentaires": {
+    "label": "Commentaires et options",
+    "type": "text"
+  }
+}

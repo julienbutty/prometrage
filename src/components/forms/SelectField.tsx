@@ -1,0 +1,93 @@
+"use client";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+
+export interface SelectFieldProps {
+  /** ID unique du champ */
+  id: string;
+  /** Label affiché au-dessus du champ */
+  label: string;
+  /** Valeur actuelle (modifiée) */
+  value: string;
+  /** Valeur originale du PDF (optionnel) */
+  originalValue?: string;
+  /** Liste des options disponibles */
+  options: string[];
+  /** Callback appelé lors du changement de valeur */
+  onChange: (value: string) => void;
+}
+
+/**
+ * Composant Select simple pour champs à choix limités
+ *
+ * Utilisé pour les champs avec peu d'options (pack, gamme, etc.)
+ * Plus simple que ComboboxField (pas de recherche)
+ *
+ * @example
+ * ```tsx
+ * <SelectField
+ *   id="pack"
+ *   label="Pack"
+ *   value={formData.pack}
+ *   originalValue={donneesOriginales.pack}
+ *   options={["Tradition", "Confort", "Initial"]}
+ *   onChange={(value) => handleChange("pack", value)}
+ * />
+ * ```
+ */
+export function SelectField({
+  id,
+  label,
+  value,
+  originalValue,
+  options,
+  onChange,
+}: SelectFieldProps) {
+  // Détecte si la valeur a été modifiée par rapport au PDF
+  const isModified = value !== originalValue && value !== "";
+
+  return (
+    <div className="space-y-2">
+      {/* Label et badge "Modifié" */}
+      <div className="flex items-center justify-between">
+        <Label htmlFor={id} className="text-sm font-medium">
+          {label}
+        </Label>
+        {isModified && (
+          <Badge variant="default" className="text-xs">
+            Modifié
+          </Badge>
+        )}
+      </div>
+
+      {/* Valeur PDF originale */}
+      {originalValue && (
+        <div className="text-xs text-muted-foreground">
+          PDF: <span className="font-medium">{originalValue}</span>
+        </div>
+      )}
+
+      {/* Select */}
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger id={id} className="w-full h-14">
+          <SelectValue placeholder="Sélectionner..." />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option} value={option} className="h-12 text-base">
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}

@@ -1,0 +1,193 @@
+{
+  "pack": {
+    "label": "Pack",
+    "type": "combobox",
+    "options": ["Tradition", "Confort", "Initial"],
+    "allowCustom": true
+  },
+  "gamme": {
+    "label": "Gamme",
+    "type": "select",
+    "options": ["PERFORMAX"]
+  },
+  "couleurInt": {
+    "label": "Teinte RAL intérieure",
+    "type": "combobox",
+    "options": ["Blanc", "Noir", "F9"],
+    "allowCustom": true,
+    "placeholder": "Ex: RAL 7016, Idem intérieure"
+  },
+  "couleurExt": {
+    "label": "Teinte RAL extérieure",
+    "type": "combobox",
+    "options": ["Blanc", "Noir", "F9", "Idem intérieure"],
+    "allowCustom": true,
+    "placeholder": "Ex: RAL 7016"
+  },
+  "nombreVantaux": {
+    "label": "Nombre de vantaux",
+    "type": "number"
+  },
+  "pose": {
+    "label": "Type de pose",
+    "type": "combobox",
+    "options": ["en tunnel", "en applique", "sur dormant existant", "en feuillure", "sous coffre tunnel"],
+    "allowCustom": true
+  },
+  "dimensions": {
+    "label": "Dimensions / Type",
+    "type": "combobox",
+    "options": ["Exécution", "Tableau Fini", "clair de bois", "Ailes comprises"],
+    "allowCustom": true
+  },
+  "dormant": {
+    "label": "Dormant",
+    "type": "combobox",
+    "options": [
+      "sans aile",
+      "avec aile",
+      "Dormant rénovation",
+      "Aile intégrée 25mm",
+      "Aile intégrée 44mm",
+      "Sans aile avec double gorges"
+    ],
+    "allowCustom": true,
+    "placeholder": "Ex: sans aile, avec gorge"
+  },
+  "habillageInt": {
+    "label": "Habillage intérieur",
+    "type": "combobox",
+    "options": [
+      "Plat 25mm",
+      "Plat 30x2",
+      "Plat 45mm",
+      "Standard",
+      "Sans"
+    ],
+    "allowCustom": true,
+    "placeholder": "Ex: Plat 30x2 (Réf: XF302)"
+  },
+  "habillageExt": {
+    "label": "Habillage extérieur",
+    "type": "combobox",
+    "options": [
+      "Cornière 20x20",
+      "Bavette 40mm",
+      "Standard",
+      "Sans"
+    ],
+    "allowCustom": true,
+    "placeholder": "Ex: Cornière 20x20 (Réf: XL202015)"
+  },
+  "fixation": {
+    "label": "Fixation",
+    "type": "select",
+    "options": ["Pattes std", "Pattes PRDT", "Vis"]
+  },
+  "seuil": {
+    "label": "Seuil",
+    "type": "combobox",
+    "options": ["Seuil Alu standard", "PMR 20mm", "40mm"],
+    "allowCustom": true
+  },
+  "rails": {
+    "label": "Rails",
+    "type": "combobox",
+    "options": ["2 rails", "3 rails", "inox", "standard"],
+    "allowCustom": true,
+    "placeholder": "Ex: 2 rails inox"
+  },
+  "epaisseurVitrage": {
+    "label": "Épaisseur vitrage",
+    "type": "select",
+    "options": ["18 mm", "26 mm", "45 mm"]
+  },
+  "doubleVitrage": {
+    "label": "Double vitrage",
+    "type": "combobox",
+    "options": [
+      "4/16/4",
+      "4/20/4",
+      "44.2.16w Argon 4 PTR+ (Ug=1.1)",
+      "Standard"
+    ],
+    "allowCustom": true,
+    "placeholder": "Ex: 44.2.16w Argon 4 PTR+"
+  },
+  "couleurVitrage": {
+    "label": "Couleur vitrage",
+    "type": "combobox",
+    "options": ["blanc", "noir", "PTR+", "PTR"],
+    "allowCustom": true
+  },
+  "intercalaire": {
+    "label": "Intercalaire",
+    "type": "combobox",
+    "options": ["Blanc", "Noir", "noir", "blanc"],
+    "allowCustom": true,
+    "placeholder": "Ex: warm edge, gris"
+  },
+  "ouvrantPrincipal": {
+    "label": "Ouvrant principal",
+    "type": "combobox",
+    "options": ["Gauche", "Droite", "droite", "gauche"],
+    "allowCustom": true
+  },
+  "fermeture": {
+    "label": "Fermeture",
+    "type": "combobox",
+    "options": [
+      "Fermeture 1 point",
+      "Fermeture sur vantail principal 3 pts en inox",
+      "Fermeture sur vantail secondaire 3 pts en inox",
+      "Standard"
+    ],
+    "allowCustom": true,
+    "placeholder": "Ex: 3 pts en inox / sur vantail secondaire"
+  },
+  "poignee": {
+    "label": "Poignée",
+    "type": "combobox",
+    "options": [
+      "Poignée standard",
+      "Poignée intérieure manœuvrante Aktiv",
+      "Poignée sur vantail principal",
+      "Poignée sur vantail secondaire"
+    ],
+    "allowCustom": true,
+    "placeholder": "Ex: Aktiv sur vantail principal et secondaire"
+  },
+  "couleurJoints": {
+    "label": "Couleur des joints",
+    "type": "combobox",
+    "options": ["blanc", "noir", "gris", "Blanc", "Noir", "Gris"],
+    "allowCustom": true
+  },
+  "couleurQuincaillerie": {
+    "label": "Couleur quincaillerie",
+    "type": "combobox",
+    "options": ["blanc", "noir", "F9", "Blanc", "Noir"],
+    "allowCustom": true,
+    "placeholder": "Ex: F9, RAL 7016"
+  },
+  "couleurPareTempete": {
+    "label": "Couleur pare-tempête",
+    "type": "combobox",
+    "options": ["9016", "7016", "Blanc", "Noir"],
+    "allowCustom": true,
+    "placeholder": "Ex: RAL 9016"
+  },
+  "hauteurAllege": {
+    "label": "Hauteur d'allège",
+    "type": "number",
+    "unit": "mm"
+  },
+  "intitule": {
+    "label": "Intitulé",
+    "type": "text"
+  },
+  "commentaires": {
+    "label": "Commentaires et options",
+    "type": "text"
+  }
+}
