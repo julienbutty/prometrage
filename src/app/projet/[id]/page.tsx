@@ -2,7 +2,18 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, FileText, MapPin, Phone, CheckCircle2 } from "lucide-react";
+import {
+  ArrowLeft,
+  FileText,
+  MapPin,
+  Phone,
+  CheckCircle2,
+  Circle,
+  Clock,
+  DoorOpen,
+  Maximize2,
+  Home
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,6 +23,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { detectMateriau, detectPose, detectTypeProduit } from "@/lib/utils/menuiserie-type";
+import { MenuiserieCardSkeleton } from "@/components/skeletons/MenuiserieCardSkeleton";
 
 interface Menuiserie {
   id: string;
@@ -25,6 +38,7 @@ interface Menuiserie {
     [key: string]: any;
   };
   donneesModifiees?: Record<string, any> | null;
+  validee?: boolean;
   ordre: number;
 }
 
@@ -63,11 +77,59 @@ export default function ProjetDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen p-4">
-        <div className="animate-pulse space-y-4">
-          <div className="h-10 w-32 bg-gray-200 rounded" />
-          <div className="h-32 bg-gray-200 rounded" />
-          <div className="h-64 bg-gray-200 rounded" />
+      <div className="min-h-screen bg-gray-50">
+        {/* Header skeleton */}
+        <div className="bg-white border-b sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto p-4 lg:px-8 flex items-center gap-4">
+            <div className="h-10 w-10 bg-gray-200 rounded animate-pulse" />
+            <div className="flex-1 min-w-0 space-y-2">
+              <div className="h-6 lg:h-8 w-48 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+            </div>
+            <div className="h-8 w-20 bg-gray-200 rounded animate-pulse" />
+          </div>
+        </div>
+
+        {/* Main content skeleton */}
+        <div className="max-w-7xl mx-auto p-4 lg:p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Sidebar skeleton */}
+            <div className="lg:col-span-4 xl:col-span-3">
+              <Card>
+                <CardHeader>
+                  <div className="h-5 w-40 bg-gray-200 rounded animate-pulse" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="h-3 w-12 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-3 w-20 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-4 w-full bg-gray-200 rounded animate-pulse" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-3 w-16 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-4 w-28 bg-gray-200 rounded animate-pulse" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Menuiseries grid skeleton */}
+            <div className="lg:col-span-8 xl:col-span-9">
+              <div className="mb-4 space-y-2">
+                <div className="h-6 lg:h-7 w-48 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 w-64 bg-gray-200 rounded animate-pulse" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <MenuiserieCardSkeleton key={i} />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -93,7 +155,7 @@ export default function ProjetDetailPage() {
   }
 
   const completedCount = data.menuiseries.filter(
-    (m) => m.donneesModifiees !== null && m.donneesModifiees !== undefined
+    (m) => m.validee === true
   ).length;
 
   return (
@@ -227,44 +289,101 @@ export default function ProjetDetailPage() {
             {/* Grid responsive: 1 col mobile, 2 cols tablet, 3 cols desktop */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {data.menuiseries.map((menuiserie) => {
-                const isCompleted =
-                  menuiserie.donneesModifiees !== null &&
-                  menuiserie.donneesModifiees !== undefined;
+                // Détection automatique du type
+                const materiau = detectMateriau(menuiserie.donneesOriginales);
+                const pose = detectPose(menuiserie.donneesOriginales);
+                const typeProduit = detectTypeProduit(menuiserie.donneesOriginales);
+
+                // Icône selon le type de produit
+                const ProductIcon =
+                  typeProduit === "PORTE"
+                    ? DoorOpen
+                    : typeProduit === "COULISSANT"
+                    ? Maximize2
+                    : Home;
+
+                // Statut visuel basé sur le champ validee
+                const statut = menuiserie.validee
+                  ? "VALIDEE"
+                  : menuiserie.donneesModifiees
+                  ? "EN_COURS"
+                  : "IMPORTEE";
+                const statutConfig = {
+                  VALIDEE: {
+                    icon: CheckCircle2,
+                    label: "Validée",
+                    bgColor: "bg-green-600",
+                    borderColor: "border-green-500",
+                    textColor: "text-green-600",
+                  },
+                  EN_COURS: {
+                    icon: Clock,
+                    label: "En cours",
+                    bgColor: "bg-orange-500",
+                    borderColor: "border-orange-400",
+                    textColor: "text-orange-600",
+                  },
+                  IMPORTEE: {
+                    icon: Circle,
+                    label: "À faire",
+                    bgColor: "bg-gray-400",
+                    borderColor: "border-gray-300",
+                    textColor: "text-gray-600",
+                  },
+                };
+
+                const StatusIcon = statutConfig[statut].icon;
 
                 return (
                   <Card
                     key={menuiserie.id}
-                    className={`cursor-pointer hover:shadow-lg transition-all hover:-translate-y-1 ${
-                      isCompleted ? "border-green-500 border-2" : ""
-                    }`}
+                    className={`cursor-pointer hover:shadow-lg transition-all hover:-translate-y-1 border-2 ${statutConfig[statut].borderColor}`}
                     onClick={() => router.push(`/menuiserie/${menuiserie.id}`)}
                   >
                     <CardHeader className="pb-3">
-                      <div className="space-y-2">
+                      <div className="space-y-3">
+                        {/* Ligne 1 : Repère uniquement */}
+                        {menuiserie.repere && (
+                          <Badge className="text-sm font-semibold bg-blue-600 hover:bg-blue-700 px-3 py-1 truncate max-w-full" title={menuiserie.repere}>
+                            {menuiserie.repere}
+                          </Badge>
+                        )}
+
+                        {/* Ligne 2 : Intitulé */}
+                        <CardTitle className="text-base line-clamp-2">
+                          {menuiserie.intitule}
+                        </CardTitle>
+
+                        {/* Ligne 3 : Badges techniques */}
                         <div className="flex flex-wrap items-center gap-2">
-                          {menuiserie.repere && (
-                            <Badge variant="outline" className="text-xs">
-                              {menuiserie.repere}
-                            </Badge>
-                          )}
+                          {/* Badge ALU/PVC */}
+                          <Badge
+                            className={`text-xs ${
+                              materiau === "ALU"
+                                ? "bg-slate-700 hover:bg-slate-800"
+                                : "bg-white text-gray-800 border-2 border-gray-300 hover:bg-gray-50"
+                            }`}
+                          >
+                            {materiau}
+                          </Badge>
+
+                          {/* Badge NEUF/RENO */}
+                          <Badge
+                            variant="secondary"
+                            className={`text-xs ${
+                              pose === "NEUF" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
+                            }`}
+                          >
+                            {pose}
+                          </Badge>
+
+                          {/* Badge Gamme si disponible */}
                           {menuiserie.donneesOriginales.gamme && (
-                            <Badge className="text-xs">
+                            <Badge variant="outline" className="text-xs">
                               {menuiserie.donneesOriginales.gamme}
                             </Badge>
                           )}
                         </div>
-                        <CardTitle className="text-base line-clamp-2">
-                          {menuiserie.intitule}
-                        </CardTitle>
-                        {isCompleted && (
-                          <Badge
-                            variant="default"
-                            className="text-xs bg-green-600 hover:bg-green-700 w-fit"
-                          >
-                            <CheckCircle2 className="h-3 w-3 mr-1" />
-                            Complété
-                          </Badge>
-                        )}
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
@@ -285,6 +404,27 @@ export default function ProjetDetailPage() {
                           <p className="text-sm font-medium capitalize">
                             {menuiserie.donneesOriginales.pose}
                           </p>
+                        </div>
+                      )}
+
+                      {/* Affichage couleurs si disponibles */}
+                      {(menuiserie.donneesOriginales.couleurInt || menuiserie.donneesOriginales.couleurExt) && (
+                        <div className="space-y-1">
+                          <p className="text-xs text-gray-500 uppercase tracking-wide">
+                            Couleurs
+                          </p>
+                          <div className="flex items-center gap-2 text-xs">
+                            {menuiserie.donneesOriginales.couleurInt && (
+                              <span className="px-2 py-1 rounded bg-gray-100 border">
+                                Int: {menuiserie.donneesOriginales.couleurInt}
+                              </span>
+                            )}
+                            {menuiserie.donneesOriginales.couleurExt && (
+                              <span className="px-2 py-1 rounded bg-gray-100 border">
+                                Ext: {menuiserie.donneesOriginales.couleurExt}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       )}
                     </CardContent>

@@ -18,6 +18,7 @@ import { FieldWithDiff } from "@/components/forms/FieldWithDiff";
 import { TextFieldWithDiff } from "@/components/forms/TextFieldWithDiff";
 import { DynamicField } from "@/components/forms/DynamicField";
 import { NavigationBar } from "@/components/menuiseries/NavigationBar";
+import { EcartsAlert } from "@/components/menuiseries/EcartsAlert";
 import HelpIcon from "@/components/forms/HelpIcon";
 import PhotoUpload from "@/components/forms/PhotoUpload";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -256,6 +257,10 @@ export default function MenuiseriePage() {
     onSuccess: () => {
       toast.success("Mesures enregistrées");
       queryClient.invalidateQueries({ queryKey: ["menuiserie", menuiserieId] });
+      // Invalider aussi le projet parent pour mettre à jour la liste
+      if (menuiserie?.projet.id) {
+        queryClient.invalidateQueries({ queryKey: ["projet", menuiserie.projet.id] });
+      }
     },
     onError: () => {
       toast.error("Erreur lors de l'enregistrement");
@@ -276,6 +281,10 @@ export default function MenuiseriePage() {
     onSuccess: () => {
       toast.success("Menuiserie validée !");
       queryClient.invalidateQueries({ queryKey: ["menuiserie", menuiserieId] });
+      // Invalider aussi le projet parent pour mettre à jour la liste
+      if (menuiserie?.projet.id) {
+        queryClient.invalidateQueries({ queryKey: ["projet", menuiserie.projet.id] });
+      }
 
       // Navigation automatique vers la menuiserie suivante (ou retour projet)
       if (menuiserie?.navigation.hasNext && menuiserie.navigation.nextId) {
@@ -471,6 +480,9 @@ export default function MenuiseriePage() {
       </div>
 
       <div className="mx-auto max-w-7xl space-y-4 p-4 lg:p-8">
+        {/* Alerte écarts critiques */}
+        {menuiserie.ecarts && <EcartsAlert ecarts={menuiserie.ecarts} />}
+
         {/* Layout Desktop : 2 colonnes (Image | Formulaires) */}
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
           {/* Colonne gauche : Image (sticky sur desktop) */}

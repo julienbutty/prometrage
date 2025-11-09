@@ -8,6 +8,7 @@ import { Header } from "@/components/layout/Header";
 import { ProjectList } from "@/components/ProjectList";
 import { UploadButton } from "@/components/UploadButton";
 import { UploadProgress } from "@/components/UploadProgress";
+import { ProjectCardSkeleton } from "@/components/skeletons/ProjectCardSkeleton";
 
 interface Projet {
   id: string;
@@ -99,12 +100,22 @@ export default function Home() {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-1 container mx-auto p-4">
-          <div className="animate-pulse space-y-4">
-            <div className="h-10 w-48 bg-gray-200 rounded" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded" />
+        <main className="flex-1 container mx-auto">
+          <div className="p-4 sm:p-6 lg:p-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+              {/* Title skeleton */}
+              <div className="space-y-2">
+                <div className="h-8 sm:h-10 lg:h-12 w-48 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 sm:h-5 w-64 bg-gray-200 rounded animate-pulse" />
+              </div>
+              {/* Upload button skeleton */}
+              <div className="h-12 w-full sm:w-48 bg-gray-200 rounded animate-pulse" />
+            </div>
+
+            {/* Project cards skeleton grid */}
+            <div className="w-full grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <ProjectCardSkeleton key={i} />
               ))}
             </div>
           </div>
