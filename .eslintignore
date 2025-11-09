@@ -1,0 +1,17 @@
+# Generated files
+src/generated/
+
+# Node modules
+node_modules/
+
+# Build outputs
+.next/
+out/
+dist/
+
+# Tests
+coverage/
+
+# Environment files
+.env*
+!.env.example
