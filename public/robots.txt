@@ -1,0 +1,27 @@
+# Prometrage POC - Pas d'indexation
+# https://prometrage.vercel.app
+
+User-agent: *
+Disallow: /
+
+# Bloquer tous les robots spécifiques
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Googlebot-Image
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+User-agent: Slurp
+Disallow: /
+
+User-agent: DuckDuckBot
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
