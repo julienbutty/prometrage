@@ -578,7 +578,7 @@ export default function MenuiseriePage() {
   const sortedAdditionalFields = sortByFieldOrder(additionalFields);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-64 lg:pb-40">
+    <div className="min-h-screen overflow-x-hidden bg-gray-50 pb-64 lg:pb-40">
       {/* Header Responsive */}
       <div className="sticky top-0 z-10 border-b bg-white shadow-sm">
         <div className="mx-auto max-w-7xl">
@@ -623,7 +623,7 @@ export default function MenuiseriePage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl space-y-4 p-4 lg:p-8">
+      <div className="mx-auto w-full max-w-7xl space-y-4 p-4 lg:p-8">
         {/* Alerte écarts critiques */}
         {menuiserie.ecarts && <EcartsAlert ecarts={menuiserie.ecarts} />}
 
@@ -726,7 +726,7 @@ export default function MenuiseriePage() {
                     // Si le champ a une config dynamique, utiliser DynamicField
                     if (detectedInfo?.formConfig[key]) {
                       return (
-                        <div key={key} className="lg:col-span-1">
+                        <div key={key} className="min-w-0 lg:col-span-1">
                           <DynamicField
                             fieldKey={key}
                             config={detectedInfo.formConfig[key]}
@@ -741,7 +741,7 @@ export default function MenuiseriePage() {
                     // Sinon, utiliser FieldWithDiff pour les champs numériques
                     if (NUMERIC_FIELDS.includes(key)) {
                       return (
-                        <div key={key} className="lg:col-span-1">
+                        <div key={key} className="min-w-0 lg:col-span-1">
                           <FieldWithDiff
                             id={key}
                             label={FIELD_LABELS[key] || key}
@@ -757,7 +757,7 @@ export default function MenuiseriePage() {
 
                     // Fallback : champ texte
                     return (
-                      <div key={key} className="lg:col-span-1">
+                      <div key={key} className="min-w-0 lg:col-span-1">
                         <TextFieldWithDiff
                           id={key}
                           label={FIELD_LABELS[key] || key}
@@ -801,7 +801,7 @@ export default function MenuiseriePage() {
                           // Si le champ a une config dynamique, utiliser DynamicField
                           if (detectedInfo?.formConfig[key]) {
                             return (
-                              <div key={key} className="lg:col-span-1">
+                              <div key={key} className="min-w-0 lg:col-span-1">
                                 <DynamicField
                                   fieldKey={key}
                                   config={detectedInfo.formConfig[key]}
@@ -816,7 +816,7 @@ export default function MenuiseriePage() {
                           // Champs numériques avec calcul d'écart
                           if (NUMERIC_FIELDS.includes(key)) {
                             return (
-                              <div key={key} className="lg:col-span-1">
+                              <div key={key} className="min-w-0 lg:col-span-1">
                                 <FieldWithDiff
                                   id={key}
                                   label={FIELD_LABELS[key] || key}
@@ -840,7 +840,7 @@ export default function MenuiseriePage() {
                               : "/docs/dormant-applique.pdf";
 
                           return (
-                            <div key={key} className="lg:col-span-1">
+                            <div key={key} className="min-w-0 lg:col-span-1">
                               <TextFieldWithDiff
                                 id={key}
                                 label={FIELD_LABELS[key] || key}

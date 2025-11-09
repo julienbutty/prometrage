@@ -92,7 +92,7 @@ export function FieldWithDiff({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="min-w-0 space-y-2">
       <div className="flex items-center justify-between">
         <Label htmlFor={id} className="text-base font-medium">
           {label}

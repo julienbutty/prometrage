@@ -32,7 +32,7 @@ export function TextFieldWithDiff({
   const hasValue = originalValue !== null && originalValue !== undefined && originalValue !== "";
 
   return (
-    <div className="space-y-2">
+    <div className="min-w-0 space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Label htmlFor={id} className="text-base font-medium">

@@ -86,7 +86,7 @@ export function ComboboxField({
     !filteredOptions.some((opt) => opt.toLowerCase() === search.toLowerCase());
 
   return (
-    <div className="space-y-2">
+    <div className="min-w-0 space-y-2">
       {/* Label et badge "Modifié" */}
       <div className="flex items-center justify-between">
         <Label htmlFor={id} className="text-sm font-medium">
@@ -119,12 +119,15 @@ export function ComboboxField({
               !value && "text-muted-foreground"
             )}
           >
-            <span className="truncate">{value || placeholder}</span>
+            <span className="min-w-0 flex-1 truncate">{value || placeholder}</span>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0" align="start">
-          <Command shouldFilter={false}>
+        <PopoverContent
+          className="w-full max-w-[calc(100vw-2rem)] p-0"
+          align="start"
+        >
+          <Command shouldFilter={false} className="max-w-full">
             <CommandInput
               placeholder="Rechercher..."
               value={search}
