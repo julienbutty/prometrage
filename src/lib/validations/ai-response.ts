@@ -55,9 +55,11 @@ export const AIMenuiserieSchema = z.object({
 
 // Metadata from AI response
 export const AIMetadataSchema = z.object({
+  isValidDocument: z.boolean().default(true), // True si fiche métreur valide
+  invalidReason: z.string().nullable().optional(), // Raison si document invalide
   confidence: z.number().min(0).max(1),
   warnings: z.array(z.string()),
-  clientInfo: ClientInfoSchema.optional(),
+  clientInfo: ClientInfoSchema.optional().nullable(),
 });
 
 // Complete AI response schema

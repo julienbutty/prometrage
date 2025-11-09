@@ -11,7 +11,11 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -101,7 +105,7 @@ export function ComboboxField({
 
       {/* Valeur PDF originale */}
       {originalValue && (
-        <div className="text-xs text-muted-foreground">
+        <div className="text-muted-foreground text-xs">
           PDF: <span className="font-medium">{originalValue}</span>
         </div>
       )}
@@ -115,15 +119,18 @@ export function ComboboxField({
             role="button"
             aria-expanded={open}
             className={cn(
-              "w-full h-14 justify-between text-left font-normal",
+              "h-14 w-full justify-between text-left font-normal",
               !value && "text-muted-foreground"
             )}
           >
-            <span className="min-w-0 flex-1 truncate">{value || placeholder}</span>
+            <span className="min-w-0 flex-1 truncate">
+              {value || placeholder}
+            </span>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent
+          onOpenAutoFocus={(e) => e.preventDefault}
           className="w-full max-w-[calc(100vw-2rem)] p-0"
           align="start"
         >

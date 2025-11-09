@@ -5,6 +5,7 @@ import {
   parsePDFWithAI,
   AIParsingError,
   AILowConfidenceError,
+  AIInvalidDocumentError,
 } from "@/lib/pdf/ai-parser";
 import { extractImagesFromPDF } from "@/lib/pdf/image-extractor";
 import { findOrCreateClient } from "@/lib/clients";
@@ -201,6 +202,23 @@ export async function POST(request: NextRequest) {
     console.error("[Upload] Error:", error);
 
     // Handle AI-specific errors
+    if (error instanceof AIInvalidDocumentError) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: "INVALID_DOCUMENT_TYPE",
+            message: "Le PDF fourni n'est pas une fiche métreur de menuiseries",
+            details: {
+              reason: error.reason,
+              suggestion: "Veuillez uploader un bon de commande de menuiseries valide",
+            },
+          },
+        },
+        { status: 400 }
+      );
+    }
+
     if (error instanceof AILowConfidenceError) {
       return NextResponse.json(
         {

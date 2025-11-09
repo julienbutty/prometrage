@@ -5,7 +5,21 @@
 
 export const EXTRACTION_PROMPT = `Tu es un expert en extraction de données de fiches métreur pour menuiseries.
 
-Analyse ce PDF et extrais TOUTES les menuiseries présentes.
+**VALIDATION PRÉLIMINAIRE** :
+Avant toute extraction, vérifie que le document est bien une fiche métreur de menuiseries (bon de commande avec dimensions, gammes, types de menuiseries).
+Si le document n'est PAS une fiche métreur (ex: facture générique, catalogue, CV, contrat, etc.), retourne immédiatement :
+{
+  "menuiseries": [],
+  "metadata": {
+    "isValidDocument": false,
+    "invalidReason": "Le document n'est pas une fiche métreur de menuiseries. Type détecté : [type du document]",
+    "confidence": 0,
+    "warnings": [],
+    "clientInfo": null
+  }
+}
+
+Si c'est bien une fiche métreur, analyse le PDF et extrais TOUTES les menuiseries présentes.
 Pour chaque menuiserie, extrais les données suivantes au format JSON strict :
 
 IMPORTANT : Chaque menuiserie dans le PDF a une image/schéma associé (vue technique de la fenêtre/porte).
@@ -44,6 +58,8 @@ Tu DOIS extraire cette image et la fournir en base64 dans le champ "imageBase64"
     }
   ],
   "metadata": {
+    "isValidDocument": true,
+    "invalidReason": null,
     "confidence": 0.95,
     "warnings": ["Dimension hauteur peu lisible pour menuiserie #2"],
     "clientInfo": {
@@ -62,16 +78,17 @@ Tu DOIS extraire cette image et la fournir en base64 dans le champ "imageBase64"
 - Si plusieurs noms de famille (ex: "DUPONT-MARTIN"), conserve-les tous avec le tiret
 
 RÈGLES STRICTES:
-1. Toutes les dimensions DOIVENT être des nombres en millimètres (pas de string)
-2. Si une valeur est illisible ou absente, utilise null et ajoute un warning dans metadata.warnings
-3. Normalise les gammes en MAJUSCULES (OPTIMAX, PERFORMAX, INNOVAX)
-4. Normalise les poses en minuscules (tunnel, applique, renovation)
-5. Extrais TOUTES les menuiseries du document, même partiellement remplies
-6. Conserve les descriptions exactes pour couleurs et options
-7. Le score de confiance doit refléter la qualité globale de l'extraction (0-1)
-8. **IMPORTANT REPÈRE** : Si l'intitulé contient deux points ":" (ex: "Variante coulissant : Coulissant 2 vantaux"), NE MODIFIE PAS l'intitulé, conserve-le tel quel. Le backend se chargera d'extraire le repère.
-9. Si le repère est explicitement mentionné séparément du titre, extrais-le dans le champ "repere", sinon utilise null
-10. Pour les champs optionnels absents, utilise null (ne les omets pas)
-11. **EXTRACTION D'IMAGES** : Pour chaque menuiserie, extrais l'image/schéma technique associé et fournis-le en base64 avec le préfixe data URI complet (ex: "data:image/png;base64,...")
+1. **VALIDATION** : Le champ "isValidDocument" DOIT toujours être présent (true si fiche métreur, false sinon)
+2. Toutes les dimensions DOIVENT être des nombres en millimètres (pas de string)
+3. Si une valeur est illisible ou absente, utilise null et ajoute un warning dans metadata.warnings
+4. Normalise les gammes en MAJUSCULES (OPTIMAX, PERFORMAX, INNOVAX)
+5. Normalise les poses en minuscules (tunnel, applique, renovation)
+6. Extrais TOUTES les menuiseries du document, même partiellement remplies
+7. Conserve les descriptions exactes pour couleurs et options
+8. Le score de confiance doit refléter la qualité globale de l'extraction (0-1)
+9. **IMPORTANT REPÈRE** : Si l'intitulé contient deux points ":" (ex: "Variante coulissant : Coulissant 2 vantaux"), NE MODIFIE PAS l'intitulé, conserve-le tel quel. Le backend se chargera d'extraire le repère.
+10. Si le repère est explicitement mentionné séparément du titre, extrais-le dans le champ "repere", sinon utilise null
+11. Pour les champs optionnels absents, utilise null (ne les omets pas)
+12. **EXTRACTION D'IMAGES** : Pour chaque menuiserie, extrais l'image/schéma technique associé et fournis-le en base64 avec le préfixe data URI complet (ex: "data:image/png;base64,...")
 
 Réponds UNIQUEMENT avec le JSON, sans texte additionnel avant ou après.`;

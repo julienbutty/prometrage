@@ -76,7 +76,9 @@ export default function Home() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error?.message || "Upload failed");
+        const errorMessage = error.error?.message || "Upload failed";
+        const errorDetails = error.error?.details?.reason || error.error?.details?.suggestion;
+        throw new Error(errorDetails ? `${errorMessage}\n${errorDetails}` : errorMessage);
       }
 
       return response.json();

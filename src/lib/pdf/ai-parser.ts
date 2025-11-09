@@ -47,6 +47,16 @@ export class AILowConfidenceError extends Error {
   }
 }
 
+export class AIInvalidDocumentError extends Error {
+  constructor(
+    message: string,
+    public reason: string
+  ) {
+    super(message);
+    this.name = "AIInvalidDocumentError";
+  }
+}
+
 /**
  * Extract JSON from AI response text
  * Handles cases where AI wraps JSON in markdown code blocks
@@ -129,6 +139,15 @@ export async function parsePDFWithAI(
       // Validate with Zod
       const validated = AIResponseSchema.parse(rawData);
 
+      // Check if document is valid (is a menuiserie fiche métreur)
+      if (validated.metadata.isValidDocument === false) {
+        const reason = validated.metadata.invalidReason || "Le document n'est pas une fiche métreur de menuiseries";
+        throw new AIInvalidDocumentError(
+          "Document invalide détecté par l'IA",
+          reason
+        );
+      }
+
       // Check confidence threshold
       if (validated.metadata.confidence < CONFIG.minConfidence) {
         throw new AILowConfidenceError(
@@ -162,6 +181,11 @@ export async function parsePDFWithAI(
       };
     } catch (error) {
       console.error(`[AI Parser] Attempt ${attempt + 1} failed:`, error);
+
+      // Don't retry for invalid documents or low confidence
+      if (error instanceof AIInvalidDocumentError) {
+        throw error; // Immediately throw, no retry
+      }
 
       // If it's the last attempt, throw the error
       if (attempt === maxRetries - 1) {
