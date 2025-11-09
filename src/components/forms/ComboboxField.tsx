@@ -16,9 +16,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 export interface ComboboxFieldProps {
   /** ID unique du champ */
@@ -40,7 +47,10 @@ export interface ComboboxFieldProps {
 }
 
 /**
- * Composant Combobox avec recherche et saisie libre optionnelle
+ * Composant Combobox responsive avec recherche et saisie libre optionnelle
+ *
+ * - **Desktop** (≥768px): Popover dropdown
+ * - **Mobile** (<768px): Drawer bottom sheet
  *
  * Permet de :
  * - Rechercher dans une liste d'options
@@ -74,6 +84,7 @@ export function ComboboxField({
 }: ComboboxFieldProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   // Détecte si la valeur a été modifiée par rapport au PDF
   const isModified = value !== originalValue && value !== "";
@@ -88,6 +99,77 @@ export function ComboboxField({
     allowCustom &&
     search.trim() !== "" &&
     !filteredOptions.some((opt) => opt.toLowerCase() === search.toLowerCase());
+
+  // Handler pour sélection (commun aux 2 versions)
+  const handleSelect = (selectedValue: string) => {
+    onChange(selectedValue);
+    setOpen(false);
+    setSearch("");
+  };
+
+  // Render du contenu Command (commun aux 2 versions)
+  const renderCommandContent = () => (
+    <Command shouldFilter={false}>
+      <CommandInput
+        placeholder="Rechercher..."
+        value={search}
+        onValueChange={setSearch}
+      />
+      <CommandList>
+        <CommandEmpty>Aucune option trouvée.</CommandEmpty>
+        <CommandGroup>
+          {/* Options filtrées */}
+          {filteredOptions.map((option) => (
+            <CommandItem
+              key={option}
+              value={option}
+              onSelect={handleSelect}
+              className="h-12"
+            >
+              <Check
+                className={cn(
+                  "mr-2 h-4 w-4",
+                  value === option ? "opacity-100" : "opacity-0"
+                )}
+              />
+              {option}
+            </CommandItem>
+          ))}
+
+          {/* Option de saisie libre */}
+          {showCustomOption && (
+            <CommandItem
+              value={search}
+              onSelect={handleSelect}
+              className="text-primary h-12"
+            >
+              <Check className="mr-2 h-4 w-4 opacity-0" />
+              Utiliser &quot;{search}&quot;
+            </CommandItem>
+          )}
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  );
+
+  // Render du trigger button (commun aux 2 versions)
+  const renderTrigger = () => (
+    <Button
+      id={id}
+      variant="outline"
+      role="button"
+      aria-expanded={open}
+      className={cn(
+        "h-14 w-full justify-between text-left font-normal",
+        !value && "text-muted-foreground"
+      )}
+    >
+      <span className="min-w-0 flex-1 truncate">
+        {value || placeholder}
+      </span>
+      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+    </Button>
+  );
 
   return (
     <div className="min-w-0 space-y-2">
@@ -110,82 +192,27 @@ export function ComboboxField({
         </div>
       )}
 
-      {/* Combobox */}
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            id={id}
-            variant="outline"
-            role="button"
-            aria-expanded={open}
-            className={cn(
-              "h-14 w-full justify-between text-left font-normal",
-              !value && "text-muted-foreground"
-            )}
-          >
-            <span className="min-w-0 flex-1 truncate">
-              {value || placeholder}
-            </span>
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          onOpenAutoFocus={(e) => {
-            e.preventDefault();
-          }}
-          className="w-full max-w-[calc(100vw-2rem)] p-0"
-          align="start"
-        >
-          <Command shouldFilter={false} className="max-w-full">
-            <CommandInput
-              placeholder="Rechercher..."
-              value={search}
-              onValueChange={setSearch}
-            />
-            <CommandList>
-              <CommandEmpty>Aucune option trouvée.</CommandEmpty>
-              <CommandGroup>
-                {/* Options filtrées */}
-                {filteredOptions.map((option) => (
-                  <CommandItem
-                    key={option}
-                    value={option}
-                    onSelect={(currentValue) => {
-                      onChange(currentValue);
-                      setOpen(false);
-                      setSearch("");
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === option ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {option}
-                  </CommandItem>
-                ))}
-
-                {/* Option de saisie libre */}
-                {showCustomOption && (
-                  <CommandItem
-                    value={search}
-                    onSelect={(currentValue) => {
-                      onChange(currentValue);
-                      setOpen(false);
-                      setSearch("");
-                    }}
-                    className="text-primary"
-                  >
-                    <Check className="mr-2 h-4 w-4 opacity-0" />
-                    Utiliser &quot;{search}&quot;
-                  </CommandItem>
-                )}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+      {/* Desktop: Popover */}
+      {isDesktop ? (
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>{renderTrigger()}</PopoverTrigger>
+          <PopoverContent className="w-full p-0" align="start">
+            {renderCommandContent()}
+          </PopoverContent>
+        </Popover>
+      ) : (
+        /* Mobile: Drawer */
+        <Drawer open={open} onOpenChange={setOpen}>
+          <DrawerTrigger asChild>{renderTrigger()}</DrawerTrigger>
+          <DrawerContent>
+            {/* Titre caché pour accessibilité */}
+            <DrawerTitle className="sr-only">{label}</DrawerTitle>
+            <div className="mt-4 border-t">
+              {renderCommandContent()}
+            </div>
+          </DrawerContent>
+        </Drawer>
+      )}
     </div>
   );
 }
