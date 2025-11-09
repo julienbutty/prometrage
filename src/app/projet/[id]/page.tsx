@@ -14,10 +14,12 @@ import {
   DoorOpen,
   Maximize2,
   Home,
-  Trash2
+  Trash2,
+  FileDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
+import { BonsCommandeDialog } from "@/components/BonsCommandeDialog";
 import { toast } from "sonner";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import {
@@ -70,6 +72,7 @@ export default function ProjetDetailPage() {
   const queryClient = useQueryClient();
   const haptic = useHapticFeedback();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showBonsCommandeDialog, setShowBonsCommandeDialog] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["projet", projetId],
@@ -323,6 +326,17 @@ export default function ProjetDetailPage() {
               >
                 Commencer la prise de côtes
               </Button>
+
+              {/* Bouton Bons de Commande Desktop */}
+              <Button
+                variant="outline"
+                className="w-full h-12 text-base hidden lg:flex"
+                onClick={() => setShowBonsCommandeDialog(true)}
+                disabled={completedCount === 0}
+              >
+                <FileDown className="mr-2 h-5 w-5" />
+                Bons de commande ({completedCount})
+              </Button>
             </div>
           </div>
 
@@ -487,10 +501,10 @@ export default function ProjetDetailPage() {
         </div>
       </div>
 
-      {/* Fixed Bottom Button - Mobile Only */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
+      {/* Fixed Bottom Buttons - Mobile Only */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t space-y-2">
         <Button
-          className="w-full h-14 text-lg"
+          className="w-full h-12 text-base"
           onClick={() => {
             if (data.menuiseries.length > 0) {
               router.push(`/menuiserie/${data.menuiseries[0].id}`);
@@ -500,10 +514,19 @@ export default function ProjetDetailPage() {
         >
           Commencer la prise de côtes
         </Button>
+        <Button
+          variant="outline"
+          className="w-full h-12 text-base"
+          onClick={() => setShowBonsCommandeDialog(true)}
+          disabled={completedCount === 0}
+        >
+          <FileDown className="mr-2 h-5 w-5" />
+          Bons de commande ({completedCount})
+        </Button>
       </div>
 
-      {/* Bottom padding for mobile fixed button */}
-      <div className="lg:hidden h-24" />
+      {/* Bottom padding for mobile fixed buttons */}
+      <div className="lg:hidden h-32" />
 
       {/* Dialog de confirmation de suppression */}
       <DeleteConfirmDialog
@@ -513,6 +536,15 @@ export default function ProjetDetailPage() {
         isDeleting={deleteMutation.isPending}
         title="Supprimer ce projet ?"
         description={`Êtes-vous sûr de vouloir supprimer le projet "${data.reference}" ? Cette action supprimera également toutes les menuiseries associées (${data.menuiseries.length}). Cette action est irréversible.`}
+      />
+
+      {/* Dialog de génération des bons de commande */}
+      <BonsCommandeDialog
+        open={showBonsCommandeDialog}
+        onOpenChange={setShowBonsCommandeDialog}
+        projetId={projetId}
+        projetReference={data.reference}
+        menuiseries={data.menuiseries}
       />
     </div>
   );

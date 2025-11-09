@@ -3,7 +3,11 @@ import { prisma } from "@/lib/prisma";
 
 /**
  * POST /api/menuiseries/[id]/valider
- * Valide une menuiserie (marque comme terminée)
+ * Valide une menuiserie (enregistre les modifications + marque comme terminée)
+ *
+ * Body optionnel :
+ * - donneesModifiees: les données à enregistrer avant validation
+ * - repere: le repère mis à jour
  */
 export async function POST(
   request: NextRequest,
@@ -11,6 +15,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
+    const body = await request.json().catch(() => ({}));
 
     // Check if menuiserie exists
     const menuiserie = await prisma.menuiserie.findUnique({
@@ -30,25 +35,24 @@ export async function POST(
       );
     }
 
-    // Validate: cannot validate if no modifications exist
-    if (!menuiserie.donneesModifiees) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: "VALIDATION_ERROR",
-            message: "Cannot validate menuiserie without modifications",
-            details: "Please save modifications before validating",
-          },
-        },
-        { status: 400 }
-      );
+    // Préparer les données à enregistrer
+    let donneesModifiees = menuiserie.donneesModifiees;
+
+    // Si des modifications sont fournies dans le body, les utiliser
+    if (body.donneesModifiees) {
+      donneesModifiees = body.donneesModifiees;
+    }
+    // Sinon, si aucune modification n'existe en BDD, copier les données originales
+    else if (!donneesModifiees) {
+      donneesModifiees = menuiserie.donneesOriginales;
     }
 
-    // Update menuiserie: set validee to true and dateValidation to now
+    // Update menuiserie: enregistrer les modifications + valider
     const updated = await prisma.menuiserie.update({
       where: { id },
       data: {
+        donneesModifiees: donneesModifiees as any, // Force type car on garantit que ce n'est pas null
+        repere: body.repere ?? menuiserie.repere,
         validee: true,
         dateValidation: new Date(),
       },

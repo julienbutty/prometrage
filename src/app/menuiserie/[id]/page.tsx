@@ -193,7 +193,6 @@ export default function MenuiseriePage() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // États pour les modales de confirmation
-  const [confirmSaveBeforeValidate, setConfirmSaveBeforeValidate] = useState(false);
   const [confirmValidate, setConfirmValidate] = useState(false);
   const [confirmNavigation, setConfirmNavigation] = useState(false);
   const [confirmBackToProject, setConfirmBackToProject] = useState(false);
@@ -307,9 +306,11 @@ export default function MenuiseriePage() {
   });
 
   const validerMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (data?: { donneesModifiees: Record<string, any>; repere?: string }) => {
       const response = await fetch(`/api/menuiseries/${menuiserieId}/valider`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data || {}),
       });
       if (!response.ok) {
         const error = await response.json();
@@ -462,22 +463,25 @@ export default function MenuiseriePage() {
   const handleValider = () => {
     if (!menuiserie) return;
 
-    // Si des modifications non sauvegardées existent, demander de sauvegarder d'abord
-    if (hasUnsavedChanges) {
-      setConfirmSaveBeforeValidate(true);
-      return;
-    }
-
-    // Sinon, demander confirmation de validation
+    // Toujours demander confirmation avant de valider
     setConfirmValidate(true);
   };
 
-  const handleConfirmSaveAndValidate = () => {
-    handleSave();
-    // Attendre que la sauvegarde soit terminée avant de valider
-    setTimeout(() => {
-      validerMutation.mutate();
-    }, 500);
+  const handleConfirmValidate = () => {
+    if (!menuiserie) return;
+
+    // Préparer les données à enregistrer avec la validation
+    const donneesModifiees = {
+      ...formData,
+      observations,
+      photosObservations: photosObservations.length > 0 ? photosObservations : undefined,
+    };
+
+    // Valider avec les données actuelles (auto-enregistrement)
+    validerMutation.mutate({
+      donneesModifiees,
+      repere: repere || undefined,
+    });
   };
 
   const handleNavigate = (targetId: string) => {
@@ -947,7 +951,7 @@ export default function MenuiseriePage() {
               <Button
                 className="h-14 flex-1 bg-green-600 text-lg hover:bg-green-700"
                 onClick={handleValider}
-                disabled={updateMutation.isPending || validerMutation.isPending || !menuiserie.donneesModifiees}
+                disabled={updateMutation.isPending || validerMutation.isPending}
               >
                 <CheckCircle className="mr-2 h-5 w-5" />
                 {validerMutation.isPending ? "Validation..." : "Valider"}
@@ -981,7 +985,7 @@ export default function MenuiseriePage() {
             <Button
               className="h-14 whitespace-nowrap bg-green-600 px-8 text-lg hover:bg-green-700"
               onClick={handleValider}
-              disabled={updateMutation.isPending || validerMutation.isPending || !menuiserie.donneesModifiees}
+              disabled={updateMutation.isPending || validerMutation.isPending}
             >
               <CheckCircle className="mr-2 h-5 w-5" />
               {validerMutation.isPending ? "Validation..." : "Valider"}
@@ -992,27 +996,21 @@ export default function MenuiseriePage() {
 
       {/* Modales de confirmation */}
       <ConfirmDialog
-        open={confirmSaveBeforeValidate}
-        onOpenChange={setConfirmSaveBeforeValidate}
-        onConfirm={handleConfirmSaveAndValidate}
-        title="Enregistrer avant validation ?"
-        description="Vous avez des modifications non sauvegardées. Voulez-vous les enregistrer avant de valider cette menuiserie ?"
-        confirmText="Oui, enregistrer et valider"
-        cancelText="Annuler"
-        variant="default"
-      />
-
-      <ConfirmDialog
         open={confirmValidate}
         onOpenChange={setConfirmValidate}
-        onConfirm={() => validerMutation.mutate()}
+        onConfirm={handleConfirmValidate}
         title="Valider cette menuiserie ?"
         description={
           <>
             <span className="block">Êtes-vous sûr de vouloir valider cette menuiserie ?</span>
             <span className="mt-2 block font-medium text-gray-700">
-              Elle sera marquée comme terminée et vous passerez automatiquement à la suivante.
+              Les données actuelles seront enregistrées et la menuiserie sera marquée comme terminée.
             </span>
+            {menuiserie?.navigation.hasNext && (
+              <span className="mt-1 block text-sm text-gray-600">
+                Vous passerez automatiquement à la menuiserie suivante.
+              </span>
+            )}
           </>
         }
         confirmText="Oui, valider"
