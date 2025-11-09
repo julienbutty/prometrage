@@ -78,7 +78,7 @@ export default function ClientsPage() {
             variant="ghost"
             size="icon"
             onClick={() => router.push("/")}
-            className="h-10 w-10"
+            className="h-11 w-11"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>

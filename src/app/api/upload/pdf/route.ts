@@ -8,13 +8,59 @@ import {
 } from "@/lib/pdf/ai-parser";
 import { extractImagesFromPDF } from "@/lib/pdf/image-extractor";
 import { findOrCreateClient } from "@/lib/clients";
+import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
+import { requirePassword } from "@/lib/auth-simple";
 
 /**
  * POST /api/upload/pdf
  * Upload PDF and parse using Anthropic Claude Sonnet 4.5
+ *
+ * Protection:
+ * - Rate limiting: 5 uploads/heure par IP
+ * - Password optionnel via APP_PASSWORD env var
  */
 export async function POST(request: NextRequest) {
   try {
+    // 0. Rate limiting (protection anti-spam)
+    const clientIP = getClientIP(request);
+    const rateLimitResult = checkRateLimit(clientIP, RATE_LIMITS.PDF_UPLOAD);
+
+    if (!rateLimitResult.success) {
+      console.warn(`[Upload] Rate limit exceeded for IP: ${clientIP}`);
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: "RATE_LIMIT_EXCEEDED",
+            message: "Trop de requêtes. Veuillez réessayer plus tard.",
+            details: {
+              limit: rateLimitResult.limit,
+              remaining: rateLimitResult.remaining,
+              resetAt: rateLimitResult.reset,
+            },
+          },
+        },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": String(rateLimitResult.limit),
+            "X-RateLimit-Remaining": String(rateLimitResult.remaining),
+            "X-RateLimit-Reset": String(rateLimitResult.reset),
+            "Retry-After": String(Math.ceil((rateLimitResult.reset * 1000 - Date.now()) / 1000)),
+          },
+        }
+      );
+    }
+
+    // 0.1. Vérification mot de passe (si configuré)
+    const passwordError = await requirePassword(request);
+    if (passwordError) {
+      console.warn(`[Upload] Unauthorized access attempt from IP: ${clientIP}`);
+      return passwordError;
+    }
+
+    console.log(`[Upload] Rate limit OK for ${clientIP} - Remaining: ${rateLimitResult.remaining}/${rateLimitResult.limit}`);
+
     // 1. Validate request
     const formData = await request.formData();
     const file = formData.get("file") as File;

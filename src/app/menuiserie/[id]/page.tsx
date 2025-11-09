@@ -3,8 +3,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Save, ChevronDown, ChevronUp, CheckCircle } from "lucide-react";
+import { ArrowLeft, Save, ChevronDown, ChevronUp, CheckCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +23,7 @@ import { EcartsAlert } from "@/components/menuiseries/EcartsAlert";
 import HelpIcon from "@/components/forms/HelpIcon";
 import PhotoUpload from "@/components/forms/PhotoUpload";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { Badge } from "@/components/ui/badge";
 import type { PhotoObservation } from "@/lib/validations/photo-observation";
 import { getFormConfigKey, detectMateriau, detectPose, detectTypeProduit } from "@/lib/utils/menuiserie-type";
@@ -195,7 +197,11 @@ export default function MenuiseriePage() {
   const [confirmValidate, setConfirmValidate] = useState(false);
   const [confirmNavigation, setConfirmNavigation] = useState(false);
   const [confirmBackToProject, setConfirmBackToProject] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [pendingNavigationId, setPendingNavigationId] = useState<string | null>(null);
+
+  // Haptic feedback hook
+  const haptic = useHapticFeedback();
 
   const { data: menuiserie, isLoading } = useQuery({
     queryKey: ["menuiserie", menuiserieId],
@@ -254,16 +260,49 @@ export default function MenuiseriePage() {
       if (!response.ok) throw new Error("Failed to update");
       return response.json();
     },
+    onMutate: async (newData) => {
+      // Annuler les requêtes en cours pour éviter les conflits
+      await queryClient.cancelQueries({ queryKey: ["menuiserie", menuiserieId] });
+
+      // Snapshot de l'état actuel pour rollback
+      const previousMenuiserie = queryClient.getQueryData(["menuiserie", menuiserieId]);
+
+      // Optimistic update - mettre à jour immédiatement le cache
+      queryClient.setQueryData(["menuiserie", menuiserieId], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            donneesModifiees: newData.donneesModifiees,
+            repere: newData.repere ?? old.data.repere,
+          },
+        };
+      });
+
+      // Retourner le contexte pour rollback si erreur
+      return { previousMenuiserie };
+    },
     onSuccess: () => {
+      haptic.medium(); // Vibration feedback pour l'enregistrement
       toast.success("Mesures enregistrées");
+      setHasUnsavedChanges(false);
+    },
+    onError: (err, newData, context) => {
+      haptic.error(); // Vibration d'erreur
+      toast.error("Erreur lors de l'enregistrement");
+
+      // Rollback à l'état précédent
+      if (context?.previousMenuiserie) {
+        queryClient.setQueryData(["menuiserie", menuiserieId], context.previousMenuiserie);
+      }
+    },
+    onSettled: () => {
+      // Refetch pour s'assurer d'avoir les données à jour
       queryClient.invalidateQueries({ queryKey: ["menuiserie", menuiserieId] });
-      // Invalider aussi le projet parent pour mettre à jour la liste
       if (menuiserie?.projet.id) {
         queryClient.invalidateQueries({ queryKey: ["projet", menuiserie.projet.id] });
       }
-    },
-    onError: () => {
-      toast.error("Erreur lors de l'enregistrement");
     },
   });
 
@@ -278,13 +317,50 @@ export default function MenuiseriePage() {
       }
       return response.json();
     },
-    onSuccess: () => {
-      toast.success("Menuiserie validée !");
-      queryClient.invalidateQueries({ queryKey: ["menuiserie", menuiserieId] });
-      // Invalider aussi le projet parent pour mettre à jour la liste
+    onMutate: async () => {
+      // Annuler les requêtes en cours
+      await queryClient.cancelQueries({ queryKey: ["menuiserie", menuiserieId] });
       if (menuiserie?.projet.id) {
-        queryClient.invalidateQueries({ queryKey: ["projet", menuiserie.projet.id] });
+        await queryClient.cancelQueries({ queryKey: ["projet", menuiserie.projet.id] });
       }
+
+      // Snapshot pour rollback
+      const previousMenuiserie = queryClient.getQueryData(["menuiserie", menuiserieId]);
+      const previousProjet = menuiserie?.projet.id
+        ? queryClient.getQueryData(["projet", menuiserie.projet.id])
+        : null;
+
+      // Optimistic update - marquer comme validée
+      queryClient.setQueryData(["menuiserie", menuiserieId], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            validee: true,
+          },
+        };
+      });
+
+      // Optimistic update - mettre à jour le statut dans le projet
+      if (menuiserie?.projet.id) {
+        queryClient.setQueryData(["projet", menuiserie.projet.id], (old: any) => {
+          if (!old) return old;
+          return {
+            ...old,
+            menuiseries: old.menuiseries.map((m: any) =>
+              m.id === menuiserieId ? { ...m, validee: true } : m
+            ),
+          };
+        });
+      }
+
+      return { previousMenuiserie, previousProjet };
+    },
+    onSuccess: () => {
+      haptic.success(); // Pattern de succès pour la validation
+      toast.success("Menuiserie validée !");
+      setHasUnsavedChanges(false);
 
       // Navigation automatique vers la menuiserie suivante (ou retour projet)
       if (menuiserie?.navigation.hasNext && menuiserie.navigation.nextId) {
@@ -294,10 +370,66 @@ export default function MenuiseriePage() {
         router.push(`/projet/${menuiserie?.projet.id}`);
       }
     },
-    onError: (error) => {
+    onError: (error, variables, context) => {
+      haptic.error(); // Vibration d'erreur
       toast.error(error instanceof Error ? error.message : "Erreur lors de la validation");
+
+      // Rollback
+      if (context?.previousMenuiserie) {
+        queryClient.setQueryData(["menuiserie", menuiserieId], context.previousMenuiserie);
+      }
+      if (context?.previousProjet && menuiserie?.projet.id) {
+        queryClient.setQueryData(["projet", menuiserie.projet.id], context.previousProjet);
+      }
+    },
+    onSettled: () => {
+      // Refetch pour s'assurer d'avoir les données à jour
+      queryClient.invalidateQueries({ queryKey: ["menuiserie", menuiserieId] });
+      if (menuiserie?.projet.id) {
+        queryClient.invalidateQueries({ queryKey: ["projet", menuiserie.projet.id] });
+      }
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/menuiseries/${menuiserieId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error?.message || "Failed to delete menuiserie");
+      }
+      return response.json();
+    },
+    onSuccess: (result) => {
+      haptic.success();
+      toast.success("Menuiserie supprimée");
+
+      // Invalider les caches
+      if (result.data.projetId) {
+        queryClient.invalidateQueries({ queryKey: ["projet", result.data.projetId] });
+      }
+
+      // Rediriger vers le projet
+      if (menuiserie?.projet.id) {
+        router.push(`/projet/${menuiserie.projet.id}`);
+      } else {
+        router.push("/");
+      }
+    },
+    onError: (error) => {
+      haptic.error();
+      toast.error("Erreur lors de la suppression", {
+        description: error instanceof Error ? error.message : "Une erreur est survenue",
+      });
+    },
+  });
+
+  const handleDelete = async () => {
+    await deleteMutation.mutateAsync();
+    setConfirmDelete(false);
+  };
 
   const handleFieldChange = (key: string, value: any) => {
     setHasUnsavedChanges(true);
@@ -457,7 +589,7 @@ export default function MenuiseriePage() {
                 }
                 router.push(`/projet/${menuiserie.projet.id}`);
               }}
-              className="h-10 w-10 lg:h-12 lg:w-12"
+              className="h-11 w-11 lg:h-12 lg:w-12"
             >
               <ArrowLeft className="h-5 w-5 lg:h-6 lg:w-6" />
             </Button>
@@ -475,6 +607,14 @@ export default function MenuiseriePage() {
                 {menuiserie.intitule}
               </p>
             </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setConfirmDelete(true)}
+              className="h-11 w-11 text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              <Trash2 className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </div>
@@ -903,6 +1043,16 @@ export default function MenuiseriePage() {
         confirmText="Oui, retourner au projet"
         cancelText="Annuler"
         variant="destructive"
+      />
+
+      {/* Dialog de confirmation de suppression */}
+      <DeleteConfirmDialog
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        onConfirm={handleDelete}
+        isDeleting={deleteMutation.isPending}
+        title="Supprimer cette menuiserie ?"
+        description={`Êtes-vous sûr de vouloir supprimer "${menuiserie?.repere || menuiserie?.intitule}" ? Cette action est irréversible.`}
       />
     </div>
   );

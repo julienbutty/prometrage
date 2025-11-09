@@ -4,11 +4,14 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useHapticFeedback } from "@/hooks/useHapticFeedback";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { Header } from "@/components/layout/Header";
 import { ProjectList } from "@/components/ProjectList";
 import { UploadButton } from "@/components/UploadButton";
 import { UploadProgress } from "@/components/UploadProgress";
 import { ProjectCardSkeleton } from "@/components/skeletons/ProjectCardSkeleton";
+import { PullToRefreshIndicator } from "@/components/PullToRefreshIndicator";
 
 interface Projet {
   id: string;
@@ -30,8 +33,9 @@ export default function Home() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [uploadingFile, setUploadingFile] = useState<string | null>(null);
+  const haptic = useHapticFeedback();
 
-  const { data: projets = [], isLoading } = useQuery({
+  const { data: projets = [], isLoading, refetch } = useQuery({
     queryKey: ["projets"],
     queryFn: async () => {
       const response = await fetch("/api/projets");
@@ -41,6 +45,21 @@ export default function Home() {
       const result = await response.json();
       return result.data as Projet[];
     },
+  });
+
+  // Pull-to-refresh avec feedback haptique
+  const {
+    containerRef,
+    isPulling,
+    isRefreshing,
+    pullDistance,
+    shouldTriggerRefresh,
+  } = usePullToRefresh({
+    onRefresh: async () => {
+      haptic.light();
+      await refetch();
+    },
+    isEnabled: !isLoading,
   });
 
   const uploadMutation = useMutation({
@@ -63,6 +82,7 @@ export default function Home() {
       return response.json();
     },
     onSuccess: (data) => {
+      haptic.success();
       toast.success("PDF uploadé avec succès", {
         description: `${data.data.parseStatus.total} menuiserie(s) détectée(s)`,
       });
@@ -74,6 +94,7 @@ export default function Home() {
       }, 1500);
     },
     onError: (error: Error) => {
+      haptic.error();
       setUploadingFile(null); // Close progress modal
       toast.error("Erreur d'upload", {
         description: error.message,
@@ -125,7 +146,13 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col" ref={containerRef}>
+      <PullToRefreshIndicator
+        pullDistance={pullDistance}
+        isRefreshing={isRefreshing}
+        shouldTriggerRefresh={shouldTriggerRefresh}
+      />
+
       <Header />
 
       <main className="flex-1 container mx-auto">

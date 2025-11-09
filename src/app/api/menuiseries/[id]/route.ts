@@ -241,3 +241,65 @@ export async function PUT(
     );
   }
 }
+
+/**
+ * DELETE /api/menuiseries/[id]
+ * Supprime une menuiserie
+ */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    // Vérifier que la menuiserie existe
+    const menuiserie = await prisma.menuiserie.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        projetId: true,
+      },
+    });
+
+    if (!menuiserie) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: "NOT_FOUND",
+            message: "Menuiserie not found",
+          },
+        },
+        { status: 404 }
+      );
+    }
+
+    // Supprimer la menuiserie
+    await prisma.menuiserie.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        id: menuiserie.id,
+        projetId: menuiserie.projetId,
+      },
+    });
+  } catch (error) {
+    console.error("[API] Delete menuiserie error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: "SERVER_ERROR",
+          message: "Failed to delete menuiserie",
+          details: error instanceof Error ? error.message : "Unknown error",
+        },
+      },
+      { status: 500 }
+    );
+  }
+}

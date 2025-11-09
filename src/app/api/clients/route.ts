@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { clientUpdateSchema } from "@/lib/validations/client";
+import { ZodError } from "zod";
 
 /**
  * GET /api/clients
@@ -85,6 +87,91 @@ export async function GET(request: NextRequest) {
         error: {
           code: "SERVER_ERROR",
           message: "Failed to fetch clients",
+          details: error instanceof Error ? error.message : "Unknown error",
+        },
+      },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * POST /api/clients
+ * Crée un nouveau client
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+
+    // Validate input
+    const validated = clientUpdateSchema.parse(body);
+
+    // Check if client with same email already exists
+    if (validated.email) {
+      const existingClient = await prisma.client.findUnique({
+        where: { email: validated.email },
+      });
+
+      if (existingClient) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: "CONFLICT",
+              message: "Un client avec cet email existe déjà",
+              details: { field: "email" },
+            },
+          },
+          { status: 409 }
+        );
+      }
+    }
+
+    // Create client
+    const client = await prisma.client.create({
+      data: {
+        nom: validated.nom,
+        email: validated.email,
+        tel: validated.tel,
+      },
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          id: client.id,
+          nom: client.nom,
+          email: client.email,
+          tel: client.tel,
+        },
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("[API] Create client error:", error);
+
+    // Handle validation errors
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Données invalides",
+            details: error.issues,
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: "SERVER_ERROR",
+          message: "Failed to create client",
           details: error instanceof Error ? error.message : "Unknown error",
         },
       },

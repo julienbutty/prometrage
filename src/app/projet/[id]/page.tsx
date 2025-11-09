@@ -1,6 +1,7 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -12,9 +13,13 @@ import {
   Clock,
   DoorOpen,
   Maximize2,
-  Home
+  Home,
+  Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
+import { toast } from "sonner";
+import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import {
   Card,
   CardContent,
@@ -62,6 +67,9 @@ export default function ProjetDetailPage() {
   const params = useParams();
   const router = useRouter();
   const projetId = params.id as string;
+  const queryClient = useQueryClient();
+  const haptic = useHapticFeedback();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["projet", projetId],
@@ -74,6 +82,41 @@ export default function ProjetDetailPage() {
       return result.data as Projet;
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/projets/${projetId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error?.message || "Failed to delete projet");
+      }
+      return response.json();
+    },
+    onSuccess: (result) => {
+      haptic.success();
+      toast.success("Projet supprimé", {
+        description: `${result.data.deletedMenuiseries} menuiserie(s) supprimée(s)`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["projets"] });
+      if (data?.client.id) {
+        queryClient.invalidateQueries({ queryKey: ["client", data.client.id] });
+      }
+      router.push("/");
+    },
+    onError: (error) => {
+      haptic.error();
+      toast.error("Erreur lors de la suppression", {
+        description: error instanceof Error ? error.message : "Une erreur est survenue",
+      });
+    },
+  });
+
+  const handleDelete = async () => {
+    await deleteMutation.mutateAsync();
+    setShowDeleteDialog(false);
+  };
 
   if (isLoading) {
     return (
@@ -167,7 +210,7 @@ export default function ProjetDetailPage() {
             variant="ghost"
             size="icon"
             onClick={() => router.push("/")}
-            className="h-10 w-10"
+            className="h-11 w-11"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
@@ -195,6 +238,14 @@ export default function ProjetDetailPage() {
           >
             {completedCount} / {data.menuiseries.length} ✓
           </Badge>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowDeleteDialog(true)}
+            className="h-11 w-11 text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            <Trash2 className="h-5 w-5" />
+          </Button>
         </div>
       </div>
 
@@ -453,6 +504,16 @@ export default function ProjetDetailPage() {
 
       {/* Bottom padding for mobile fixed button */}
       <div className="lg:hidden h-24" />
+
+      {/* Dialog de confirmation de suppression */}
+      <DeleteConfirmDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleDelete}
+        isDeleting={deleteMutation.isPending}
+        title="Supprimer ce projet ?"
+        description={`Êtes-vous sûr de vouloir supprimer le projet "${data.reference}" ? Cette action supprimera également toutes les menuiseries associées (${data.menuiseries.length}). Cette action est irréversible.`}
+      />
     </div>
   );
 }

@@ -1,9 +1,13 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Mail, Phone, MapPin, FileText } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, FileText, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
+import { toast } from "sonner";
+import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import {
   Card,
   CardContent,
@@ -43,6 +47,9 @@ export default function ClientDetailPage() {
   const params = useParams();
   const router = useRouter();
   const clientId = params.id as string;
+  const queryClient = useQueryClient();
+  const haptic = useHapticFeedback();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const { data, isLoading, error } = useQuery<ClientDetailResponse>({
     queryKey: ["client", clientId],
@@ -54,6 +61,38 @@ export default function ClientDetailPage() {
       return response.json();
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/clients/${clientId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error?.message || "Failed to delete client");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      haptic.success();
+      toast.success("Client supprimé", {
+        description: `${data.data.deletedProjets} projet(s) supprimé(s)`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      router.push("/clients");
+    },
+    onError: (error) => {
+      haptic.error();
+      toast.error("Erreur lors de la suppression", {
+        description: error instanceof Error ? error.message : "Une erreur est survenue",
+      });
+    },
+  });
+
+  const handleDelete = async () => {
+    await deleteMutation.mutateAsync();
+    setShowDeleteDialog(false);
+  };
 
   if (isLoading) {
     return (
@@ -101,7 +140,7 @@ export default function ClientDetailPage() {
             variant="ghost"
             size="icon"
             onClick={() => router.push("/clients")}
-            className="h-10 w-10"
+            className="h-11 w-11"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
@@ -114,6 +153,14 @@ export default function ClientDetailPage() {
               {client.stats.totalProjets > 1 ? "s" : ""}
             </p>
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowDeleteDialog(true)}
+            className="h-11 w-11 text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            <Trash2 className="h-5 w-5" />
+          </Button>
         </div>
       </div>
 
@@ -251,6 +298,16 @@ export default function ClientDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Dialog de confirmation de suppression */}
+      <DeleteConfirmDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleDelete}
+        isDeleting={deleteMutation.isPending}
+        title="Supprimer ce client ?"
+        description={`Êtes-vous sûr de vouloir supprimer "${client.nom}" ? Cette action supprimera également tous les projets et menuiseries associés. Cette action est irréversible.`}
+      />
     </div>
   );
 }

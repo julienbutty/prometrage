@@ -166,3 +166,68 @@ export async function PUT(
     );
   }
 }
+
+/**
+ * DELETE /api/clients/[id]
+ * Supprime un client et tous ses projets et menuiseries associés (cascade)
+ */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    // Vérifier que le client existe
+    const client = await prisma.client.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            projets: true,
+          },
+        },
+      },
+    });
+
+    if (!client) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: "NOT_FOUND",
+            message: "Client not found",
+          },
+        },
+        { status: 404 }
+      );
+    }
+
+    // Supprimer le client (cascade supprime aussi les projets et menuiseries)
+    await prisma.client.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        id: client.id,
+        deletedProjets: client._count.projets,
+      },
+    });
+  } catch (error) {
+    console.error("[API] Delete client error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: "SERVER_ERROR",
+          message: "Failed to delete client",
+          details: error instanceof Error ? error.message : "Unknown error",
+        },
+      },
+      { status: 500 }
+    );
+  }
+}
