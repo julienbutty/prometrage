@@ -1,6 +1,7 @@
 /**
  * Service de génération de bons de commande PDF
  * Utilise Puppeteer pour convertir HTML → PDF
+ * Adapté pour fonctionner sur Vercel avec @sparticuz/chromium
  */
 
 import puppeteer, { Browser, Page } from 'puppeteer';
@@ -8,19 +9,39 @@ import puppeteer, { Browser, Page } from 'puppeteer';
 let browserInstance: Browser | null = null;
 
 /**
+ * Détecte si on est en environnement Vercel serverless
+ */
+const isVercelProduction = process.env.VERCEL === '1';
+
+/**
  * Obtient ou crée une instance du navigateur Puppeteer
  * Réutilise l'instance pour optimiser les performances
+ *
+ * Sur Vercel: utilise @sparticuz/chromium (version serverless optimisée)
+ * En local/dev: utilise Chromium standard de Puppeteer
  */
 async function getBrowser(): Promise<Browser> {
   if (!browserInstance || !browserInstance.isConnected()) {
-    browserInstance = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage', // Optimisation Docker/Vercel
-      ],
-    });
+    if (isVercelProduction) {
+      // Environnement Vercel: utiliser @sparticuz/chromium
+      const chromium = await import('@sparticuz/chromium');
+
+      browserInstance = await puppeteer.launch({
+        args: chromium.default.args,
+        executablePath: await chromium.default.executablePath(),
+        headless: true,
+      });
+    } else {
+      // Environnement local: utiliser Chromium standard
+      browserInstance = await puppeteer.launch({
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+        ],
+      });
+    }
   }
   return browserInstance;
 }

@@ -1,0 +1,41 @@
+# Tests
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+vitest.config.ts
+vitest.setup.ts
+coverage/
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Dev files
+.env.local
+.env.development
+docker-compose.yml
+Dockerfile
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Cache
+.turbo/
+.next/cache/
+
+# Git
+.git/
+.gitignore
+
+# Node
+node_modules/
