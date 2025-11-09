@@ -114,6 +114,10 @@ export function ComboboxField({
         placeholder="Rechercher..."
         value={search}
         onValueChange={setSearch}
+        className={cn(
+          // Force 16px minimum sur mobile pour éviter le zoom automatique (iOS Safari)
+          !isDesktop && "text-base"
+        )}
       />
       <CommandList>
         <CommandEmpty>Aucune option trouvée.</CommandEmpty>
@@ -204,7 +208,7 @@ export function ComboboxField({
         /* Mobile: Drawer */
         <Drawer open={open} onOpenChange={setOpen}>
           <DrawerTrigger asChild>{renderTrigger()}</DrawerTrigger>
-          <DrawerContent>
+          <DrawerContent className="max-h-[60vh]">
             {/* Titre caché pour accessibilité */}
             <DrawerTitle className="sr-only">{label}</DrawerTitle>
             <div className="mt-4 border-t">
