@@ -132,6 +132,7 @@ export function ComboboxField({
               placeholder="Rechercher..."
               value={search}
               onValueChange={setSearch}
+              autoFocus={false}
             />
             <CommandList>
               <CommandEmpty>Aucune option trouvée.</CommandEmpty>
