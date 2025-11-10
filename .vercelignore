@@ -8,8 +8,8 @@ vitest.config.ts
 vitest.setup.ts
 coverage/
 
-# Documentation
-docs/
+# Documentation (exclut /docs/ markdown mais pas public/docs/ PDFs)
+/docs/
 *.md
 !README.md
 
