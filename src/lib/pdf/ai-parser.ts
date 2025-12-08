@@ -7,7 +7,7 @@ import {
 } from "../validations/ai-response";
 
 /**
- * AI PDF Parser using Anthropic Claude Sonnet 4.5
+ * AI PDF Parser using Anthropic Claude Haiku 4.5
  */
 
 // Initialize Anthropic client
@@ -17,7 +17,7 @@ const anthropic = new Anthropic({
 
 // Configuration
 const CONFIG = {
-  model: "claude-sonnet-4-20250514" as const, // Claude Sonnet 4 with PDF support
+  model: "claude-haiku-4-5-20251001" as const, // Claude Haiku 4.5 - 50K tokens/min vs 30K for Sonnet
   maxTokens: 4096,
   maxRetries: parseInt(process.env.AI_PARSING_MAX_RETRIES || "3", 10),
   minConfidence: parseFloat(process.env.AI_PARSING_MIN_CONFIDENCE || "0.7"),

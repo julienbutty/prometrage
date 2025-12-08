@@ -22,15 +22,11 @@ Si le document n'est PAS une fiche métreur (ex: facture générique, catalogue,
 Si c'est bien une fiche métreur, analyse le PDF et extrais TOUTES les menuiseries présentes.
 Pour chaque menuiserie, extrais les données suivantes au format JSON strict :
 
-IMPORTANT : Chaque menuiserie dans le PDF a une image/schéma associé (vue technique de la fenêtre/porte).
-Tu DOIS extraire cette image et la fournir en base64 dans le champ "imageBase64".
-
 {
   "menuiseries": [
     {
       "repere": "Salon" | null,
       "intitule": "Coulissant 2 vantaux",
-      "imageBase64": "data:image/png;base64,iVBORw0KGgo...",
       "largeur": 3000,
       "hauteur": 2250,
       "hauteurAllege": 1000,
@@ -89,6 +85,5 @@ RÈGLES STRICTES:
 9. **IMPORTANT REPÈRE** : Si l'intitulé contient deux points ":" (ex: "Variante coulissant : Coulissant 2 vantaux"), NE MODIFIE PAS l'intitulé, conserve-le tel quel. Le backend se chargera d'extraire le repère.
 10. Si le repère est explicitement mentionné séparément du titre, extrais-le dans le champ "repere", sinon utilise null
 11. Pour les champs optionnels absents, utilise null (ne les omets pas)
-12. **EXTRACTION D'IMAGES** : Pour chaque menuiserie, extrais l'image/schéma technique associé et fournis-le en base64 avec le préfixe data URI complet (ex: "data:image/png;base64,...")
 
 Réponds UNIQUEMENT avec le JSON, sans texte additionnel avant ou après.`;
