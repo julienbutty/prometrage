@@ -3,13 +3,12 @@
 ## Gamme
 
 - SOFTLINE
-- SWINGLINE
 - KIETISLINE
 
 ## Finition
 
 - Contemporaine
-- Moulurée
+- Moulurï¿½e
 - WOODLINE (softline uniquement)
 
 ## Pack
@@ -18,86 +17,100 @@
 - Confort
 - Optimum
 - InitialPC
-- Renfort intégral
+- Renfort intï¿½gral
 
 ## Couleur
 
 ### MONOCOLORE
+
 - Blanc
 - Beige
 - Gris
 
-### BICOLORE - Filmé
-- Filmé (film à préciser)
-- Filmé EXT (film à préciser)
-- Filmé INT (film à préciser)
+### BICOLORE - Filmï¿½
 
-### BICOLORE - Laqué
-- Laqué (RAL à préciser)
-- Laqué EXT (RAL à préciser)
-- Laqué INT (RAL à préciser)
+- Filmï¿½ (film ï¿½ prï¿½ciser)
+- Filmï¿½ EXT (film ï¿½ prï¿½ciser)
+- Filmï¿½ INT (film ï¿½ prï¿½ciser)
+
+### BICOLORE - Laquï¿½
+
+- Laquï¿½ (RAL ï¿½ prï¿½ciser)
+- Laquï¿½ EXT (RAL ï¿½ prï¿½ciser)
+- Laquï¿½ INT (RAL ï¿½ prï¿½ciser)
 
 ### Teinte masse
-- Teinté masse
+
+- Teintï¿½ masse
 
 ## Type de menuiserie
 
-### Fenêtre
+### Fenï¿½tre
+
 - OF (Ouvrant Fixe)
-- PF (Portée Fenêtre)
+- PF (Portï¿½e Fenï¿½tre)
 - PF serrure
 
 ### Porte
-- Entrée
-- Entrée-Service
+
+- Entrï¿½e
+- Entrï¿½e-Service
 - Service
-- Ouv. Ext. (Ouvrant Extérieur)
+- Ouv. Ext. (Ouvrant Extï¿½rieur)
 
-## Schéma vue intérieure
+## Schï¿½ma vue intï¿½rieure
 
-- SCHÉMA VUE INTERIEURE
+- SCHï¿½MA VUE INTERIEURE
 
 ## Dimensions / Cotes
 
 ### Largeur
+
 - LARGEUR mm sans aile
 - LARGEUR mm avec aile
 
 ### Hauteur
+
 - HAUTEUR mm
 
-### Type d'exécution
-- Exécution
+### Type d'exï¿½cution
+
+- Exï¿½cution
 - Tableau Fini
 
 ## Dormant
 
-### Type de dormant (références)
+### Type de dormant (rï¿½fï¿½rences)
+
 - sans aile (101249)
 - 101214 (101246)
 - 101215 (101247 double clip)
 - avec aile (101240 aile 17)
-- Dt réno
-- > Aile: (épaisseur mm à préciser)
+- Dt rï¿½no
+- > Aile: (ï¿½paisseur mm ï¿½ prï¿½ciser)
 
 ### Reprise de doublage
+
 - Dt. Monobloc(2)
-- Tapée rapportée
+- Tapï¿½e rapportï¿½e
 
 ## Pose
 
 ### Type de pose
+
 - en feuillure
 - en applique
 - en tunnel (tableau)
 - sous coffre tunnel
 
 ### Fixation
+
 - Vis
 - Pattes std
 - Pattes PRDT
 
 ### Seuil
+
 - Seuil Alu
 - 20mm (PMR)
 - 40mm
@@ -105,22 +118,24 @@
 
 ## Soubassement
 
-- Vitré
+- Vitrï¿½
 - Plein lisse
-- Plein rainuré (blanc)
+- Plein rainurï¿½ (blanc)
 
 ### Plates bandes
+
 - Traditionnelles
-- Double congés
-- Congés
+- Double congï¿½s
+- Congï¿½s
 - Cimaise
 - Coin mouchoir
 
 ### Hauteur traverse
-- Hauteur traverse à l'axe (à préciser)
-- ½ linteau
 
-## Habillages intérieurs
+- Hauteur traverse ï¿½ l'axe (ï¿½ prï¿½ciser)
+- ï¿½ linteau
+
+## Habillages intï¿½rieurs
 
 - Standard
 - Sans
@@ -128,7 +143,7 @@
 - Bas
 - Montants
 
-## Habillages extérieurs
+## Habillages extï¿½rieurs
 
 - Standard
 - Sans
@@ -138,29 +153,35 @@
 
 ## Vitrage
 
-### Épaisseur
+### ï¿½paisseur
+
 - 26 mm
 - 18 mm
 - 45 mm
 
 ### Vitrage standard
+
 - Std : 4/20/4 PTR+
 - 4/20/4 PTR
 
 ### Intercalaire
+
 - blanc
 - noir
 
 ### Petits Bois
+
 - 10 mm
 
 ### Type Petits Bois
-- Collés 2 faces
-- incorporés
+
+- Collï¿½s 2 faces
+- incorporï¿½s
 - Liseret de Versailles
 - GO 2 faces
 
 ### Couleur Petits Bois
+
 - Blanc
 - Laiton
 - Argent
@@ -168,110 +189,126 @@
 - Bronze
 
 ### Petits Bois panneau
-- schéma / VTL
+
+- schï¿½ma / VTL
 
 ## Options Quincaillerie
 
-### Configuration générale
-- Double Béquille
-- Ferrage Symétrique
+### Configuration gï¿½nï¿½rale
+
+- Double Bï¿½quille
+- Ferrage Symï¿½trique
 - Coloris standard
 - Extra plate
-- Autre (à préciser)
+- Autre (ï¿½ prï¿½ciser)
 
-### Serrures et sécurité
-- Crémone verrou SF
-- Entrebailleur Intégré
+### Serrures et sï¿½curitï¿½
+
+- Crï¿½mone verrou SF
+- Entrebailleur Intï¿½grï¿½
 
 ### Mortaise
-- Mortaise extérieure facade
-- Mortaise extérieure dessous
+
+- Mortaise extï¿½rieure facade
+- Mortaise extï¿½rieure dessous
 
 ### Grille VRI
+
 - Grille dans coffre VRI
 
 ## Ventilation
 
-### Débit autoréglable 22m3/h
+### Dï¿½bit autorï¿½glable 22m3/h
+
 - 34db
 - 37db
 - 39db
 - 41db
 
-### Débit autoréglable 30m3/h
+### Dï¿½bit autorï¿½glable 30m3/h
+
 - 34db
 - 37db
 - 39db
 - 41db
 
-### Débit autoréglable 45m3/h
+### Dï¿½bit autorï¿½glable 45m3/h
+
 - 37db
 - 39db
 
-### Débit hygroréglable 5 à 45m3/h
+### Dï¿½bit hygrorï¿½glable 5 ï¿½ 45m3/h
+
 - 34db
 - 37db
 - 39db
 - 41db
 
-## Volet Roulant Incorporé (VRI)
+## Volet Roulant Incorporï¿½ (VRI)
 
 ### Type VRI
-- (à préciser)
+
+- (ï¿½ prï¿½ciser)
 
 ### Type de lames
+
 - PVC 44
 - Alu Rs52
 - Alu Rs41
 - CRX
 
 ### Couleur coffre
-- (Couleur à préciser)
+
+- (Couleur ï¿½ prï¿½ciser)
 
 ### ManSuvre
 
 #### Type de manSuvre
+
 - Sangle
 - Treuil
 - Tirage direct
 - Electrique
 - Electronique
-- Radio (monté / non monté)
-- Solaire RTS (monté / non monté)
+- Radio (montï¿½ / non montï¿½)
+- Solaire RTS (montï¿½ / non montï¿½)
 
 #### Fabricant moteur
+
 - Somfy
 - Gaposa
 
 #### Sortie
+
 - Gauche
 - Droite
 - Dessous
-- Côté
+- Cï¿½tï¿½
 
 ### Panneau solaire
-- monté
-- non monté
+
+- montï¿½
+- non montï¿½
 
 ## Hauteurs
 
-- Hauteur d'allège (Ht allège)
-- Hauteur poignée (Ht poignée)
-- Note : Poignée à hauteur PMR = Pack Confort obligatoire
+- Hauteur d'allï¿½ge (Ht allï¿½ge)
+- Hauteur poignï¿½e (Ht poignï¿½e)
+- Note : Poignï¿½e ï¿½ hauteur PMR = Pack Confort obligatoire
 
 ## Divers
 
-- Préciser ouvrant principal : OP
+- Prï¿½ciser ouvrant principal : OP
 - Sem (Semaine de livraison)
-- Délai
-- Référence
+- Dï¿½lai
+- Rï¿½fï¿½rence
 - Commentaires et autres Options
 
 ## Notes importantes (du PDF)
 
-- Pour un meilleur traitement de vos commandes, il est impératif de renseigner un maximum de cases
-- Sans précisions de votre part, la fabrication sera conforme au standard du tarif
+- Pour un meilleur traitement de vos commandes, il est impï¿½ratif de renseigner un maximum de cases
+- Sans prï¿½cisions de votre part, la fabrication sera conforme au standard du tarif
 - La couleur des profils sera blanche et les accessoires seront de coloris standard
-- (1) Noter PMR dans la case Hauteur poignée et renseigner la hauteur d'allège pour être conforme à la Norme PMR
-- Poignée à hauteur PMR = Pack Confort obligatoire
-- (2) côtes tableau obligatoires (spécifique NEUF)
+- (1) Noter PMR dans la case Hauteur poignï¿½e et renseigner la hauteur d'allï¿½ge pour ï¿½tre conforme ï¿½ la Norme PMR
+- Poignï¿½e ï¿½ hauteur PMR = Pack Confort obligatoire
+- (2) cï¿½tes tableau obligatoires (spï¿½cifique NEUF)

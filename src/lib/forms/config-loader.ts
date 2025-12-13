@@ -42,7 +42,14 @@ const DEFAULT_FORM_CONFIG: FormConfig = {
   gamme: {
     label: "Gamme",
     type: "select",
-    options: ["OPTIMAX", "INNOVAX", "PERFORMAX", "SOFTLINE", "SWINGLINE", "KIETISLINE", "WISIO"],
+    options: [
+      "OPTIMAX",
+      "INNOVAX",
+      "PERFORMAX",
+      "SOFTLINE",
+      "KIETISLINE",
+      "WISIO",
+    ],
   },
   pack: {
     label: "Pack",
@@ -66,7 +73,12 @@ const DEFAULT_FORM_CONFIG: FormConfig = {
   pose: {
     label: "Type de pose",
     type: "select",
-    options: ["en feuillure", "en applique", "en tunnel (tableau)", "sous coffre tunnel"],
+    options: [
+      "en feuillure",
+      "en applique",
+      "en tunnel (tableau)",
+      "sous coffre tunnel",
+    ],
   },
   epaisseurVitrage: {
     label: "Épaisseur vitrage",
@@ -103,7 +115,9 @@ const DEFAULT_FORM_CONFIG: FormConfig = {
  */
 export function loadFormConfig(configKey: string): FormConfig {
   if (!configKey || configKey.trim() === "") {
-    console.warn("[config-loader] Empty configKey provided, using default config");
+    console.warn(
+      "[config-loader] Empty configKey provided, using default config"
+    );
     return DEFAULT_FORM_CONFIG;
   }
 
