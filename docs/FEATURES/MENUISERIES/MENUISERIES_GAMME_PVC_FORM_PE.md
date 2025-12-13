@@ -1,112 +1,128 @@
-# Enum et valeurs du formulaire - Portes d'Entrée et de Service PVC
+# Enum et valeurs du formulaire - Portes d'Entrï¿½e et de Service PVC
 
 ## Gamme
 
 - SOFTLINE
 - WOODLINE (softline uniquement)
-- SWINGLINE
 
 ## Finition
 
 - Contemporaine
-- Moulurée* (* panneau ép.30 maxi)
+- Moulurï¿½e* (* panneau ï¿½p.30 maxi)
 
 ## Couleur
 
 ### MONOCOLORE
+
 - Blanc
 - Beige
 - Gris
 
-### BICOLORE - Filmé
-- Filmé (film à préciser)
-- Filmé EXT (film à préciser)
-- Filmé INT (film à préciser)
+### BICOLORE - Filmï¿½
 
-### BICOLORE - Laqué
-- Laqué (RAL à préciser)
-- Laqué EXT (RAL à préciser)
-- Laqué INT (RAL à préciser)
+- Filmï¿½ (film ï¿½ prï¿½ciser)
+- Filmï¿½ EXT (film ï¿½ prï¿½ciser)
+- Filmï¿½ INT (film ï¿½ prï¿½ciser)
+
+### BICOLORE - Laquï¿½
+
+- Laquï¿½ (RAL ï¿½ prï¿½ciser)
+- Laquï¿½ EXT (RAL ï¿½ prï¿½ciser)
+- Laquï¿½ INT (RAL ï¿½ prï¿½ciser)
 
 ### Teinte masse
-- Teinté masse
+
+- Teintï¿½ masse
 
 ## Type de porte
 
-### Porte d'entrée
-- **PE 1 Vtl.** (Porte Entrée 1 Vantail)
-- **PE 2 Vtx.** (Porte Entrée 2 Vantaux)
+### Porte d'entrï¿½e
+
+- **PE 1 Vtl.** (Porte Entrï¿½e 1 Vantail)
+- **PE 2 Vtx.** (Porte Entrï¿½e 2 Vantaux)
 
 ### Porte de service
+
 - **PS 1 Vtl.** (Porte Service 1 Vantail)
 - **PS 2 Vtx.** (Porte Service 2 Vantaux)
-- Porte de service (générique)
+- Porte de service (gï¿½nï¿½rique)
 
 ## Construction Porte
 
-### Schéma vue intérieure
-- SCHÉMA VUE INTERIEURE
+### Schï¿½ma vue intï¿½rieure
+
+- SCHï¿½MA VUE INTERIEURE
 
 ### Cotes
+
 - LARGEUR mm
 - HAUTEUR mm
 
 ### Ouverture
-- Extérieure
+
+- Extï¿½rieure
 
 ### Tierce
+
 - axe montant
 
 ## Dormant
 
-### Dormant RENO (Rénovation)
+### Dormant RENO (Rï¿½novation)
+
 - 111045 aile de 39,5
-- 111043 aile compensée 42
-- 111048 aile compensée 32
+- 111043 aile compensï¿½e 42
+- 111048 aile compensï¿½e 32
 - 111053 aile de 65
 - 101240 aile de 17
-- Réno sur ancien bati : en tunnel (tableau)
-- Réno sur ancien bati : en feuillure
-- Réno sur ancien bati : en applique
-- Réno sur ancien bati : sous coffre tunnel
+- Rï¿½no sur ancien bati : en tunnel (tableau)
+- Rï¿½no sur ancien bati : en feuillure
+- Rï¿½no sur ancien bati : en applique
+- Rï¿½no sur ancien bati : sous coffre tunnel
 
 ### Dormant NEUF
+
 - 101214 sans aile
 - 101246 sans aile
 - 101249 sans aile
 - 101240 aile de 17
-- 101215 (non réalisable avec seuil ALU)
+- 101215 (non rï¿½alisable avec seuil ALU)
 
 ### Reprise de doublage (NEUF)
-- Dormant monobloc* (* côtes tableau obligatoires)
-- Tapées rapportées
-- épaisseur doublage (à préciser)
+
+- Dormant monobloc* (* cï¿½tes tableau obligatoires)
+- Tapï¿½es rapportï¿½es
+- ï¿½paisseur doublage (ï¿½ prï¿½ciser)
 
 ## Traverse
 
-- Ht standard* (* Hauteur standard traverse à l'axe : Porte = 900)
-- Ht hors standard (à préciser)
+- Ht standard* (* Hauteur standard traverse ï¿½ l'axe : Porte = 900)
+- Ht hors standard (ï¿½ prï¿½ciser)
 
 ## Pose
 
 ### Cotes
-- Exécution
+
+- Exï¿½cution
 - Tableau fini
 - Clair de bois
 - Ailes comprises
 
 ### Fixation
+
 - Vis
 - Pattes Std
 - Pattes PRDT
 
 ### Seuil
+
 - Seuil Alu
 - 20mm (PMR)
 - 40mm
 - sans Seuil** (** plinthe automatique sous porte)
 
 ### Compensateur
+
 - 15mm
 - 21mm
 - 10mm (en blanc uniquement)
@@ -115,28 +131,33 @@
 ## Remplissage
 
 ### Soubassement
-- Vitré
+
+- Vitrï¿½
 - Plein lisse
-- Plein rainuré (blanc)
+- Plein rainurï¿½ (blanc)
 
 ### Plates bandes
+
 - Traditionnelles
-- Double congés
-- Congés
+- Double congï¿½s
+- Congï¿½s
 - Cimaise
 - Coin mouchoir
 
-### Vitrage déco ou imprimés
-- (à préciser)
+### Vitrage dï¿½co ou imprimï¿½s
+
+- (ï¿½ prï¿½ciser)
 
 ### Petits Bois
-- schéma / vantail et tierce
 
-### Grille Décor
-- Grille Décor Noir
-- Grille Décor Gris
+- schï¿½ma / vantail et tierce
 
-## Habillages intérieurs
+### Grille Dï¿½cor
+
+- Grille Dï¿½cor Noir
+- Grille Dï¿½cor Gris
+
+## Habillages intï¿½rieurs
 
 - Standard
 - Sans
@@ -145,7 +166,7 @@
 - Bas
 - Moulures MR 90x15
 
-## Habillages extérieurs
+## Habillages extï¿½rieurs
 
 - Standard
 - Sans
@@ -155,185 +176,210 @@
 
 ## Vitrage
 
-### Épaisseur
+### ï¿½paisseur
+
 - 26 mm
 - 18 mm
 - 45 mm
 
 ### Vitrage standard
+
 - Std : 4/20/4 PTR+
 - 4/20/4 PTR
 
 ### Intercalaire
+
 - blanc
 - noir
 
 ### Petits Bois
+
 - 10 mm
-- incorporés
-- Collés 2 faces
+- incorporï¿½s
+- Collï¿½s 2 faces
 
 ### Type Petits Bois
+
 - Liseret de Versailles
 - GO 2 faces
 
 ### Couleur Petits Bois
+
 - Blanc
 - Laiton
 - Argent
 - Plomb
 - Bronze
 
-### Petits Bois détail
+### Petits Bois dï¿½tail
+
 - PTR+
 - PTR
 
 ## Options CREMONE
 
-### Serrure 7 points haute sécurité
+### Serrure 7 points haute sï¿½curitï¿½
+
 - Manuelle
-- Motorisée
-- Note : (*) hauteur maxi = 2300, hauteur mini = 2000
+- Motorisï¿½e
+- Note : (\*) hauteur maxi = 2300, hauteur mini = 2000
 
 ## Options CYLINDRE
 
 ### Type de cylindre
-- **F6S Sécurité Standard** (5 clés)
-- **RX16 Haute Sécurité** (5 clés)
-- bouton moleté intérieur
-- s'entrouvrant
-- clé(s) supplémentaire(s) - nombre à préciser
 
-## Poignées
+- **F6S Sï¿½curitï¿½ Standard** (5 clï¿½s)
+- **RX16 Haute Sï¿½curitï¿½** (5 clï¿½s)
+- bouton moletï¿½ intï¿½rieur
+- s'entrouvrant
+- clï¿½(s) supplï¿½mentaire(s) - nombre ï¿½ prï¿½ciser
+
+## Poignï¿½es
 
 ### Sur plaque 40 mm
+
 - Coloris standard
-- autre coloris (à préciser)
+- autre coloris (ï¿½ prï¿½ciser)
 
 ### Sur rosace fine
-- Modèle (à préciser)
-- Finition (à préciser)
+
+- Modï¿½le (ï¿½ prï¿½ciser)
+- Finition (ï¿½ prï¿½ciser)
 
 ### Note importante
-- si Barre de Tirage : poignée intérieure strictement sur rosaces
+
+- si Barre de Tirage : poignï¿½e intï¿½rieure strictement sur rosaces
 
 ## Barres de Tirage
 
 ### Type
+
 - **Baton NEMO**
-- autre modèle (à préciser)
+- autre modï¿½le (ï¿½ prï¿½ciser)
 
 ### Position
+
 - Ext.
 - Int./Ext.
 - Horizontal
 - Vertical
 
 ### Finition
+
 - Inox 304
 - Inox 316
 - laiton PVD
 
 ### Dimensions
-- modèle (à préciser)
-- hauteur (à préciser)
 
-## Porte Fermière
+- modï¿½le (ï¿½ prï¿½ciser)
+- hauteur (ï¿½ prï¿½ciser)
+
+## Porte Fermiï¿½re
 
 - 1 vantail dans ouvrant
 - 1 vantail OB dans ouvrant
-- 2 battants séparés
+- 2 battants sï¿½parï¿½s
 
 ## Autre Quincaillerie
 
-- serrure à rouleau
-- gâche électrique 12-24 V
-- pêne journalier
+- serrure ï¿½ rouleau
+- gï¿½che ï¿½lectrique 12-24 V
+- pï¿½ne journalier
 
-## Ferme-Porte Vachette à coulisse
+## Ferme-Porte Vachette ï¿½ coulisse
 
 - DC 340
 - DC 500
 - DC 700
-- Arrêt glissière
+- Arrï¿½t glissiï¿½re
 
-## Crémone Pompier Norme CE
+## Crï¿½mone Pompier Norme CE
 
-- (à préciser si applicable)
+- (ï¿½ prï¿½ciser si applicable)
 
 ## Anti-Panique
 
-- 3 Points: latéral, haut et bas
-- béquille extérieure
+- 3 Points: latï¿½ral, haut et bas
+- bï¿½quille extï¿½rieure
 
 ## Divers
 
-- Préciser ouvrant principal : OP
-- PORTE (type général)
+- Prï¿½ciser ouvrant principal : OP
+- PORTE (type gï¿½nï¿½ral)
 
-## Volet Roulant Incorporé (VRI)
+## Volet Roulant Incorporï¿½ (VRI)
 
 ### Type VRI
-- (à préciser)
-- ½linteau
+
+- (ï¿½ prï¿½ciser)
+- ï¿½linteau
 
 ### Type de lames
+
 - PVC 44
 - Alu Rs52
 - Alu Rs41
 - CRX
 
 ### Couleur coffre
-- Coloris (à préciser)
+
+- Coloris (ï¿½ prï¿½ciser)
 
 ### ManSuvre
 
 #### Type de manSuvre
+
 - Sangle
 - Treuil
 - Tirage direct
 - Electrique
 - Electronique
-- Radio (monté / non monté)
-- Solaire RTS (monté / non monté)
+- Radio (montï¿½ / non montï¿½)
+- Solaire RTS (montï¿½ / non montï¿½)
 
 #### Fabricant moteur
+
 - Somfy
 - Gaposa
 
 #### Sortie
+
 - Gauche
 - Droite
 - Dessous
-- Côté
+- Cï¿½tï¿½
 
 ### Panneau solaire
-- monté
-- non monté
+
+- montï¿½
+- non montï¿½
 
 ## Divers administratif
 
-- REP (Repère)
-- QTÉ (Quantité)
-- Référence
+- REP (Repï¿½re)
+- QTï¿½ (Quantitï¿½)
+- Rï¿½fï¿½rence
 - Date : / /
-- Délai
+- Dï¿½lai
 - Sem (Semaine)
 - Commentaires et autres Options
 
 ## Notes importantes (du PDF)
 
 ### Important :
-- Pour un meilleur traitement de vos commandes, il est impératif de renseigner un maximum de cases
-- Sans précisions de votre part, la fabrication sera conforme au standard du tarif
+
+- Pour un meilleur traitement de vos commandes, il est impï¿½ratif de renseigner un maximum de cases
+- Sans prï¿½cisions de votre part, la fabrication sera conforme au standard du tarif
 - La couleur des profils sera blanche et les accessoires seront de coloris standard
-- L'utilisation de crémone automatique à crochets + gâche filante n'est pas systématique. Voir descriptif dans le tarif
+- L'utilisation de crï¿½mone automatique ï¿½ crochets + gï¿½che filante n'est pas systï¿½matique. Voir descriptif dans le tarif
 
 ### Notes techniques :
-- (*) Hauteur standard traverse à l'axe : Porte = 900
-- (**) plinthe automatique sous porte (si sans seuil)
-- (*) côtes tableau obligatoires (pour dormant monobloc NEUF)
-- (*) panneau ép.30 maxi (pour finition Moulurée)
-- (*) hauteur maxi = 2300, hauteur mini = 2000 (pour serrure 7 points haute sécurité)
-- 101215 non réalisable avec seuil ALU
-- si Barre de Tirage : poignée intérieure strictement sur rosaces
+
+- (\*) Hauteur standard traverse ï¿½ l'axe : Porte = 900
+- (\*\*) plinthe automatique sous porte (si sans seuil)
+- (\*) cï¿½tes tableau obligatoires (pour dormant monobloc NEUF)
+- (\*) panneau ï¿½p.30 maxi (pour finition Moulurï¿½e)
+- (\*) hauteur maxi = 2300, hauteur mini = 2000 (pour serrure 7 points haute sï¿½curitï¿½)
+- 101215 non rï¿½alisable avec seuil ALU
+- si Barre de Tirage : poignï¿½e intï¿½rieure strictement sur rosaces

@@ -35,11 +35,6 @@ describe("detectMateriau", () => {
     expect(result).toBe("PVC");
   });
 
-  it("détecte PVC via gamme SWINGLINE", () => {
-    const result = detectMateriau({ gamme: "SWINGLINE" });
-    expect(result).toBe("PVC");
-  });
-
   it("détecte PVC via gamme KIETISLINE", () => {
     const result = detectMateriau({ gamme: "KIETISLINE" });
     expect(result).toBe("PVC");

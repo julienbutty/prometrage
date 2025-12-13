@@ -2,7 +2,7 @@
   "gamme": {
     "label": "Gamme",
     "type": "select",
-    "options": ["SOFTLINE", "SWINGLINE", "KIETISLINE"]
+    "options": ["SOFTLINE", "KIETISLINE"]
   },
   "finition": {
     "label": "Finition",
@@ -37,7 +37,12 @@
   "typeMenuiserie": {
     "label": "Type de menuiserie",
     "type": "select",
-    "options": ["Entrée", "Entrée-Service", "Service", "Ouv. Ext. (Ouvrant Extérieur)"]
+    "options": [
+      "Entrée",
+      "Entrée-Service",
+      "Service",
+      "Ouv. Ext. (Ouvrant Extérieur)"
+    ]
   },
   "typeExecution": {
     "label": "Type d'exécution",
