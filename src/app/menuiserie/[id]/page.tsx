@@ -25,6 +25,7 @@ import PhotoUpload from "@/components/forms/PhotoUpload";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { Badge } from "@/components/ui/badge";
+import { MenuiserieSVGEditor } from "@/components/menuiseries/MenuiserieSVGEditor";
 import type { PhotoObservation } from "@/lib/validations/photo-observation";
 import { getFormConfigKey, detectMateriau, detectPose, detectTypeProduit } from "@/lib/utils/menuiserie-type";
 import { loadFormConfig } from "@/lib/forms/config-loader";
@@ -71,12 +72,9 @@ interface Menuiserie {
   navigation: NavigationInfo;
 }
 
-// Champs critiques (toujours visibles) : Dimensions + Caractéristiques produit
+// Champs critiques (toujours visibles) : Caractéristiques produit
+// Note: Dimensions (largeur, hauteur, hauteurAllege) déplacées dans MenuiserieSVGEditor
 const CRITICAL_FIELDS = [
-  // Dimensions
-  "largeur",
-  "hauteur",
-  "hauteurAllege",
   // Caractéristiques produit (gérées dynamiquement par config)
   "gamme",
   "pack",
@@ -627,32 +625,38 @@ export default function MenuiseriePage() {
         {/* Alerte écarts critiques */}
         {menuiserie.ecarts && <EcartsAlert ecarts={menuiserie.ecarts} />}
 
-        {/* Layout Desktop : 2 colonnes (Image | Formulaires) */}
+        {/* Layout Desktop : 2 colonnes (SVG Editor | Formulaires) */}
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-          {/* Colonne gauche : Image (sticky sur desktop) */}
-          {menuiserie.imageBase64 && (
-            <div className="lg:col-span-5">
-              <Card className="lg:sticky lg:top-24">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
-                    🖼️ Schéma technique
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-gray-50">
-                    {/* <img
-                      src={menuiserie.imageBase64}
-                      alt={`Schéma ${menuiserie.repere || menuiserie.intitule}`}
-                      className="w-full h-full object-contain"
-                    /> */}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
+          {/* Colonne gauche : Éditeur SVG avec dimensions (sticky sur desktop) */}
+          <div className="lg:col-span-5">
+            <Card className="lg:sticky lg:top-24">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+                  📏 Dimensions & Schéma
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <MenuiserieSVGEditor
+                  typeMenuiserie={menuiserie.donneesOriginales.typeMenuiserie || menuiserie.donneesOriginales.intitule || ''}
+                  dimensions={{
+                    largeur: String(formData.largeur ?? ''),
+                    hauteur: String(formData.hauteur ?? ''),
+                    hauteurAllege: String(formData.hauteurAllege ?? ''),
+                  }}
+                  originalDimensions={{
+                    largeur: menuiserie.donneesOriginales.largeur,
+                    hauteur: menuiserie.donneesOriginales.hauteur,
+                    hauteurAllege: menuiserie.donneesOriginales.hauteurAllege,
+                  }}
+                  onDimensionChange={(field, value) => handleFieldChange(field, value)}
+                  showHabillages={false}
+                />
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Colonne droite : Formulaires */}
-          <div className={`space-y-4 ${menuiserie.imageBase64 ? 'lg:col-span-7' : 'lg:col-span-12'} mt-4 lg:mt-0`}>
+          <div className="space-y-4 lg:col-span-7 mt-4 lg:mt-0">
             {/* Repère éditable */}
             <Card>
               <CardHeader>
@@ -712,11 +716,11 @@ export default function MenuiseriePage() {
               </Card>
             )}
 
-            {/* Champs critiques : Dimensions + Caractéristiques (toujours visibles) */}
+            {/* Champs critiques : Caractéristiques produit (toujours visibles) */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
-                  📏 Informations principales
+                  🎨 Caractéristiques produit
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 lg:space-y-6">

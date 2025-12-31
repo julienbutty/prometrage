@@ -315,6 +315,71 @@ Le parsing PDF échouait pour les produits PVC car les schémas de validation Zo
 - ✅ Mobile-first conservé (h-14, touch targets 44px)
 - ✅ Documentation complète
 
+### 🖼️ Phase 3.7 : Visualisation SVG Menuiserie - ✅ COMPLÉTÉE (Décembre 2025)
+
+**Objectif** : Afficher un schéma SVG dynamique pour chaque menuiserie avec saisie contextuelle des dimensions.
+
+#### Infrastructure SVG
+
+- [x] **Types SVG** : `src/lib/svg/types.ts` avec MenuiserieType, MenuiserieSVGProps, HabillagesSide
+- [x] **Parsing type** : Fonction `parseMenuiserieType` pour extraire type + nombre de vantaux
+  - Supporte : fenêtre, porte-fenêtre, coulissant, châssis fixe, châssis soufflet
+  - 12 tests unitaires PASS
+
+- [x] **Templates SVG** : 5 templates React JSX dans `src/lib/svg/menuiserie-templates.tsx`
+  - Fenêtre (1-4 vantaux)
+  - Porte-fenêtre (1-4 vantaux)
+  - Coulissant (2-4 vantaux avec flèches directionnelles)
+  - Châssis fixe
+  - Châssis soufflet
+  - 10 tests unitaires PASS
+
+#### Composants UI
+
+- [x] **MenuiserieSVG** : Composant de rendu SVG dans `src/components/menuiseries/MenuiserieSVG.tsx`
+  - Props : type, nbVantaux, width, height, className
+  - Aria-label pour accessibilité
+  - 8 tests unitaires PASS
+
+- [x] **DimensionInput** : Input numérique positionnable dans `src/components/menuiseries/DimensionInput.tsx`
+  - Props : label, name, value, originalValue, onChange, unit, position
+  - Affiche placeholder avec valeur originale du PDF
+  - Mobile-first (h-14, touch targets 44px)
+  - 6 tests unitaires PASS
+
+- [x] **HabillageInputs** : Groupe de 4 inputs habillages dans `src/components/menuiseries/HabillageInputs.tsx`
+  - Props : type (interieur/exterieur), values, originalValues, onChange
+  - Layout grid 2x2 sur mobile, 4 colonnes sur desktop
+  - 6 tests unitaires PASS
+
+- [x] **MenuiserieSVGEditor** : Éditeur complet avec SVG + inputs dans `src/components/menuiseries/MenuiserieSVGEditor.tsx`
+  - Layout CSS Grid (desktop) / Flex-col (mobile)
+  - Dimensions positionnées autour du SVG :
+    - Largeur : en haut
+    - Hauteur : à droite
+    - Allège : en bas
+  - Habillages intérieurs/extérieurs en dessous
+  - Mode controlled component (props onChange)
+  - 9 tests unitaires PASS
+
+#### Intégration Page Menuiserie
+
+- [x] **Refactoring `/menuiserie/[id]`** :
+  - Remplacement de l'affichage statique par MenuiserieSVGEditor
+  - Dimensions déplacées dans le SVG Editor (non dupliquées)
+  - Connexion au formulaire existant via handleFieldChange
+  - Mutation TanStack Query inchangée (sauvegarde existante)
+
+**Résultats** :
+- ✅ 51 tests SVG unitaires PASS
+- ✅ Total : 172 tests unitaires PASS
+- ✅ Type-check PASS
+- ✅ Lint PASS (0 erreurs sur fichiers SVG)
+- ✅ UX améliorée : saisie contextuelle autour du schéma
+- ✅ Mobile-first : layout responsive (flex-col < 640px, grid >= 640px)
+
+**Specs** : `/specs/002-svg-menuiserie-view/`
+
 ### 🎨 Phase 4 : UI/UX Mobile (Semaine 4)
 
 #### Composants visuels
