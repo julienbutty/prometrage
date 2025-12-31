@@ -25,12 +25,10 @@ export const MenuiserieDataSchema = z.object({
     .min(MIN_DIMENSION, `La hauteur doit être au moins ${MIN_DIMENSION}mm`)
     .max(MAX_DIMENSION, `La hauteur ne peut pas dépasser ${MAX_DIMENSION}mm`),
 
-  // Gamme de produits
-  gamme: z
-    .enum(["OPTIMAX", "PERFORMAX", "INNOVAX"], {
-      message: "La gamme doit être OPTIMAX, PERFORMAX ou INNOVAX",
-    })
-    .optional(),
+  // Gamme de produits: string libre pour supporter ALU + PVC et futures gammes
+  // ALU: OPTIMAX, INNOVAX, PERFORMAX
+  // PVC: SOFTLINE, KIETISLINE, WISIO
+  gamme: z.string().optional(),
 
   // Type de pose
   pose: z

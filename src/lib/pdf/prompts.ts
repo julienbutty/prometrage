@@ -30,7 +30,7 @@ Pour chaque menuiserie, extrais les données suivantes au format JSON strict :
       "largeur": 3000,
       "hauteur": 2250,
       "hauteurAllege": 1000,
-      "gamme": "OPTIMAX" | "PERFORMAX" | "INNOVAX",
+      "gamme": "OPTIMAX" | "INNOVAX" | "PERFORMAX" | "SOFTLINE" | "KIETISLINE" | "WISIO",  // ALU: OPTIMAX, INNOVAX, PERFORMAX | PVC: SOFTLINE, KIETISLINE, WISIO
       "couleurInt": "RAL 9016",
       "couleurExt": "RAL 7016",
       "pose": "tunnel" | "applique" | "renovation",
@@ -77,7 +77,10 @@ RÈGLES STRICTES:
 1. **VALIDATION** : Le champ "isValidDocument" DOIT toujours être présent (true si fiche métreur, false sinon)
 2. Toutes les dimensions DOIVENT être des nombres en millimètres (pas de string)
 3. Si une valeur est illisible ou absente, utilise null et ajoute un warning dans metadata.warnings
-4. Normalise les gammes en MAJUSCULES (OPTIMAX, PERFORMAX, INNOVAX)
+4. Normalise les gammes en MAJUSCULES. Gammes supportées :
+   - ALU (Aluminium) : OPTIMAX, INNOVAX, PERFORMAX
+   - PVC : SOFTLINE, KIETISLINE, WISIO
+   Si une gamme inconnue est détectée, extrais-la telle quelle et ajoute un warning
 5. Normalise les poses en minuscules (tunnel, applique, renovation)
 6. Extrais TOUTES les menuiseries du document, même partiellement remplies
 7. Conserve les descriptions exactes pour couleurs et options

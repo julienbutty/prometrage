@@ -182,6 +182,39 @@
 - [x] **Documentation** : API_SPEC.md, CONTEXT.md, TODO_LIST.md mis à jour
 - [x] **Tests intégration** : Tests API endpoint `/valider` (7 tests)
 
+### 🔧 Phase 3.4 : Stabilisation Parsing PDF Multi-Produits (ALU + PVC) - ✅ COMPLÉTÉE (Décembre 2025)
+
+#### Problème résolu
+
+Le parsing PDF échouait pour les produits PVC car les schémas de validation Zod n'acceptaient que les gammes ALU.
+
+#### Modifications effectuées
+
+- [x] **Schema Zod ai-response.ts** : Champ `gamme` transformé de enum vers string libre
+- [x] **Schema Zod menuiserie.ts** : Champ `gamme` transformé de enum vers string libre
+- [x] **Prompt IA prompts.ts** : Ajout gammes PVC (SOFTLINE, KIETISLINE, WISIO) avec commentaires explicatifs
+- [x] **Tests unitaires** : 31 nouveaux tests pour validation PVC et flexibilité
+
+#### Gammes supportées
+
+| Matériau | Gamme | Type Produit |
+|----------|-------|--------------|
+| ALU | OPTIMAX | Fenêtre/Porte |
+| ALU | INNOVAX | Fenêtre/Porte |
+| ALU | PERFORMAX | Coulissant |
+| PVC | SOFTLINE | Fenêtre/Porte |
+| PVC | KIETISLINE | Fenêtre/Porte |
+| PVC | WISIO | Coulissant |
+
+**Résultats** :
+- ✅ 31 nouveaux tests unitaires PASS
+- ✅ Total : 295 tests PASS
+- ✅ Type-check PASS
+- ✅ Lint PASS
+- ✅ PDFs PVC parsés sans erreur de validation
+- ✅ PDFs mixtes ALU+PVC supportés
+- ✅ Extensibilité future : nouvelles gammes acceptées automatiquement
+
 ### 🖼️ Phase 3.5 : Extraction Images PDF - EN ATTENTE
 
 #### Infrastructure préparée (schema + API prêts)
