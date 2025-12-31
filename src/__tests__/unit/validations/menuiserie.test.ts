@@ -65,15 +65,18 @@ describe("MenuiserieDataSchema - Données de menuiserie", () => {
       });
     });
 
-    it("devrait rejeter une gamme invalide", () => {
+    it("devrait accepter toute gamme string (flexibilité pour futures gammes)", () => {
+      // Depuis la feature 001-pdf-parsing-multi-product, gamme est un string libre
+      // pour supporter ALU (OPTIMAX, INNOVAX, PERFORMAX) et PVC (SOFTLINE, KIETISLINE, WISIO)
+      // ainsi que d'éventuelles futures gammes sans modification code
       const data = {
         largeur: 3000,
         hauteur: 2250,
-        gamme: "INVALID_GAMME",
+        gamme: "FUTURE_GAMME",
       };
 
       const result = MenuiserieDataSchema.safeParse(data);
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
     });
   });
 

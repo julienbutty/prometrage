@@ -21,7 +21,9 @@ export const AIMenuiserieSchema = z.object({
   largeur: z.number().min(100).max(10000),
   hauteur: z.number().min(100).max(10000),
   hauteurAllege: z.number().optional().nullable(),
-  gamme: z.enum(["OPTIMAX", "PERFORMAX", "INNOVAX"]).optional().nullable(),
+  // Gamme: string libre pour supporter ALU (OPTIMAX, INNOVAX, PERFORMAX) et PVC (SOFTLINE, KIETISLINE, WISIO)
+  // et permettre l'ajout de nouvelles gammes futures sans modification de code
+  gamme: z.string().optional().nullable(),
   couleurInt: z.string().optional().nullable(),
   couleurExt: z.string().optional().nullable(),
   pose: z.enum(["tunnel", "applique", "renovation"]).optional().nullable(),
