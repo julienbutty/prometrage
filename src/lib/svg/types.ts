@@ -1,7 +1,14 @@
 /**
  * Types pour la génération SVG de menuiseries
  * @see specs/002-svg-menuiserie-view/data-model.md
+ * @see specs/003-habillages-svg-integration/data-model.md
  */
+
+import type { HabillageValue, Side } from '@/lib/validations/habillage';
+
+// Re-export pour compatibilité
+export type { HabillageValue, Side };
+export { HABILLAGE_VALUES, HABILLAGE_LABELS, SIDES, SIDE_LABELS } from '@/lib/validations/habillage';
 
 /**
  * Types de menuiseries supportés pour la génération SVG
@@ -15,12 +22,13 @@ export type MenuiserieType =
 
 /**
  * Structure pour un côté d'habillage
+ * @breaking v003 - Changed from number | null to HabillageValue | null
  */
 export interface HabillagesSide {
-  haut: number | null;
-  bas: number | null;
-  gauche: number | null;
-  droite: number | null;
+  haut: HabillageValue | null;
+  bas: HabillageValue | null;
+  gauche: HabillageValue | null;
+  droite: HabillageValue | null;
 }
 
 /**
@@ -104,41 +112,13 @@ export interface DimensionInputProps {
 }
 
 /**
- * Props du composant HabillageInputs
- */
-export interface HabillageInputsProps {
-  /** Type d'habillage */
-  type: 'interieur' | 'exterieur';
-  /** Valeurs originales */
-  originalValues?: Partial<HabillagesSide>;
-  /** Valeurs actuelles */
-  values: {
-    haut: string;
-    bas: string;
-    gauche: string;
-    droite: string;
-  };
-  /** Callback de changement */
-  onChange: (side: keyof HabillagesSide, value: string) => void;
-}
-
-/**
  * Données du formulaire pour React Hook Form
+ * @updated v003 - habillages utilisent maintenant HabillageValue | null
  */
 export interface MenuiserieSVGFormData {
   largeur: string;
   hauteur: string;
   hauteurAllege: string;
-  habillagesInterieurs: {
-    haut: string;
-    bas: string;
-    gauche: string;
-    droite: string;
-  };
-  habillagesExterieurs: {
-    haut: string;
-    bas: string;
-    gauche: string;
-    droite: string;
-  };
+  habillagesInterieurs: HabillagesSide;
+  habillagesExterieurs: HabillagesSide;
 }

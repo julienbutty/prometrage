@@ -2,9 +2,10 @@
 
 import { MenuiserieSVG } from './MenuiserieSVG';
 import { DimensionInput } from './DimensionInput';
-import { HabillageInputs } from './HabillageInputs';
+import { HabillageSection } from './HabillageSection';
 import { parseMenuiserieType } from '@/lib/svg/svg-utils';
-import type { HabillagesSide } from '@/lib/svg/types';
+import type { HabillageValue, Side, HabillageConfig } from '@/lib/validations/habillage';
+import { HABILLAGES_PVC } from '@/lib/validations/habillage';
 import { cn } from '@/lib/utils';
 
 /**
@@ -31,27 +32,19 @@ interface MenuiserieSVGEditorProps {
   /** Callback quand une dimension change */
   onDimensionChange?: (field: 'largeur' | 'hauteur' | 'hauteurAllege', value: string) => void;
   /** Valeurs actuelles des habillages intérieurs */
-  habillagesInterieurs?: {
-    haut: string;
-    bas: string;
-    gauche: string;
-    droite: string;
-  };
-  /** Valeurs originales des habillages intérieurs */
-  originalHabillagesInterieurs?: Partial<HabillagesSide>;
+  habillagesInterieurs?: Record<Side, HabillageValue | null>;
   /** Callback quand un habillage intérieur change */
-  onHabillageIntChange?: (side: keyof HabillagesSide, value: string) => void;
+  onHabillageIntChange?: (side: Side, value: HabillageValue) => void;
+  /** Côtés intérieurs en animation highlight */
+  highlightedIntSides?: Set<Side>;
   /** Valeurs actuelles des habillages extérieurs */
-  habillagesExterieurs?: {
-    haut: string;
-    bas: string;
-    gauche: string;
-    droite: string;
-  };
-  /** Valeurs originales des habillages extérieurs */
-  originalHabillagesExterieurs?: Partial<HabillagesSide>;
+  habillagesExterieurs?: Record<Side, HabillageValue | null>;
   /** Callback quand un habillage extérieur change */
-  onHabillageExtChange?: (side: keyof HabillagesSide, value: string) => void;
+  onHabillageExtChange?: (side: Side, value: HabillageValue) => void;
+  /** Côtés extérieurs en animation highlight */
+  highlightedExtSides?: Set<Side>;
+  /** Configuration des options d'habillage selon matériau/pose */
+  habillageConfig?: HabillageConfig;
   /** Afficher les habillages (défaut: true) */
   showHabillages?: boolean;
   /** Classes CSS additionnelles */
@@ -82,32 +75,30 @@ export function MenuiserieSVGEditor({
   originalDimensions,
   onDimensionChange,
   habillagesInterieurs,
-  originalHabillagesInterieurs,
   onHabillageIntChange,
+  highlightedIntSides = new Set(),
   habillagesExterieurs,
-  originalHabillagesExterieurs,
   onHabillageExtChange,
+  highlightedExtSides = new Set(),
+  habillageConfig = HABILLAGES_PVC,
   showHabillages = true,
   className,
 }: MenuiserieSVGEditorProps) {
   // Parser le type de menuiserie
   const parsed = parseMenuiserieType(typeMenuiserie || '');
 
-  // Handlers avec guard pour mode display-only
+  // Handler avec guard pour mode display-only
   const handleDimensionChange = (field: 'largeur' | 'hauteur' | 'hauteurAllege', value: string) => {
     onDimensionChange?.(field, value);
   };
 
-  const handleHabillageIntChange = (side: keyof HabillagesSide, value: string) => {
-    onHabillageIntChange?.(side, value);
+  // Valeurs par défaut pour les habillages (null pour non sélectionné)
+  const defaultHabillages: Record<Side, HabillageValue | null> = {
+    haut: null,
+    bas: null,
+    gauche: null,
+    droite: null,
   };
-
-  const handleHabillageExtChange = (side: keyof HabillagesSide, value: string) => {
-    onHabillageExtChange?.(side, value);
-  };
-
-  // Valeurs par défaut pour les habillages
-  const defaultHabillages = { haut: '', bas: '', gauche: '', droite: '' };
 
   return (
     <div className={cn('w-full', className)}>
@@ -178,17 +169,19 @@ export function MenuiserieSVGEditor({
       {/* Habillages - Section séparée sous le SVG */}
       {showHabillages && (
         <div className="mt-6 space-y-4">
-          <HabillageInputs
+          <HabillageSection
             type="interieur"
-            originalValues={originalHabillagesInterieurs}
             values={habillagesInterieurs || defaultHabillages}
-            onChange={handleHabillageIntChange}
+            onChange={(side, value) => onHabillageIntChange?.(side, value)}
+            options={habillageConfig.interieurs}
+            highlightedSides={highlightedIntSides}
           />
-          <HabillageInputs
+          <HabillageSection
             type="exterieur"
-            originalValues={originalHabillagesExterieurs}
             values={habillagesExterieurs || defaultHabillages}
-            onChange={handleHabillageExtChange}
+            onChange={(side, value) => onHabillageExtChange?.(side, value)}
+            options={habillageConfig.exterieurs}
+            highlightedSides={highlightedExtSides}
           />
         </div>
       )}
