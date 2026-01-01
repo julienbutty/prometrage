@@ -6,6 +6,9 @@ import { useState, useEffect } from "react";
 import { ArrowLeft, Save, ChevronDown, ChevronUp, CheckCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
+import { useHabillagesPropagation } from "@/hooks/useHabillagesPropagation";
+import type { HabillageValue, Side } from "@/lib/validations/habillage";
+import { getHabillageConfig } from "@/lib/validations/habillage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -200,6 +203,10 @@ export default function MenuiseriePage() {
   // Haptic feedback hook
   const haptic = useHapticFeedback();
 
+  // Hooks de propagation pour les habillages
+  const habillagesInt = useHabillagesPropagation();
+  const habillagesExt = useHabillagesPropagation();
+
   const { data: menuiserie, isLoading } = useQuery({
     queryKey: ["menuiserie", menuiserieId],
     queryFn: async (): Promise<Menuiserie> => {
@@ -220,8 +227,10 @@ export default function MenuiseriePage() {
     const typeProduit = detectTypeProduit(data);
     const configKey = getFormConfigKey(data);
     const formConfig = loadFormConfig(configKey);
+    // Configuration des habillages selon le matériau et le type de pose
+    const habillageConfig = getHabillageConfig(materiau, pose);
 
-    return { materiau, pose, typeProduit, configKey, formConfig };
+    return { materiau, pose, typeProduit, configKey, formConfig, habillageConfig };
   }, [menuiserie]);
 
   // Initialize form when data loads
@@ -442,6 +451,17 @@ export default function MenuiseriePage() {
     });
   };
 
+  // Handlers pour les habillages avec propagation
+  const handleHabillageIntChange = (side: Side, value: HabillageValue) => {
+    setHasUnsavedChanges(true);
+    habillagesInt.handleChange(side, value);
+  };
+
+  const handleHabillageExtChange = (side: Side, value: HabillageValue) => {
+    setHasUnsavedChanges(true);
+    habillagesExt.handleChange(side, value);
+  };
+
   const handleSave = () => {
     if (!menuiserie) return;
 
@@ -449,6 +469,9 @@ export default function MenuiseriePage() {
       ...formData,
       observations,
       photosObservations: photosObservations.length > 0 ? photosObservations : undefined,
+      // Habillages avec la nouvelle structure
+      habillageInt: habillagesInt.values,
+      habillageExt: habillagesExt.values,
     };
 
     updateMutation.mutate({
@@ -473,6 +496,9 @@ export default function MenuiseriePage() {
       ...formData,
       observations,
       photosObservations: photosObservations.length > 0 ? photosObservations : undefined,
+      // Habillages avec la nouvelle structure
+      habillageInt: habillagesInt.values,
+      habillageExt: habillagesExt.values,
     };
 
     // Valider avec les données actuelles (auto-enregistrement)
@@ -649,7 +675,13 @@ export default function MenuiseriePage() {
                     hauteurAllege: menuiserie.donneesOriginales.hauteurAllege,
                   }}
                   onDimensionChange={(field, value) => handleFieldChange(field, value)}
-                  showHabillages={false}
+                  habillagesInterieurs={habillagesInt.values}
+                  onHabillageIntChange={handleHabillageIntChange}
+                  highlightedIntSides={habillagesInt.highlightedSides}
+                  habillagesExterieurs={habillagesExt.values}
+                  onHabillageExtChange={handleHabillageExtChange}
+                  highlightedExtSides={habillagesExt.highlightedSides}
+                  habillageConfig={detectedInfo?.habillageConfig}
                 />
               </CardContent>
             </Card>

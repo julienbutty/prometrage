@@ -5,6 +5,13 @@ import { calculateEcarts } from "@/lib/utils/ecarts";
 import { PhotosObservationsSchema } from "@/lib/validations/photo-observation";
 import { getMenuiserieStatut, StatutMenuiserie } from "@/lib/types/menuiserie-status";
 
+/**
+ * Schéma de validation pour les données modifiées
+ * Supporte:
+ * - Valeurs simples (string, number, boolean, null)
+ * - Photos d'observation (array)
+ * - Habillages (objet avec 4 côtés)
+ */
 const updateMenuiserieSchema = z.object({
   donneesModifiees: z.record(
     z.string(),
@@ -14,6 +21,12 @@ const updateMenuiserieSchema = z.object({
       z.boolean(),
       z.null(),
       z.array(z.any()), // Pour photosObservations
+      z.object({
+        haut: z.string().nullable().optional(),
+        bas: z.string().nullable().optional(),
+        gauche: z.string().nullable().optional(),
+        droite: z.string().nullable().optional(),
+      }), // Pour habillageInt/habillageExt (schema flexible)
     ])
   ),
   repere: z.string().optional(),
