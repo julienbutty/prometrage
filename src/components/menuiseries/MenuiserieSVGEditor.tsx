@@ -2,13 +2,17 @@
 
 import { MenuiserieSVG } from './MenuiserieSVG';
 import { DimensionInput } from './DimensionInput';
-import { HabillageSection } from './HabillageSection';
+import { HabillageGroup } from './HabillageGroup';
+import { ApplyToAllButton } from './ApplyToAllButton';
 import { parseMenuiserieType } from '@/lib/svg/svg-utils';
 import type { HabillageValue, Side, HabillageConfig } from '@/lib/validations/habillage';
 import { HABILLAGES_PVC } from '@/lib/validations/habillage';
 import { cn } from '@/lib/utils';
 
 /**
+ * @deprecated Utilisez SVGZone à la place. Ce composant sera supprimé dans une future version.
+ * @see SVGZone pour le nouveau composant avec toggle habillages et layout amélioré
+ *
  * Props pour le composant MenuiserieSVGEditor
  * Supporte deux modes:
  * 1. Controlled: onChange est fourni, le parent gère l'état
@@ -47,27 +51,38 @@ interface MenuiserieSVGEditorProps {
   habillageConfig?: HabillageConfig;
   /** Afficher les habillages (défaut: true) */
   showHabillages?: boolean;
+  /** Callback pour "Appliquer Int à tous" */
+  onApplyIntToAll?: () => void;
+  /** Callback pour "Appliquer Ext à tous" */
+  onApplyExtToAll?: () => void;
+  /** Désactiver le bouton "Appliquer Int à tous" */
+  disableApplyIntToAll?: boolean;
+  /** Désactiver le bouton "Appliquer Ext à tous" */
+  disableApplyExtToAll?: boolean;
+  /** Afficher le champ Allège (défaut: true pour rétrocompatibilité) */
+  showAllege?: boolean;
   /** Classes CSS additionnelles */
   className?: string;
 }
 
 /**
- * Éditeur SVG avec champs de saisie positionnés autour du schéma
+ * @deprecated Utilisez SVGZone à la place
  *
- * Layout Desktop (Grid):
+ * Éditeur SVG avec habillages positionnés spatialement autour du schéma
+ *
+ * Layout Desktop (Grid 3 colonnes):
  * ```
- *              [largeur]
- *             [  SVG  ] [hauteur]
- *              [allège ]
- * [habillages intérieurs]
- * [habillages extérieurs]
+ *                    [Hab Haut]
+ *  [Hauteur+HabG]     [SVG]      [HabD]
+ *              [Largeur + Hab Bas]
  * ```
  *
  * Layout Mobile (Flex-col):
- * - SVG en haut
- * - Champs dimensions
- * - Habillages intérieurs
- * - Habillages extérieurs
+ * 1. Hab Haut
+ * 2. SVG
+ * 3. Hauteur + Hab Gauche
+ * 4. Hab Droite
+ * 5. Largeur + Hab Bas
  */
 export function MenuiserieSVGEditor({
   typeMenuiserie,
@@ -82,6 +97,11 @@ export function MenuiserieSVGEditor({
   highlightedExtSides = new Set(),
   habillageConfig = HABILLAGES_PVC,
   showHabillages = true,
+  onApplyIntToAll,
+  onApplyExtToAll,
+  disableApplyIntToAll = true,
+  disableApplyExtToAll = true,
+  showAllege = true,
   className,
 }: MenuiserieSVGEditorProps) {
   // Parser le type de menuiserie
@@ -93,27 +113,114 @@ export function MenuiserieSVGEditor({
   };
 
   // Valeurs par défaut pour les habillages (null pour non sélectionné)
-  const defaultHabillages: Record<Side, HabillageValue | null> = {
+  const defaultHabillagesInt: Record<Side, HabillageValue | null> = {
+    haut: null,
+    bas: null,
+    gauche: null,
+    droite: null,
+  };
+  const defaultHabillagesExt: Record<Side, HabillageValue | null> = {
     haut: null,
     bas: null,
     gauche: null,
     droite: null,
   };
 
+  const habInt = habillagesInterieurs || defaultHabillagesInt;
+  const habExt = habillagesExterieurs || defaultHabillagesExt;
+
+  // Helper to create HabillageGroup values for a side
+  const getGroupValues = (side: Side) => ({
+    interieur: habInt[side],
+    exterieur: habExt[side],
+  });
+
+  // Helper to check if a side is highlighted
+  const isIntHighlighted = (side: Side) => highlightedIntSides.has(side);
+  const isExtHighlighted = (side: Side) => highlightedExtSides.has(side);
+
   return (
     <div className={cn('w-full', className)}>
-      {/* Layout mobile: flex-col, desktop: grid */}
-      <div
-        className={cn(
-          // Mobile: colonne verticale
-          'flex flex-col gap-4',
-          // Desktop: grille avec SVG au centre
-          'sm:grid sm:grid-cols-[auto_1fr_auto] sm:grid-rows-[auto_1fr_auto]',
-          'sm:gap-4 sm:items-center sm:justify-items-center'
+      {/* Layout mobile: flex-col, desktop: grid 3 colonnes */}
+      <div className="flex flex-col gap-3">
+
+        {/* ROW 1: Habillages HAUT (centré) */}
+        {showHabillages && (
+          <div className="order-1 flex justify-center">
+            <HabillageGroup
+              side="haut"
+              values={getGroupValues('haut')}
+              onIntChange={(value) => onHabillageIntChange?.('haut', value)}
+              onExtChange={(value) => onHabillageExtChange?.('haut', value)}
+              options={habillageConfig}
+              orientation="horizontal"
+              highlightInt={isIntHighlighted('haut')}
+              highlightExt={isExtHighlighted('haut')}
+            />
+          </div>
         )}
-      >
-        {/* Largeur - Position: haut centre */}
-        <div className="sm:col-start-2 sm:row-start-1 sm:justify-self-center">
+
+        {/* ROW 2: [Hauteur + Hab Gauche] | SVG | [Hab Droite] */}
+        <div className="order-2 flex flex-col sm:flex-row gap-3 items-stretch">
+
+          {/* Colonne gauche: Hauteur + Hab Gauche */}
+          <div className="order-3 sm:order-1 flex flex-col gap-2 sm:w-auto">
+            <DimensionInput
+              label="Hauteur"
+              name="hauteur"
+              originalValue={originalDimensions?.hauteur}
+              value={dimensions.hauteur}
+              onChange={(v) => handleDimensionChange('hauteur', v)}
+              unit="mm"
+              position="right"
+            />
+            {showHabillages && (
+              <HabillageGroup
+                side="gauche"
+                values={getGroupValues('gauche')}
+                onIntChange={(value) => onHabillageIntChange?.('gauche', value)}
+                onExtChange={(value) => onHabillageExtChange?.('gauche', value)}
+                options={habillageConfig}
+                orientation="vertical"
+                highlightInt={isIntHighlighted('gauche')}
+                highlightExt={isExtHighlighted('gauche')}
+              />
+            )}
+          </div>
+
+          {/* Centre: SVG */}
+          <div className="order-2 flex-1 min-w-0">
+            <div className="aspect-[4/3] w-full max-w-[200px] mx-auto bg-gray-50 rounded-lg p-3 flex items-center justify-center">
+              <MenuiserieSVG
+                type={parsed.type}
+                nbVantaux={parsed.nbVantaux}
+                className="max-w-full max-h-full"
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1 text-center">
+              {typeMenuiserie || 'Type non spécifié'}
+            </p>
+          </div>
+
+          {/* Colonne droite: Hab Droite */}
+          {showHabillages && (
+            <div className="order-4 sm:order-3 flex flex-col gap-2 sm:w-auto">
+              <HabillageGroup
+                side="droite"
+                values={getGroupValues('droite')}
+                onIntChange={(value) => onHabillageIntChange?.('droite', value)}
+                onExtChange={(value) => onHabillageExtChange?.('droite', value)}
+                options={habillageConfig}
+                orientation="vertical"
+                highlightInt={isIntHighlighted('droite')}
+                highlightExt={isExtHighlighted('droite')}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* ROW 3: Largeur + Hab Bas + Allège */}
+        <div className="order-5 flex flex-col sm:flex-row gap-3 items-start justify-center">
           <DimensionInput
             label="Largeur"
             name="largeur"
@@ -123,68 +230,53 @@ export function MenuiserieSVGEditor({
             unit="mm"
             position="top"
           />
-        </div>
 
-        {/* SVG - Position: centre */}
-        <div className="sm:col-start-2 sm:row-start-2 w-full max-w-md mx-auto sm:mx-0">
-          <div className="aspect-[4/3] w-full bg-gray-50 rounded-lg p-4 flex items-center justify-center">
-            <MenuiserieSVG
-              type={parsed.type}
-              nbVantaux={parsed.nbVantaux}
-              className="max-w-full max-h-full"
+          {showHabillages && (
+            <HabillageGroup
+              side="bas"
+              values={getGroupValues('bas')}
+              onIntChange={(value) => onHabillageIntChange?.('bas', value)}
+              onExtChange={(value) => onHabillageExtChange?.('bas', value)}
+              options={habillageConfig}
+              orientation="horizontal"
+              highlightInt={isIntHighlighted('bas')}
+              highlightExt={isExtHighlighted('bas')}
             />
+          )}
+
+          {showAllege && (
+            <DimensionInput
+              label="Hauteur d'allège"
+              name="hauteurAllege"
+              originalValue={originalDimensions?.hauteurAllege}
+              value={dimensions.hauteurAllege}
+              onChange={(v) => handleDimensionChange('hauteurAllege', v)}
+              unit="mm"
+              position="bottom"
+            />
+          )}
+        </div>
+
+        {/* ROW 4: Boutons "Appliquer à tous" */}
+        {showHabillages && (onApplyIntToAll || onApplyExtToAll) && (
+          <div className="order-6 flex flex-col sm:flex-row gap-2 justify-center mt-2">
+            {onApplyIntToAll && (
+              <ApplyToAllButton
+                type="interieur"
+                onApply={onApplyIntToAll}
+                disabled={disableApplyIntToAll}
+              />
+            )}
+            {onApplyExtToAll && (
+              <ApplyToAllButton
+                type="exterieur"
+                onApply={onApplyExtToAll}
+                disabled={disableApplyExtToAll}
+              />
+            )}
           </div>
-          <p className="text-xs text-gray-500 mt-2 text-center">
-            {typeMenuiserie || 'Type non spécifié'}
-          </p>
-        </div>
-
-        {/* Hauteur - Position: droite centre */}
-        <div className="sm:col-start-3 sm:row-start-2 sm:justify-self-start">
-          <DimensionInput
-            label="Hauteur"
-            name="hauteur"
-            originalValue={originalDimensions?.hauteur}
-            value={dimensions.hauteur}
-            onChange={(v) => handleDimensionChange('hauteur', v)}
-            unit="mm"
-            position="right"
-          />
-        </div>
-
-        {/* Allège - Position: bas centre */}
-        <div className="sm:col-start-2 sm:row-start-3 sm:justify-self-center">
-          <DimensionInput
-            label="Hauteur d'allège"
-            name="hauteurAllege"
-            originalValue={originalDimensions?.hauteurAllege}
-            value={dimensions.hauteurAllege}
-            onChange={(v) => handleDimensionChange('hauteurAllege', v)}
-            unit="mm"
-            position="bottom"
-          />
-        </div>
+        )}
       </div>
-
-      {/* Habillages - Section séparée sous le SVG */}
-      {showHabillages && (
-        <div className="mt-6 space-y-4">
-          <HabillageSection
-            type="interieur"
-            values={habillagesInterieurs || defaultHabillages}
-            onChange={(side, value) => onHabillageIntChange?.(side, value)}
-            options={habillageConfig.interieurs}
-            highlightedSides={highlightedIntSides}
-          />
-          <HabillageSection
-            type="exterieur"
-            values={habillagesExterieurs || defaultHabillages}
-            onChange={(side, value) => onHabillageExtChange?.(side, value)}
-            options={habillageConfig.exterieurs}
-            highlightedSides={highlightedExtSides}
-          />
-        </div>
-      )}
     </div>
   );
 }

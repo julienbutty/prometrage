@@ -25,6 +25,10 @@ interface UseHabillagesPropagationReturn {
   handleChange: (side: Side, value: HabillageValue) => void;
   /** Réinitialise les valeurs et l'état de propagation */
   reset: () => void;
+  /** Applique la première valeur non-null à tous les côtés */
+  applyToAll: () => void;
+  /** Indique si au moins une valeur est définie */
+  hasAnyValue: boolean;
 }
 
 /**
@@ -147,11 +151,49 @@ export function useHabillagesPropagation(
     }
   }, [defaultValues]);
 
+  /**
+   * Applique la première valeur non-null à tous les côtés
+   * @see specs/005-svg-habillages-redesign/research.md
+   */
+  const applyToAll = useCallback(() => {
+    setValues((prevValues) => {
+      // Trouver la première valeur non-null (ordre: haut, bas, gauche, droite)
+      const sourceSide = SIDES.find((side) => prevValues[side] !== null);
+      if (!sourceSide) return prevValues; // Rien à propager si tout est null
+
+      const valueToApply = prevValues[sourceSide];
+      const newValues: HabillagesValues = {
+        haut: valueToApply,
+        bas: valueToApply,
+        gauche: valueToApply,
+        droite: valueToApply,
+      };
+
+      // Highlight tous les côtés sauf le premier (source)
+      const propagatedSides = SIDES.filter((s) => s !== sourceSide);
+      triggerHighlight(propagatedSides);
+
+      // Tous les côtés deviennent "overridden"
+      setOverriddenSides(new Set(SIDES));
+
+      return newValues;
+    });
+  }, [triggerHighlight]);
+
+  /**
+   * Indique si au moins une valeur est définie
+   */
+  const hasAnyValue = useMemo(() => {
+    return SIDES.some((side) => values[side] !== null);
+  }, [values]);
+
   return {
     values,
     highlightedSides,
     handleChange,
     reset,
+    applyToAll,
+    hasAnyValue,
   };
 }
 
