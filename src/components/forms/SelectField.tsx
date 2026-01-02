@@ -77,12 +77,12 @@ export function SelectField({
 
       {/* Select */}
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger id={id} className="w-full h-14">
+        <SelectTrigger id={id} className="w-full h-11">
           <SelectValue placeholder="Sélectionner..." />
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (
-            <SelectItem key={option} value={option} className="h-12 text-base">
+            <SelectItem key={option} value={option} className="h-11">
               {option}
             </SelectItem>
           ))}

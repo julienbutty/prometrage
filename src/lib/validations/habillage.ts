@@ -159,3 +159,40 @@ export const HABILLAGE_VALUES = HABILLAGES_PVC.interieurs.map(o => o.value);
 export const HABILLAGE_LABELS: Record<string, string> = Object.fromEntries(
   HABILLAGES_PVC.interieurs.map(o => [o.value, o.label])
 );
+
+/**
+ * Configuration des styles pill pour distinction Int/Ext
+ * @see specs/005-svg-habillages-redesign/data-model.md
+ */
+export interface PillStyleConfig {
+  border: string;
+  background: string;
+  text: string;
+  ring: string;
+  icon: string;
+}
+
+/**
+ * Styles pill pour habillages intérieurs (bleu) et extérieurs (orange)
+ */
+export const PILL_STYLES: Record<'interieur' | 'exterieur', PillStyleConfig> = {
+  interieur: {
+    border: 'border-blue-500',
+    background: 'bg-blue-50',
+    text: 'text-blue-700',
+    ring: 'ring-blue-400',
+    icon: '🔵',
+  },
+  exterieur: {
+    border: 'border-orange-500',
+    background: 'bg-orange-50',
+    text: 'text-orange-700',
+    ring: 'ring-orange-400',
+    icon: '🟠',
+  },
+};
+
+/**
+ * Type pour le variant de style d'un sélecteur d'habillage
+ */
+export type HabillageVariant = 'interieur' | 'exterieur';
