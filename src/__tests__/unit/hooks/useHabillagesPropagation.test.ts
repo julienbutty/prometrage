@@ -204,6 +204,126 @@ describe('useHabillagesPropagation', () => {
     });
   });
 
+  describe('applyToAll functionality', () => {
+    it('should apply first non-null value to all sides', () => {
+      const { result } = renderHook(() => useHabillagesPropagation());
+
+      // Set one value (will propagate due to first selection)
+      act(() => {
+        result.current.handleChange('haut', 'Standard');
+      });
+
+      act(() => {
+        vi.advanceTimersByTime(300);
+      });
+
+      // Now change another to different value
+      act(() => {
+        result.current.handleChange('gauche', 'Sans');
+      });
+
+      // Apply to all should use first non-null (haut = Standard)
+      act(() => {
+        result.current.applyToAll();
+      });
+
+      expect(result.current.values).toEqual({
+        haut: 'Standard',
+        bas: 'Standard',
+        gauche: 'Standard',
+        droite: 'Standard',
+      });
+    });
+
+    it('should highlight all sides except source when applying to all', () => {
+      const { result } = renderHook(() => useHabillagesPropagation());
+
+      // Set up mixed values
+      act(() => {
+        result.current.handleChange('haut', 'Standard');
+      });
+
+      act(() => {
+        vi.advanceTimersByTime(300);
+      });
+
+      act(() => {
+        result.current.handleChange('gauche', 'Sans');
+      });
+
+      // Apply to all
+      act(() => {
+        result.current.applyToAll();
+      });
+
+      // Should highlight all except haut (the source)
+      expect(result.current.highlightedSides.has('haut')).toBe(false);
+      expect(result.current.highlightedSides.has('bas')).toBe(true);
+      expect(result.current.highlightedSides.has('gauche')).toBe(true);
+      expect(result.current.highlightedSides.has('droite')).toBe(true);
+    });
+
+    it('should do nothing if all values are null', () => {
+      const { result } = renderHook(() => useHabillagesPropagation());
+
+      const initialValues = result.current.values;
+
+      act(() => {
+        result.current.applyToAll();
+      });
+
+      expect(result.current.values).toEqual(initialValues);
+      expect(result.current.highlightedSides.size).toBe(0);
+    });
+  });
+
+  describe('hasAnyValue computed property', () => {
+    it('should be false when all values are null', () => {
+      const { result } = renderHook(() => useHabillagesPropagation());
+
+      expect(result.current.hasAnyValue).toBe(false);
+    });
+
+    it('should be true when at least one value is set', () => {
+      const { result } = renderHook(() => useHabillagesPropagation());
+
+      act(() => {
+        result.current.handleChange('haut', 'Standard');
+      });
+
+      expect(result.current.hasAnyValue).toBe(true);
+    });
+
+    it('should be true with initial values', () => {
+      const initialValues = {
+        haut: 'Standard' as HabillageValue,
+        bas: null,
+        gauche: null,
+        droite: null,
+      };
+
+      const { result } = renderHook(() => useHabillagesPropagation(initialValues));
+
+      expect(result.current.hasAnyValue).toBe(true);
+    });
+
+    it('should be false after reset', () => {
+      const { result } = renderHook(() => useHabillagesPropagation());
+
+      act(() => {
+        result.current.handleChange('haut', 'Standard');
+      });
+
+      expect(result.current.hasAnyValue).toBe(true);
+
+      act(() => {
+        result.current.reset();
+      });
+
+      expect(result.current.hasAnyValue).toBe(false);
+    });
+  });
+
   describe('reset functionality', () => {
     it('should reset to initial values', () => {
       const { result } = renderHook(() => useHabillagesPropagation());

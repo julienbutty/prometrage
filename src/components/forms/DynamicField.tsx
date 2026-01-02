@@ -91,7 +91,7 @@ export function DynamicField({
           type="text"
           value={normalizedValue}
           onChange={(e) => onChange(e.target.value)}
-          className="h-14"
+          className="h-11"
           readOnly
         />
       </div>
@@ -152,7 +152,7 @@ export function DynamicField({
             value={String(normalizedValue)}
             onChange={(e) => onChange(e.target.value)}
             placeholder={config.placeholder}
-            className="h-14"
+            className="h-11"
           />
         </div>
       );

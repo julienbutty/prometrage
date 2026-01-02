@@ -19,9 +19,11 @@ import {
 import { Label } from '@/components/ui/label';
 import {
   SIDE_LABELS,
+  PILL_STYLES,
   type HabillageValue,
   type Side,
   type HabillageOption,
+  type HabillageVariant,
 } from '@/lib/validations/habillage';
 import { cn } from '@/lib/utils';
 
@@ -34,6 +36,8 @@ export interface HabillageSelectProps {
   onChange: (value: HabillageValue) => void;
   /** Options d'habillage disponibles (dépend du matériau/pose) */
   options: HabillageOption[];
+  /** Variant pour le style (interieur = bleu, exterieur = orange) */
+  variant?: HabillageVariant;
   /** Affiche l'animation de highlight */
   isHighlighted?: boolean;
   /** Classes CSS additionnelles */
@@ -53,10 +57,12 @@ export function HabillageSelect({
   value,
   onChange,
   options,
+  variant,
   isHighlighted = false,
   className,
 }: HabillageSelectProps) {
   const sideLabel = SIDE_LABELS[side];
+  const styles = variant ? PILL_STYLES[variant] : null;
 
   return (
     <div className={cn('flex flex-col gap-1', className)}>
@@ -75,13 +81,15 @@ export function HabillageSelect({
           aria-label={`Habillage ${sideLabel}`}
           className={cn(
             // Base styles
-            'w-full min-h-[44px] text-sm',
+            'w-full min-h-[40px] text-sm',
             // Touch-friendly
             'h-11',
             // Transition pour highlight
             'transition-all duration-300',
             // Highlight animation
-            isHighlighted && 'ring-2 ring-blue-400 bg-blue-50'
+            isHighlighted && [
+              'ring-2 ring-blue-400 bg-blue-50',
+            ]
           )}
         >
           <SelectValue placeholder="Sélectionner" />

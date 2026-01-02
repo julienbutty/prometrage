@@ -95,11 +95,58 @@ describe('HabillageSelect', () => {
       expect(screen.getByRole('combobox')).toHaveAccessibleName(/haut/i);
     });
 
-    it('should have minimum touch target of 44px', () => {
+    it('should have minimum touch target of 40px', () => {
       render(<HabillageSelect {...defaultProps} />);
 
       const trigger = screen.getByRole('combobox');
-      expect(trigger.className).toMatch(/min-h-\[44px\]/);
+      expect(trigger.className).toMatch(/min-h-\[40px\]/);
+    });
+  });
+
+  describe('variant styling (US2)', () => {
+    it('should apply blue border for interieur variant', () => {
+      render(<HabillageSelect {...defaultProps} variant="interieur" />);
+
+      const trigger = screen.getByRole('combobox');
+      expect(trigger.className).toMatch(/border-blue-500/);
+    });
+
+    it('should apply orange border for exterieur variant', () => {
+      render(<HabillageSelect {...defaultProps} variant="exterieur" />);
+
+      const trigger = screen.getByRole('combobox');
+      expect(trigger.className).toMatch(/border-orange-500/);
+    });
+
+    it('should apply border-2 for pill styling when variant is set', () => {
+      render(<HabillageSelect {...defaultProps} variant="interieur" />);
+
+      const trigger = screen.getByRole('combobox');
+      expect(trigger.className).toMatch(/border-2/);
+    });
+
+    it('should not apply variant styling when variant is undefined', () => {
+      render(<HabillageSelect {...defaultProps} />);
+
+      const trigger = screen.getByRole('combobox');
+      expect(trigger.className).not.toMatch(/border-blue-500/);
+      expect(trigger.className).not.toMatch(/border-orange-500/);
+    });
+
+    it('should apply variant-specific ring on highlight for interieur', () => {
+      render(<HabillageSelect {...defaultProps} variant="interieur" isHighlighted />);
+
+      const trigger = screen.getByRole('combobox');
+      expect(trigger.className).toMatch(/ring-blue-400/);
+      expect(trigger.className).toMatch(/bg-blue-50/);
+    });
+
+    it('should apply variant-specific ring on highlight for exterieur', () => {
+      render(<HabillageSelect {...defaultProps} variant="exterieur" isHighlighted />);
+
+      const trigger = screen.getByRole('combobox');
+      expect(trigger.className).toMatch(/ring-orange-400/);
+      expect(trigger.className).toMatch(/bg-orange-50/);
     });
   });
 });

@@ -128,7 +128,7 @@ export function ComboboxField({
               key={option}
               value={option}
               onSelect={handleSelect}
-              className="h-12"
+              className="h-11"
             >
               <Check
                 className={cn(
@@ -145,7 +145,7 @@ export function ComboboxField({
             <CommandItem
               value={search}
               onSelect={handleSelect}
-              className="text-primary h-12"
+              className="text-primary h-11"
             >
               <Check className="mr-2 h-4 w-4 opacity-0" />
               Utiliser &quot;{search}&quot;
@@ -164,7 +164,7 @@ export function ComboboxField({
       role="button"
       aria-expanded={open}
       className={cn(
-        "h-14 w-full justify-between text-left font-normal",
+        "h-11 w-full justify-between text-left font-normal",
         !value && "text-muted-foreground"
       )}
     >

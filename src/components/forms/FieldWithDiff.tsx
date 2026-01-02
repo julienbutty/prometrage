@@ -106,7 +106,7 @@ export function FieldWithDiff({
         pattern={type === "number" ? "[0-9]*" : undefined}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-14 text-lg"
+        className="h-11"
         placeholder={placeholder || (type === "number" ? `Ex: ${originalValue}` : "")}
       />
     </div>

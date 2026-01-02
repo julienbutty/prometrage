@@ -28,7 +28,10 @@ import PhotoUpload from "@/components/forms/PhotoUpload";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { Badge } from "@/components/ui/badge";
-import { MenuiserieSVGEditor } from "@/components/menuiseries/MenuiserieSVGEditor";
+import { InteractiveSVGZone } from "@/components/menuiseries/InteractiveSVGZone";
+import { HabillageSelect } from "@/components/menuiseries/HabillageSelect";
+import { parseMenuiserieType } from "@/lib/svg/svg-utils";
+import { SIDES } from "@/lib/validations/habillage";
 import type { PhotoObservation } from "@/lib/validations/photo-observation";
 import { getFormConfigKey, detectMateriau, detectPose, detectTypeProduit } from "@/lib/utils/menuiserie-type";
 import { loadFormConfig } from "@/lib/forms/config-loader";
@@ -647,271 +650,250 @@ export default function MenuiseriePage() {
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-7xl space-y-4 p-4 lg:p-8">
+      <div className="mx-auto max-w-7xl p-4 lg:px-8 lg:py-6 space-y-4">
         {/* Alerte écarts critiques */}
         {menuiserie.ecarts && <EcartsAlert ecarts={menuiserie.ecarts} />}
 
-        {/* Layout Desktop : 2 colonnes (SVG Editor | Formulaires) */}
-        <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-          {/* Colonne gauche : Éditeur SVG avec dimensions (sticky sur desktop) */}
-          <div className="lg:col-span-5">
-            <Card className="lg:sticky lg:top-24">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
-                  📏 Dimensions & Schéma
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <MenuiserieSVGEditor
-                  typeMenuiserie={menuiserie.donneesOriginales.typeMenuiserie || menuiserie.donneesOriginales.intitule || ''}
-                  dimensions={{
-                    largeur: String(formData.largeur ?? ''),
-                    hauteur: String(formData.hauteur ?? ''),
-                    hauteurAllege: String(formData.hauteurAllege ?? ''),
-                  }}
-                  originalDimensions={{
-                    largeur: menuiserie.donneesOriginales.largeur,
-                    hauteur: menuiserie.donneesOriginales.hauteur,
-                    hauteurAllege: menuiserie.donneesOriginales.hauteurAllege,
-                  }}
-                  onDimensionChange={(field, value) => handleFieldChange(field, value)}
-                  habillagesInterieurs={habillagesInt.values}
-                  onHabillageIntChange={handleHabillageIntChange}
-                  highlightedIntSides={habillagesInt.highlightedSides}
-                  habillagesExterieurs={habillagesExt.values}
-                  onHabillageExtChange={handleHabillageExtChange}
-                  highlightedExtSides={habillagesExt.highlightedSides}
-                  habillageConfig={detectedInfo?.habillageConfig}
-                />
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Colonne droite : Formulaires */}
-          <div className="space-y-4 lg:col-span-7 mt-4 lg:mt-0">
-            {/* Repère éditable */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
-                  🏷️ Repère
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <Label htmlFor="repere" className="text-base font-medium">
-                    Identifiant de la menuiserie
-                  </Label>
-                  <Input
-                    id="repere"
-                    value={repere}
-                    onChange={(e) => {
-                      setRepere(e.target.value);
-                      setHasUnsavedChanges(true);
-                    }}
-                    className="h-14 text-lg font-semibold"
-                    placeholder="Ex: Salon, R1, Fenêtre cuisine..."
-                  />
-                  <p className="text-xs text-gray-500">
-                    Ce repère sera utilisé pour identifier la menuiserie dans la navigation
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Détection automatique du type */}
-            {detectedInfo && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
-                    🔍 Type détecté
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="text-sm">
-                      {detectedInfo.materiau}
-                    </Badge>
-                    <Badge variant="secondary" className="text-sm">
-                      {detectedInfo.pose}
-                    </Badge>
-                    <Badge variant="secondary" className="text-sm">
-                      {detectedInfo.typeProduit}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs">
-                      Config: {detectedInfo.configKey}
-                    </Badge>
+        {/* Layout single-column */}
+        <div className="space-y-4">
+          {/* Dimensions & Schéma */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+                📏 Dimensions & Schéma
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* SVG Zone Interactive */}
+              {(() => {
+                const typeMenuiserie = menuiserie.donneesOriginales.typeMenuiserie || menuiserie.donneesOriginales.intitule || '';
+                const { type, nbVantaux } = parseMenuiserieType(typeMenuiserie);
+                return (
+                  <div className="flex flex-col items-center">
+                    <div className="w-full bg-gray-50 rounded-lg pt-8 pb-20">
+                      <InteractiveSVGZone
+                        type={type}
+                        nbVantaux={nbVantaux}
+                        largeur={formData.largeur ?? menuiserie.donneesOriginales.largeur ?? ''}
+                        hauteur={formData.hauteur ?? menuiserie.donneesOriginales.hauteur ?? ''}
+                        habillagesInt={habillagesInt.values}
+                        habillagesExt={habillagesExt.values}
+                        showHabillageLabels={!!detectedInfo?.habillageConfig}
+                      />
+                    </div>
+                    <p className="text-sm text-gray-500 text-center mt-2">
+                      {typeMenuiserie || 'Type non spécifié'}
+                    </p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Type de formulaire chargé automatiquement selon les données du PDF
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+                );
+              })()}
 
-            {/* Champs critiques : Caractéristiques produit (toujours visibles) */}
+              {/* Dimensions */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                <FieldWithDiff
+                  id="largeur"
+                  label="Largeur"
+                  value={formData.largeur ?? ""}
+                  originalValue={menuiserie.donneesOriginales.largeur}
+                  onChange={(value) => handleFieldChange("largeur", value)}
+                  type="number"
+                  unit="mm"
+                />
+                <FieldWithDiff
+                  id="hauteur"
+                  label="Hauteur"
+                  value={formData.hauteur ?? ""}
+                  originalValue={menuiserie.donneesOriginales.hauteur}
+                  onChange={(value) => handleFieldChange("hauteur", value)}
+                  type="number"
+                  unit="mm"
+                />
+                <FieldWithDiff
+                  id="hauteurAllege"
+                  label="Hauteur d'allège"
+                  value={formData.hauteurAllege ?? ""}
+                  originalValue={menuiserie.donneesOriginales.hauteurAllege}
+                  onChange={(value) => handleFieldChange("hauteurAllege", value)}
+                  type="number"
+                  unit="mm"
+                />
+              </div>
+
+              {/* Habillages intérieurs */}
+              {detectedInfo?.habillageConfig && (
+                <>
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-semibold text-gray-900">Habillages intérieurs</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {SIDES.map((side) => (
+                        <HabillageSelect
+                          key={`int-${side}`}
+                          side={side}
+                          value={habillagesInt.values[side]}
+                          onChange={(value) => handleHabillageIntChange(side, value)}
+                          options={detectedInfo.habillageConfig.interieurs}
+                          variant="interieur"
+                          isHighlighted={habillagesInt.highlightedSides.has(side)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Habillages extérieurs */}
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-semibold text-gray-900">Habillages extérieurs</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {SIDES.map((side) => (
+                        <HabillageSelect
+                          key={`ext-${side}`}
+                          side={side}
+                          value={habillagesExt.values[side]}
+                          onChange={(value) => handleHabillageExtChange(side, value)}
+                          options={detectedInfo.habillageConfig.exterieurs}
+                          variant="exterieur"
+                          isHighlighted={habillagesExt.highlightedSides.has(side)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Repère éditable */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+                🏷️ Repère
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label htmlFor="repere" className="text-base font-medium">
+                  Identifiant de la menuiserie
+                </Label>
+                <Input
+                  id="repere"
+                  value={repere}
+                  onChange={(e) => {
+                    setRepere(e.target.value);
+                    setHasUnsavedChanges(true);
+                  }}
+                  className="h-11"
+                  placeholder="Ex: Salon, R1, Fenêtre cuisine..."
+                />
+                <p className="text-xs text-gray-500">
+                  Ce repère sera utilisé pour identifier la menuiserie dans la navigation
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Détection automatique du type */}
+          {detectedInfo && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
-                  🎨 Caractéristiques produit
+                  🔍 Type détecté
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 lg:space-y-6">
-                {/* Grille responsive pour les champs */}
-                <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
-                  {criticalFields.map((key) => {
-                    // Si le champ a une config dynamique, utiliser DynamicField
-                    if (detectedInfo?.formConfig[key]) {
-                      return (
-                        <div key={key} className="min-w-0 lg:col-span-1">
-                          <DynamicField
-                            fieldKey={key}
-                            config={detectedInfo.formConfig[key]}
-                            value={formData[key] ?? ""}
-                            originalValue={menuiserie.donneesOriginales[key]}
-                            onChange={(value) => handleFieldChange(key, value)}
-                          />
-                        </div>
-                      );
-                    }
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="secondary" className="text-sm">
+                    {detectedInfo.materiau}
+                  </Badge>
+                  <Badge variant="secondary" className="text-sm">
+                    {detectedInfo.pose}
+                  </Badge>
+                  <Badge variant="secondary" className="text-sm">
+                    {detectedInfo.typeProduit}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    Config: {detectedInfo.configKey}
+                  </Badge>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Type de formulaire chargé automatiquement selon les données du PDF
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
-                    // Sinon, utiliser FieldWithDiff pour les champs numériques
-                    if (NUMERIC_FIELDS.includes(key)) {
-                      return (
-                        <div key={key} className="min-w-0 lg:col-span-1">
-                          <FieldWithDiff
-                            id={key}
-                            label={FIELD_LABELS[key] || key}
-                            value={formData[key] ?? ""}
-                            originalValue={menuiserie.donneesOriginales[key]}
-                            onChange={(value) => handleFieldChange(key, value)}
-                            type="number"
-                            unit="mm"
-                          />
-                        </div>
-                      );
-                    }
-
-                    // Fallback : champ texte
+          {/* Champs critiques : Caractéristiques produit (toujours visibles) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+                🎨 Caractéristiques produit
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 lg:space-y-6">
+              {/* Grille responsive pour les champs */}
+              <div className="grid gap-4 lg:grid-cols-2 lg:gap-6 items-end">
+                {criticalFields.map((key) => {
+                  // Si le champ a une config dynamique, utiliser DynamicField
+                  if (detectedInfo?.formConfig[key]) {
                     return (
                       <div key={key} className="min-w-0 lg:col-span-1">
-                        <TextFieldWithDiff
-                          id={key}
-                          label={FIELD_LABELS[key] || key}
+                        <DynamicField
+                          fieldKey={key}
+                          config={detectedInfo.formConfig[key]}
                           value={formData[key] ?? ""}
-                          originalValue={String(menuiserie.donneesOriginales[key])}
+                          originalValue={menuiserie.donneesOriginales[key]}
                           onChange={(value) => handleFieldChange(key, value)}
                         />
                       </div>
                     );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
+                  }
 
-            {/* Détails additionnels (collapsed) */}
-            {sortedAdditionalFields.length > 0 && (
-              <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
-                <Card>
-                  <CollapsibleTrigger asChild>
-                    <CardHeader className="cursor-pointer transition-colors hover:bg-gray-50">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
-                          📋 Détails additionnels
-                          <span className="text-xs font-normal text-gray-500 lg:text-sm">
-                            ({sortedAdditionalFields.length} champs)
-                          </span>
-                        </CardTitle>
-                        {detailsOpen ? (
-                          <ChevronUp className="h-5 w-5 text-gray-500" />
-                        ) : (
-                          <ChevronDown className="h-5 w-5 text-gray-500" />
-                        )}
+                  // Sinon, utiliser FieldWithDiff pour les champs numériques
+                  if (NUMERIC_FIELDS.includes(key)) {
+                    return (
+                      <div key={key} className="min-w-0 lg:col-span-1">
+                        <FieldWithDiff
+                          id={key}
+                          label={FIELD_LABELS[key] || key}
+                          value={formData[key] ?? ""}
+                          originalValue={menuiserie.donneesOriginales[key]}
+                          onChange={(value) => handleFieldChange(key, value)}
+                          type="number"
+                          unit="mm"
+                        />
                       </div>
-                    </CardHeader>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <CardContent className="space-y-4 pt-0 lg:space-y-6">
-                      {/* Grille responsive - tous les champs triés selon l'ordre PDF */}
-                      <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
-                        {sortedAdditionalFields.map((key) => {
-                          // Si le champ a une config dynamique, utiliser DynamicField
-                          if (detectedInfo?.formConfig[key]) {
-                            return (
-                              <div key={key} className="min-w-0 lg:col-span-1">
-                                <DynamicField
-                                  fieldKey={key}
-                                  config={detectedInfo.formConfig[key]}
-                                  value={formData[key] ?? ""}
-                                  originalValue={menuiserie.donneesOriginales[key]}
-                                  onChange={(value) => handleFieldChange(key, value)}
-                                />
-                              </div>
-                            );
-                          }
+                    );
+                  }
 
-                          // Champs numériques avec calcul d'écart
-                          if (NUMERIC_FIELDS.includes(key)) {
-                            return (
-                              <div key={key} className="min-w-0 lg:col-span-1">
-                                <FieldWithDiff
-                                  id={key}
-                                  label={FIELD_LABELS[key] || key}
-                                  value={formData[key] ?? ""}
-                                  originalValue={menuiserie.donneesOriginales[key]}
-                                  onChange={(value) => handleFieldChange(key, value)}
-                                  type="number"
-                                  unit="mm"
-                                />
-                              </div>
-                            );
-                          }
+                  // Fallback : champ texte
+                  return (
+                    <div key={key} className="min-w-0 lg:col-span-1">
+                      <TextFieldWithDiff
+                        id={key}
+                        label={FIELD_LABELS[key] || key}
+                        value={formData[key] ?? ""}
+                        originalValue={String(menuiserie.donneesOriginales[key])}
+                        onChange={(value) => handleFieldChange(key, value)}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
 
-                          // Champs texte avec indicateur de modification
-                          // Déterminer si on doit afficher l'icône d'aide pour le champ "dormant"
-                          const isDormantField = key === "dormant";
-                          const typePose = formData.pose || menuiserie.donneesOriginales.pose;
-                          const dormantHelpPdf =
-                            typePose?.toLowerCase().includes("tunnel")
-                              ? "/docs/dormant-tunnel.pdf"
-                              : "/docs/dormant-applique.pdf";
-
-                          return (
-                            <div key={key} className="min-w-0 lg:col-span-1">
-                              <TextFieldWithDiff
-                                id={key}
-                                label={FIELD_LABELS[key] || key}
-                                value={formData[key] ?? ""}
-                                originalValue={String(menuiserie.donneesOriginales[key])}
-                                onChange={(value) => handleFieldChange(key, value)}
-                                helpIcon={
-                                  isDormantField ? (
-                                    <HelpIcon pdfUrl={dormantHelpPdf} />
-                                  ) : undefined
-                                }
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </CardContent>
-                  </CollapsibleContent>
-                </Card>
-              </Collapsible>
-            )}
-
-            {/* Observations (collapsed) */}
-            <Collapsible open={observationsOpen} onOpenChange={setObservationsOpen}>
+          {/* Détails additionnels (collapsed) */}
+          {sortedAdditionalFields.length > 0 && (
+            <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
               <Card>
                 <CollapsibleTrigger asChild>
                   <CardHeader className="cursor-pointer transition-colors hover:bg-gray-50">
                     <div className="flex items-center justify-between">
                       <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
-                        💬 Observations
+                        📋 Détails additionnels
                         <span className="text-xs font-normal text-gray-500 lg:text-sm">
-                          (optionnel)
+                          ({sortedAdditionalFields.length} champs)
                         </span>
                       </CardTitle>
-                      {observationsOpen ? (
+                      {detailsOpen ? (
                         <ChevronUp className="h-5 w-5 text-gray-500" />
                       ) : (
                         <ChevronDown className="h-5 w-5 text-gray-500" />
@@ -920,42 +902,131 @@ export default function MenuiseriePage() {
                   </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <CardContent className="space-y-4 pt-0">
-                    {/* Texte des observations */}
-                    <div>
-                      <Label htmlFor="observations" className="text-sm font-medium mb-2 block">
-                        Remarques écrites
-                      </Label>
-                      <Input
-                        id="observations"
-                        value={observations}
-                        onChange={(e) => {
-                          setObservations(e.target.value);
-                          setHasUnsavedChanges(true);
-                        }}
-                        className="h-14"
-                        placeholder="Remarques particulières, problèmes constatés..."
-                      />
-                    </div>
+                  <CardContent className="space-y-4 pt-0 lg:space-y-6">
+                    {/* Grille responsive - tous les champs triés selon l'ordre PDF */}
+                    <div className="grid gap-4 lg:grid-cols-2 lg:gap-6 items-end">
+                      {sortedAdditionalFields.map((key) => {
+                        // Si le champ a une config dynamique, utiliser DynamicField
+                        if (detectedInfo?.formConfig[key]) {
+                          return (
+                            <div key={key} className="min-w-0 lg:col-span-1">
+                              <DynamicField
+                                fieldKey={key}
+                                config={detectedInfo.formConfig[key]}
+                                value={formData[key] ?? ""}
+                                originalValue={menuiserie.donneesOriginales[key]}
+                                onChange={(value) => handleFieldChange(key, value)}
+                              />
+                            </div>
+                          );
+                        }
 
-                    {/* Photos d'observations */}
-                    <div>
-                      <Label className="text-sm font-medium mb-2 block">
-                        Photos d'observation
-                      </Label>
-                      <PhotoUpload
-                        photos={photosObservations}
-                        onChange={(photos) => {
-                          setPhotosObservations(photos);
-                          setHasUnsavedChanges(true);
-                        }}
-                      />
+                        // Champs numériques avec calcul d'écart
+                        if (NUMERIC_FIELDS.includes(key)) {
+                          return (
+                            <div key={key} className="min-w-0 lg:col-span-1">
+                              <FieldWithDiff
+                                id={key}
+                                label={FIELD_LABELS[key] || key}
+                                value={formData[key] ?? ""}
+                                originalValue={menuiserie.donneesOriginales[key]}
+                                onChange={(value) => handleFieldChange(key, value)}
+                                type="number"
+                                unit="mm"
+                              />
+                            </div>
+                          );
+                        }
+
+                        // Champs texte avec indicateur de modification
+                        // Déterminer si on doit afficher l'icône d'aide pour le champ "dormant"
+                        const isDormantField = key === "dormant";
+                        const typePose = formData.pose || menuiserie.donneesOriginales.pose;
+                        const dormantHelpPdf =
+                          typePose?.toLowerCase().includes("tunnel")
+                            ? "/docs/dormant-tunnel.pdf"
+                            : "/docs/dormant-applique.pdf";
+
+                        return (
+                          <div key={key} className="min-w-0 lg:col-span-1">
+                            <TextFieldWithDiff
+                              id={key}
+                              label={FIELD_LABELS[key] || key}
+                              value={formData[key] ?? ""}
+                              originalValue={String(menuiserie.donneesOriginales[key])}
+                              onChange={(value) => handleFieldChange(key, value)}
+                              helpIcon={
+                                isDormantField ? (
+                                  <HelpIcon pdfUrl={dormantHelpPdf} />
+                                ) : undefined
+                              }
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
                   </CardContent>
                 </CollapsibleContent>
               </Card>
             </Collapsible>
-          </div>
+          )}
+
+          {/* Observations (collapsed) */}
+          <Collapsible open={observationsOpen} onOpenChange={setObservationsOpen}>
+            <Card>
+              <CollapsibleTrigger asChild>
+                <CardHeader className="cursor-pointer transition-colors hover:bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+                      💬 Observations
+                      <span className="text-xs font-normal text-gray-500 lg:text-sm">
+                        (optionnel)
+                      </span>
+                    </CardTitle>
+                    {observationsOpen ? (
+                      <ChevronUp className="h-5 w-5 text-gray-500" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-gray-500" />
+                    )}
+                  </div>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="space-y-4 pt-0">
+                  {/* Texte des observations */}
+                  <div>
+                    <Label htmlFor="observations" className="text-sm font-medium mb-2 block">
+                      Remarques écrites
+                    </Label>
+                    <Input
+                      id="observations"
+                      value={observations}
+                      onChange={(e) => {
+                        setObservations(e.target.value);
+                        setHasUnsavedChanges(true);
+                      }}
+                      className="h-11"
+                      placeholder="Remarques particulières, problèmes constatés..."
+                    />
+                  </div>
+
+                  {/* Photos d'observations */}
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">
+                      Photos d'observation
+                    </Label>
+                    <PhotoUpload
+                      photos={photosObservations}
+                      onChange={(photos) => {
+                        setPhotosObservations(photos);
+                        setHasUnsavedChanges(true);
+                      }}
+                    />
+                  </div>
+                </CardContent>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
         </div>
       </div>
 

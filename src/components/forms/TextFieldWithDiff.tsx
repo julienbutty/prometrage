@@ -59,7 +59,7 @@ export function TextFieldWithDiff({
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`h-14 ${isModified ? "border-blue-500 ring-1 ring-blue-500" : ""}`}
+        className={`h-11 ${isModified ? "border-blue-500 ring-1 ring-blue-500" : ""}`}
         placeholder={placeholder || String(originalValue)}
       />
     </div>
