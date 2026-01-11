@@ -667,13 +667,14 @@ export default function MenuiseriePage() {
               {/* SVG Zone Interactive */}
               {(() => {
                 const typeMenuiserie = menuiserie.donneesOriginales.typeMenuiserie || menuiserie.donneesOriginales.intitule || '';
-                const { type, nbVantaux } = parseMenuiserieType(typeMenuiserie);
+                const { type, nbVantaux, typeOuvrant } = parseMenuiserieType(typeMenuiserie);
                 return (
                   <div className="flex flex-col items-center">
                     <div className="w-full bg-gray-50 rounded-lg pt-8 pb-20">
                       <InteractiveSVGZone
                         type={type}
                         nbVantaux={nbVantaux}
+                        typeOuvrant={typeOuvrant}
                         largeur={formData.largeur ?? menuiserie.donneesOriginales.largeur ?? ''}
                         hauteur={formData.hauteur ?? menuiserie.donneesOriginales.hauteur ?? ''}
                         habillagesInt={habillagesInt.values}

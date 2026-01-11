@@ -1,4 +1,4 @@
-import type { MenuiserieType, ParsedMenuiserieType } from './types';
+import type { MenuiserieType, ParsedMenuiserieType, TypeOuvrant } from './types';
 
 /**
  * Patterns de reconnaissance pour chaque type de menuiserie
@@ -27,23 +27,38 @@ const TYPE_PATTERNS: Array<{
 const VANTAUX_PATTERN = /(\d+)\s*vanta/i;
 
 /**
+ * Pattern pour détecter oscillo-battant
+ */
+const OSCILLO_BATTANT_PATTERN = /oscillo[- ]?battant/i;
+
+/**
+ * Pattern pour détecter soufflet (ouverture vers l'intérieur par le haut)
+ */
+const SOUFFLET_PATTERN = /soufflet/i;
+
+/**
  * Parse le type de menuiserie et extrait le nombre de vantaux depuis le string du PDF
  *
  * @param typeString - La chaîne du type de menuiserie (ex: "Fenêtre 2 vantaux")
- * @returns L'objet avec le type et le nombre de vantaux
+ * @returns L'objet avec le type, le nombre de vantaux, et le type d'ouverture
  *
  * @example
  * parseMenuiserieType("Fenêtre 2 vantaux")
- * // => { type: 'fenetre', nbVantaux: 2 }
+ * // => { type: 'fenetre', nbVantaux: 2, typeOuvrant: 'battant', isOscilloBattant: false }
+ *
+ * parseMenuiserieType("Fenêtre 1 vantail oscillo-battant")
+ * // => { type: 'fenetre', nbVantaux: 1, typeOuvrant: 'oscillo-battant', isOscilloBattant: true }
  *
  * parseMenuiserieType("Châssis fixe en dormant")
- * // => { type: 'chassis-fixe', nbVantaux: 0 }
+ * // => { type: 'chassis-fixe', nbVantaux: 0, typeOuvrant: 'fixe', isOscilloBattant: false }
  */
 export function parseMenuiserieType(typeString: string): ParsedMenuiserieType {
   // Valeur par défaut
   const defaultResult: ParsedMenuiserieType = {
     type: 'fenetre',
     nbVantaux: 1,
+    typeOuvrant: 'battant',
+    isOscilloBattant: false,
   };
 
   if (!typeString || typeString.trim() === '') {
@@ -74,8 +89,27 @@ export function parseMenuiserieType(typeString: string): ParsedMenuiserieType {
     nbVantaux = vantauxMatch ? parseInt(vantauxMatch[1], 10) : 1;
   }
 
+  // Détecter le type d'ouverture
+  let typeOuvrant: TypeOuvrant = 'battant';
+  let isOscilloBattant = false;
+
+  if (matchedType === 'chassis-fixe') {
+    typeOuvrant = 'fixe';
+  } else if (matchedType === 'coulissant') {
+    typeOuvrant = 'coulissant';
+  } else if (matchedType === 'chassis-soufflet') {
+    typeOuvrant = 'soufflet';
+  } else if (OSCILLO_BATTANT_PATTERN.test(typeString)) {
+    typeOuvrant = 'oscillo-battant';
+    isOscilloBattant = true;
+  } else if (SOUFFLET_PATTERN.test(typeString)) {
+    typeOuvrant = 'soufflet';
+  }
+
   return {
     type: matchedType,
     nbVantaux,
+    typeOuvrant,
+    isOscilloBattant,
   };
 }

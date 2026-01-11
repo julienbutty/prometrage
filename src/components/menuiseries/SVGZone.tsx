@@ -117,7 +117,7 @@ export function SVGZone({
   highlightedExtSides,
   className,
 }: SVGZoneProps) {
-  const { type, nbVantaux } = parseMenuiserieType(typeMenuiserie);
+  const { type, nbVantaux, typeOuvrant } = parseMenuiserieType(typeMenuiserie);
 
   // Mode non-contrôlé: gestion interne de l'état du toggle
   const [internalShowHabillages, setInternalShowHabillages] = useState(false);
@@ -177,6 +177,7 @@ export function SVGZone({
         <MenuiserieSVG
           type={type}
           nbVantaux={nbVantaux}
+          typeOuvrant={typeOuvrant}
           width={300}
           height={250}
           className="max-w-full h-auto"
