@@ -43,6 +43,7 @@ export const MenuiserieDataSchema = z.object({
   habillageExt: z.string().optional(),
   intercalaire: z.string().optional(),
   ouvrantPrincipal: z.string().optional(),
+  ouvertureInterieure: z.string().optional(), // "droite tirant" | "gauche tirant"
   rails: z.string().optional(),
 
   // Permet d'autres champs dynamiques

@@ -87,6 +87,11 @@
     "type": "number",
     "unit": "mm"
   },
+  "ouvertureInterieure": {
+    "label": "Ouverture intérieure",
+    "type": "select",
+    "options": ["droite tirant", "gauche tirant"]
+  },
   "commentaires": {
     "label": "Commentaires et options",
     "type": "text"
