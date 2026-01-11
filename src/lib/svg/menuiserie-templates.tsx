@@ -171,8 +171,17 @@ export function getFenetreSVG(
         const panelY = panelInnerY;
 
         // Déterminer la direction d'ouverture pour ce vantail
-        // Vantail 0: utilise sensOuverture, autres: alternent
-        const isLeftOpening = i === 0 ? sensOuverture === 'gauche' : i % 2 === 0;
+        // Pour 2 vantaux: les deux s'ouvrent vers le centre (jonction)
+        // Pour 1 vantail: utilise sensOuverture
+        // Pour 3+ vantaux: alternent
+        let isLeftOpening: boolean;
+        if (nbVantaux === 2) {
+          // Panneau gauche (i=0): ouvre vers droite (centre) → isLeftOpening = false
+          // Panneau droit (i=1): ouvre vers gauche (centre) → isLeftOpening = true
+          isLeftOpening = i === 1;
+        } else {
+          isLeftOpening = i === 0 ? sensOuverture === 'gauche' : i % 2 === 0;
+        }
         const direction: OpeningDirection = isLeftOpening ? 'gauche' : 'droite';
 
         return (
@@ -286,7 +295,17 @@ export function getPorteFenetreSVG(
         const panelY = panelInnerY;
 
         // Déterminer la direction d'ouverture pour ce vantail
-        const isLeftOpening = i === 0 ? sensOuverture === 'gauche' : i % 2 === 0;
+        // Pour 2 vantaux: les deux s'ouvrent vers le centre (jonction)
+        // Pour 1 vantail: utilise sensOuverture
+        // Pour 3+ vantaux: alternent
+        let isLeftOpening: boolean;
+        if (nbVantaux === 2) {
+          // Panneau gauche (i=0): ouvre vers droite (centre) → isLeftOpening = false
+          // Panneau droit (i=1): ouvre vers gauche (centre) → isLeftOpening = true
+          isLeftOpening = i === 1;
+        } else {
+          isLeftOpening = i === 0 ? sensOuverture === 'gauche' : i % 2 === 0;
+        }
         const direction: OpeningDirection = isLeftOpening ? 'gauche' : 'droite';
 
         return (
