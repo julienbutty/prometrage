@@ -12,8 +12,8 @@
  */
 
 import { MenuiserieSVG } from './MenuiserieSVG';
-import type { MenuiserieType } from '@/lib/svg/types';
-import type { HabillageValue, Side } from '@/lib/validations/habillage';
+import type { MenuiserieType, TypeOuvrant } from '@/lib/svg/types';
+import type { HabillageValue } from '@/lib/validations/habillage';
 
 interface HabillageValues {
   haut: HabillageValue | null;
@@ -27,6 +27,8 @@ export interface InteractiveSVGZoneProps {
   type: MenuiserieType;
   /** Nombre de vantaux */
   nbVantaux: number;
+  /** Type d'ouverture (battant, soufflet, oscillo-battant, fixe, coulissant) */
+  typeOuvrant?: TypeOuvrant;
   /** Largeur en mm */
   largeur: string | number;
   /** Hauteur en mm */
@@ -74,6 +76,7 @@ function HabillageLabel({
 export function InteractiveSVGZone({
   type,
   nbVantaux,
+  typeOuvrant = 'battant',
   largeur,
   hauteur,
   habillagesInt,
@@ -82,6 +85,38 @@ export function InteractiveSVGZone({
 }: InteractiveSVGZoneProps) {
   const largeurValue = typeof largeur === 'string' ? largeur : String(largeur);
   const hauteurValue = typeof hauteur === 'string' ? hauteur : String(hauteur);
+
+  // Calculer les proportions du SVG basées sur les dimensions réelles
+  const largeurNum = typeof largeur === 'number' ? largeur : parseInt(largeur) || 200;
+  const hauteurNum = typeof hauteur === 'number' ? hauteur : parseInt(hauteur) || 150;
+
+  // Dimensions du conteneur SVG (agrandies pour meilleure visibilité)
+  const maxWidth = 340;
+  const maxHeight = 280;
+  const minWidth = 180; // Largeur minimum pour garder le dessin lisible
+
+  // Calculer les dimensions proportionnelles
+  const ratio = largeurNum / hauteurNum;
+  let svgWidth: number;
+  let svgHeight: number;
+
+  if (ratio > maxWidth / maxHeight) {
+    // Plus large que haut - limiter par la largeur
+    svgWidth = maxWidth;
+    svgHeight = Math.round(maxWidth / ratio);
+  } else {
+    // Plus haut que large - limiter par la hauteur
+    svgHeight = maxHeight;
+    svgWidth = Math.round(maxHeight * ratio);
+  }
+
+  // Appliquer la largeur minimum pour éviter les dessins trop étroits
+  if (svgWidth < minWidth) {
+    svgWidth = minWidth;
+    // Ajuster la hauteur pour garder une proportion acceptable (max 1:1.8)
+    const maxRatioHeight = svgWidth * 1.8;
+    svgHeight = Math.min(svgHeight, maxRatioHeight);
+  }
 
   // Valeurs par défaut pour les habillages
   const defaultHabillages: HabillageValues = {
@@ -124,7 +159,7 @@ export function InteractiveSVGZone({
               <HabillageLabel int={habInt.gauche} ext={habExt.gauche} />
             )}
           </div>
-          <div className="flex flex-col items-center h-32">
+          <div className="flex flex-col items-center h-48">
             <div className="w-2 h-px bg-gray-400" />
             <div className="w-px flex-1 bg-gray-400" />
             <div className="w-2 h-px bg-gray-400" />
@@ -134,13 +169,14 @@ export function InteractiveSVGZone({
         {/* === SVG Menuiserie === */}
         <div
           className="relative border-2 border-blue-400 rounded bg-white shadow-sm"
-          style={{ width: 240, height: 160 }}
+          style={{ width: svgWidth, height: svgHeight }}
         >
           <MenuiserieSVG
             type={type}
             nbVantaux={nbVantaux}
-            width={240}
-            height={160}
+            typeOuvrant={typeOuvrant}
+            width={svgWidth}
+            height={svgHeight}
             className="w-full h-full"
           />
         </div>

@@ -21,6 +21,16 @@ export type MenuiserieType =
   | 'chassis-soufflet';
 
 /**
+ * Type d'ouverture pour les indicateurs SVG
+ */
+export type TypeOuvrant = 'battant' | 'soufflet' | 'oscillo-battant' | 'fixe' | 'coulissant';
+
+/**
+ * Direction d'ouverture
+ */
+export type OpeningDirection = 'gauche' | 'droite';
+
+/**
  * Structure pour un côté d'habillage
  * @breaking v003 - Changed from number | null to HabillageValue | null
  */
@@ -52,6 +62,10 @@ export interface MenuiserieSVGProps {
   width?: number;
   /** Hauteur du viewBox SVG (défaut: 150) */
   height?: number;
+  /** Type d'ouverture (battant, soufflet, oscillo-battant, fixe, coulissant) */
+  typeOuvrant?: TypeOuvrant;
+  /** Direction d'ouverture (gauche, droite) */
+  sensOuverture?: OpeningDirection;
   /** Classes CSS additionnelles */
   className?: string;
 }
@@ -62,6 +76,10 @@ export interface MenuiserieSVGProps {
 export interface ParsedMenuiserieType {
   type: MenuiserieType;
   nbVantaux: number;
+  /** Type d'ouverture détecté depuis le texte */
+  typeOuvrant: TypeOuvrant;
+  /** true si oscillo-battant détecté */
+  isOscilloBattant: boolean;
 }
 
 /**

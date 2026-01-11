@@ -194,6 +194,7 @@ export function MenuiserieSVGEditor({
               <MenuiserieSVG
                 type={parsed.type}
                 nbVantaux={parsed.nbVantaux}
+                typeOuvrant={parsed.typeOuvrant}
                 className="max-w-full max-h-full"
               />
             </div>
