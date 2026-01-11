@@ -23,6 +23,8 @@ export interface SelectFieldProps {
   options: string[];
   /** Callback appelé lors du changement de valeur */
   onChange: (value: string) => void;
+  /** Mode compact - masque le sous-label PDF pour alignement */
+  compact?: boolean;
 }
 
 /**
@@ -50,6 +52,7 @@ export function SelectField({
   originalValue,
   options,
   onChange,
+  compact = false,
 }: SelectFieldProps) {
   // Détecte si la valeur a été modifiée par rapport au PDF
   const isModified = value !== originalValue && value !== "";
@@ -68,8 +71,8 @@ export function SelectField({
         )}
       </div>
 
-      {/* Valeur PDF originale */}
-      {originalValue && (
+      {/* Valeur PDF originale - masquée en mode compact */}
+      {originalValue && !compact && (
         <div className="text-xs text-muted-foreground">
           PDF: <span className="font-medium">{originalValue}</span>
         </div>

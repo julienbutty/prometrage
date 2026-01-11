@@ -40,6 +40,11 @@ export const AIMenuiserieSchema = z.object({
     (val) => (typeof val === "string" ? val.toLowerCase() : val),
     z.enum(["droite", "gauche"]).optional().nullable()
   ),
+  // Sens d'ouverture intérieure - "droite tirant" ou "gauche tirant"
+  ouvertureInterieure: z.preprocess(
+    (val) => (typeof val === "string" ? val.toLowerCase().trim() : val),
+    z.string().optional().nullable()
+  ),
   fermeture: z.string().optional().nullable(),
   poignee: z.string().optional().nullable(),
   rails: z.preprocess(

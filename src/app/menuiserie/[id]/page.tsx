@@ -31,6 +31,7 @@ import { Badge } from "@/components/ui/badge";
 import { InteractiveSVGZone } from "@/components/menuiseries/InteractiveSVGZone";
 import { HabillageSelect } from "@/components/menuiseries/HabillageSelect";
 import { parseMenuiserieType } from "@/lib/svg/svg-utils";
+import { getEffectiveOpeningDirection } from "@/lib/svg/opening-direction";
 import { SIDES } from "@/lib/validations/habillage";
 import type { PhotoObservation } from "@/lib/validations/photo-observation";
 import { getFormConfigKey, detectMateriau, detectPose, detectTypeProduit } from "@/lib/utils/menuiserie-type";
@@ -86,6 +87,7 @@ const CRITICAL_FIELDS = [
   "pack",
   "couleurInt",
   "couleurExt",
+  // Note: ouvertureInterieure affiché conditionnellement (seulement si présent dans PDF)
   // Note: typeOuvrant retiré car pas dans les configs actuelles
   // Note: nombreVantaux seulement pour coulissants (affiché automatiquement si config existe)
 ];
@@ -164,6 +166,7 @@ const FIELD_LABELS: Record<string, string> = {
   intercalaire: "Intercalaire",
   ouvrant: "Ouvrant",
   ouvrantPrincipal: "Ouvrant principal",
+  ouvertureInterieure: "Ouverture intérieure", // Sens d'ouverture vue de l'intérieur
   fermeture: "Fermeture",
   poignee: "Poignée",
   poigneeVantailPrincipal: "Poignée vantail principal",
@@ -668,13 +671,24 @@ export default function MenuiseriePage() {
               {(() => {
                 const typeMenuiserie = menuiserie.donneesOriginales.typeMenuiserie || menuiserie.donneesOriginales.intitule || '';
                 const { type, nbVantaux, typeOuvrant } = parseMenuiserieType(typeMenuiserie);
+                // Calculate opening direction from form data or original data
+                // Note: "droite tirant" → sensOuverture: 'gauche' (triangle points left)
+                const ouvertureValue = formData.ouvertureInterieure ?? menuiserie.donneesOriginales.ouvertureInterieure;
+                const ouvrantValue = formData.ouvrantPrincipal ?? menuiserie.donneesOriginales.ouvrantPrincipal;
+                const sensOuverture = getEffectiveOpeningDirection(ouvertureValue, ouvrantValue);
+
+                // Key based on opening direction to force re-render when it changes
+                const svgKey = `svg-${sensOuverture ?? 'default'}-${ouvertureValue ?? 'none'}`;
+
                 return (
                   <div className="flex flex-col items-center">
                     <div className="w-full bg-gray-50 rounded-lg pt-8 pb-20">
                       <InteractiveSVGZone
+                        key={svgKey}
                         type={type}
                         nbVantaux={nbVantaux}
                         typeOuvrant={typeOuvrant}
+                        sensOuverture={sensOuverture}
                         largeur={formData.largeur ?? menuiserie.donneesOriginales.largeur ?? ''}
                         hauteur={formData.hauteur ?? menuiserie.donneesOriginales.hauteur ?? ''}
                         habillagesInt={habillagesInt.values}
@@ -689,8 +703,8 @@ export default function MenuiseriePage() {
                 );
               })()}
 
-              {/* Dimensions */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+              {/* Dimensions + Ouverture intérieure (si applicable) */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
                 <FieldWithDiff
                   id="largeur"
                   label="Largeur"
@@ -711,13 +725,25 @@ export default function MenuiseriePage() {
                 />
                 <FieldWithDiff
                   id="hauteurAllege"
-                  label="Hauteur d'allège"
+                  label="H. allège"
                   value={formData.hauteurAllege ?? ""}
                   originalValue={menuiserie.donneesOriginales.hauteurAllege}
                   onChange={(value) => handleFieldChange("hauteurAllege", value)}
                   type="number"
                   unit="mm"
                 />
+                {/* Ouverture intérieure - affiché SEULEMENT si présent dans le PDF */}
+                {menuiserie.donneesOriginales.ouvertureInterieure &&
+                  detectedInfo?.formConfig?.ouvertureInterieure && (
+                    <DynamicField
+                      fieldKey="ouvertureInterieure"
+                      config={detectedInfo.formConfig.ouvertureInterieure}
+                      value={formData.ouvertureInterieure ?? ""}
+                      originalValue={menuiserie.donneesOriginales.ouvertureInterieure}
+                      onChange={(value) => handleFieldChange("ouvertureInterieure", value)}
+                      compact
+                    />
+                  )}
               </div>
 
               {/* Habillages intérieurs */}

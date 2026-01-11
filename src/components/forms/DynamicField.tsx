@@ -18,6 +18,8 @@ export interface DynamicFieldProps {
   originalValue: any;
   /** Callback de changement */
   onChange: (value: any) => void;
+  /** Mode compact - masque le sous-label PDF pour SelectField */
+  compact?: boolean;
 }
 
 /**
@@ -52,6 +54,7 @@ export function DynamicField({
   value,
   originalValue,
   onChange,
+  compact = false,
 }: DynamicFieldProps) {
   // Normalise les valeurs undefined/null en chaîne vide
   const normalizedValue = value ?? "";
@@ -136,6 +139,7 @@ export function DynamicField({
           originalValue={String(normalizedOriginalValue)}
           options={config.options || []}
           onChange={onChange}
+          compact={compact}
         />
       );
 

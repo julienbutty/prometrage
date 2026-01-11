@@ -41,6 +41,7 @@ Pour chaque menuiserie, extrais les données suivantes au format JSON strict :
       "doubleVitrage": "44.2.16w Argon.4 PTR+",
       "intercalaire": "blanc" | "noir",
       "ouvrantPrincipal": "droite" | "gauche",
+      "ouvertureInterieure": "droite tirant" | "gauche tirant" | null,  // Sens d'ouverture vue de l'intérieur (battant, oscillo-battant, porte-fenêtre)
       "fermeture": "Description",
       "poignee": "Description",
       "rails": "inox" | "alu",

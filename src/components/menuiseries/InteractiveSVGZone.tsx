@@ -12,7 +12,7 @@
  */
 
 import { MenuiserieSVG } from './MenuiserieSVG';
-import type { MenuiserieType, TypeOuvrant } from '@/lib/svg/types';
+import type { MenuiserieType, TypeOuvrant, OpeningDirection } from '@/lib/svg/types';
 import type { HabillageValue } from '@/lib/validations/habillage';
 
 interface HabillageValues {
@@ -29,6 +29,8 @@ export interface InteractiveSVGZoneProps {
   nbVantaux: number;
   /** Type d'ouverture (battant, soufflet, oscillo-battant, fixe, coulissant) */
   typeOuvrant?: TypeOuvrant;
+  /** Sens d'ouverture pour le triangle SVG (gauche/droite) - null = pas de triangle */
+  sensOuverture?: OpeningDirection | null;
   /** Largeur en mm */
   largeur: string | number;
   /** Hauteur en mm */
@@ -77,6 +79,7 @@ export function InteractiveSVGZone({
   type,
   nbVantaux,
   typeOuvrant = 'battant',
+  sensOuverture,
   largeur,
   hauteur,
   habillagesInt,
@@ -175,6 +178,7 @@ export function InteractiveSVGZone({
             type={type}
             nbVantaux={nbVantaux}
             typeOuvrant={typeOuvrant}
+            sensOuverture={sensOuverture ?? undefined}
             width={svgWidth}
             height={svgHeight}
             className="w-full h-full"
