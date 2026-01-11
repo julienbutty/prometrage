@@ -691,18 +691,21 @@ export default function MenuiseriePage() {
                 return (
                   <div className="flex flex-col items-center">
                     <div className="w-full bg-gray-50 rounded-lg pt-8 pb-20">
-                      <InteractiveSVGZone
-                        key={svgKey}
-                        type={type}
-                        nbVantaux={nbVantaux}
-                        typeOuvrant={typeOuvrant}
-                        sensOuverture={sensOuverture}
-                        largeur={formData.largeur ?? menuiserie.donneesOriginales.largeur ?? ''}
-                        hauteur={formData.hauteur ?? menuiserie.donneesOriginales.hauteur ?? ''}
-                        habillagesInt={habillagesInt.values}
-                        habillagesExt={habillagesExt.values}
-                        showHabillageLabels={!!detectedInfo?.habillageConfig}
-                      />
+                      {/* Conteneur à hauteur fixe pour éviter le saut de layout lors de la saisie */}
+                      <div className="flex items-center justify-center" style={{ minHeight: '320px' }}>
+                        <InteractiveSVGZone
+                          key={svgKey}
+                          type={type}
+                          nbVantaux={nbVantaux}
+                          typeOuvrant={typeOuvrant}
+                          sensOuverture={sensOuverture}
+                          largeur={formData.largeur ?? menuiserie.donneesOriginales.largeur ?? ''}
+                          hauteur={formData.hauteur ?? menuiserie.donneesOriginales.hauteur ?? ''}
+                          habillagesInt={habillagesInt.values}
+                          habillagesExt={habillagesExt.values}
+                          showHabillageLabels={!!detectedInfo?.habillageConfig}
+                        />
+                      </div>
                     </div>
                     <p className="text-sm text-gray-500 text-center mt-2">
                       {typeMenuiserie || 'Type non spécifié'}
