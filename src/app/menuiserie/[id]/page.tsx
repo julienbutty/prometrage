@@ -449,9 +449,13 @@ export default function MenuiseriePage() {
     setHasUnsavedChanges(true);
     setFormData((prev) => {
       const newData = { ...prev, [key]: value };
-      // Convert to number if it's a numeric field
+      // Convert to number if it's a numeric field (but preserve empty strings)
       if (NUMERIC_FIELDS.includes(key)) {
-        newData[key] = typeof value === 'string' ? (parseInt(value) || 0) : value;
+        if (value === "" || value === null || value === undefined) {
+          newData[key] = ""; // Préserver la chaîne vide pour l'input
+        } else {
+          newData[key] = typeof value === 'string' ? parseInt(value) : value;
+        }
       }
       return newData;
     });
@@ -582,9 +586,13 @@ export default function MenuiseriePage() {
     return menuiserie.donneesOriginales[key] !== undefined;
   });
 
+  // Champs déjà affichés dans la section "Dimensions & Schéma"
+  const DIMENSION_FIELDS = ["largeur", "hauteur", "hauteurAllege"];
+
   const additionalFields = Object.keys(menuiserie.donneesOriginales).filter(
     (key) =>
       !CRITICAL_FIELDS.includes(key) &&
+      !DIMENSION_FIELDS.includes(key) &&
       menuiserie.donneesOriginales[key] !== null &&
       menuiserie.donneesOriginales[key] !== undefined
   );
