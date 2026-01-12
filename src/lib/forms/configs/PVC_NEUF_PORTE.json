@@ -102,6 +102,11 @@
     "type": "select",
     "options": ["droite tirant", "gauche tirant"]
   },
+  "ventilation": {
+    "label": "Ventilation",
+    "type": "select",
+    "options": ["oui", "non"]
+  },
   "commentaires": {
     "label": "Commentaires et options",
     "type": "text"

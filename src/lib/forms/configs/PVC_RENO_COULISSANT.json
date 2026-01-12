@@ -90,6 +90,11 @@
     "type": "number",
     "unit": "mm"
   },
+  "ventilation": {
+    "label": "Ventilation",
+    "type": "select",
+    "options": ["oui", "non"]
+  },
   "commentaires": {
     "label": "Commentaires et options",
     "type": "text"

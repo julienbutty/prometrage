@@ -79,19 +79,6 @@ interface Menuiserie {
   navigation: NavigationInfo;
 }
 
-// Champs critiques (toujours visibles) : Caractéristiques produit
-// Note: Dimensions (largeur, hauteur, hauteurAllege) déplacées dans MenuiserieSVGEditor
-const CRITICAL_FIELDS = [
-  // Caractéristiques produit (gérées dynamiquement par config)
-  "gamme",
-  "pack",
-  "couleurInt",
-  "couleurExt",
-  // Note: ouvertureInterieure affiché conditionnellement (seulement si présent dans PDF)
-  // Note: typeOuvrant retiré car pas dans les configs actuelles
-  // Note: nombreVantaux seulement pour coulissants (affiché automatiquement si config existe)
-];
-
 // Champs numériques (pour conversion)
 const NUMERIC_FIELDS = ["largeur", "hauteur", "hauteurAllege", "largeurTableau", "hauteurTableau", "nombreVantaux", "soubassementHauteur"];
 
@@ -583,24 +570,16 @@ export default function MenuiseriePage() {
     );
   }
 
-  // Filter fields : séparer champs critiques et additionnels
-  // NOUVEAU : Afficher TOUS les champs critiques qui ont une config dynamique (même si vides dans PDF)
-  const criticalFields = CRITICAL_FIELDS.filter((key) => {
-    // Si le champ a une config dynamique, toujours l'afficher
-    if (detectedInfo?.formConfig[key]) {
-      return true;
-    }
-    // Sinon, afficher seulement si présent dans le PDF
-    return menuiserie.donneesOriginales[key] !== undefined;
-  });
-
-  // Champs déjà affichés dans la section "Dimensions & Schéma"
-  const DIMENSION_FIELDS = ["largeur", "hauteur", "hauteurAllege"];
+  // Champs déjà affichés dans la section principale (ne pas afficher dans détails additionnels)
+  const MAIN_SECTION_FIELDS = [
+    "largeur", "hauteur", "hauteurAllege",
+    "ouvertureInterieure", "soubassement", "soubassementHauteur",
+    "ventilation", "pose", "gamme", "couleurInt", "couleurExt"
+  ];
 
   const additionalFields = Object.keys(menuiserie.donneesOriginales).filter(
     (key) =>
-      !CRITICAL_FIELDS.includes(key) &&
-      !DIMENSION_FIELDS.includes(key) &&
+      !MAIN_SECTION_FIELDS.includes(key) &&
       menuiserie.donneesOriginales[key] !== null &&
       menuiserie.donneesOriginales[key] !== undefined
   );
@@ -722,113 +701,231 @@ export default function MenuiseriePage() {
                 );
               })()}
 
-              {/* Dimensions + Ouverture intérieure (si applicable) */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
-                <FieldWithDiff
-                  id="largeur"
-                  label="Largeur"
-                  value={formData.largeur ?? ""}
-                  originalValue={menuiserie.donneesOriginales.largeur}
-                  onChange={(value) => handleFieldChange("largeur", value)}
-                  type="number"
-                  unit="mm"
-                />
-                <FieldWithDiff
-                  id="hauteur"
-                  label="Hauteur"
-                  value={formData.hauteur ?? ""}
-                  originalValue={menuiserie.donneesOriginales.hauteur}
-                  onChange={(value) => handleFieldChange("hauteur", value)}
-                  type="number"
-                  unit="mm"
-                />
-                <FieldWithDiff
-                  id="hauteurAllege"
-                  label="H. allège"
-                  value={formData.hauteurAllege ?? ""}
-                  originalValue={menuiserie.donneesOriginales.hauteurAllege}
-                  onChange={(value) => handleFieldChange("hauteurAllege", value)}
-                  type="number"
-                  unit="mm"
-                />
-                {/* Ouverture intérieure - affiché SEULEMENT si présent dans le PDF */}
-                {menuiserie.donneesOriginales.ouvertureInterieure &&
-                  detectedInfo?.formConfig?.ouvertureInterieure && (
-                    <DynamicField
-                      fieldKey="ouvertureInterieure"
-                      config={detectedInfo.formConfig.ouvertureInterieure}
-                      value={formData.ouvertureInterieure ?? ""}
-                      originalValue={menuiserie.donneesOriginales.ouvertureInterieure}
-                      onChange={(value) => handleFieldChange("ouvertureInterieure", value)}
-                      compact
-                    />
-                  )}
+              {/* ═══════════════════════════════════════════════════════════
+                  SECTION 1 : DIMENSIONS PRINCIPALES
+                  ═══════════════════════════════════════════════════════════ */}
+              <div className="rounded-lg border border-slate-200 bg-slate-50/50 p-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="h-1 w-1 rounded-full bg-slate-400" />
+                  <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
+                    Dimensions
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <FieldWithDiff
+                    id="largeur"
+                    label="Largeur"
+                    value={formData.largeur ?? ""}
+                    originalValue={menuiserie.donneesOriginales.largeur}
+                    onChange={(value) => handleFieldChange("largeur", value)}
+                    type="number"
+                    unit="mm"
+                  />
+                  <FieldWithDiff
+                    id="hauteur"
+                    label="Hauteur"
+                    value={formData.hauteur ?? ""}
+                    originalValue={menuiserie.donneesOriginales.hauteur}
+                    onChange={(value) => handleFieldChange("hauteur", value)}
+                    type="number"
+                    unit="mm"
+                  />
+                  <FieldWithDiff
+                    id="hauteurAllege"
+                    label="H. allège"
+                    value={formData.hauteurAllege ?? ""}
+                    originalValue={menuiserie.donneesOriginales.hauteurAllege}
+                    onChange={(value) => handleFieldChange("hauteurAllege", value)}
+                    type="number"
+                    unit="mm"
+                  />
+                </div>
               </div>
 
-              {/* Soubassement - Section principale */}
-              {detectedInfo?.formConfig?.soubassement && (
-                <div className="grid gap-4 lg:grid-cols-2 lg:gap-6 items-end">
-                  <DynamicField
-                    fieldKey="soubassement"
-                    config={detectedInfo.formConfig.soubassement}
-                    value={formData.soubassement ?? "sans"}
-                    originalValue={menuiserie.donneesOriginales.soubassement ?? "sans"}
-                    onChange={(value) => handleFieldChange("soubassement", value)}
-                  />
-                  {/* Hauteur conditionnelle - visible seulement si soubassement !== "sans" */}
-                  {formData.soubassement && formData.soubassement !== "sans" &&
-                   detectedInfo?.formConfig?.soubassementHauteur && (
-                    <FieldWithDiff
-                      id="soubassementHauteur"
-                      label="Hauteur soubassement"
-                      value={formData.soubassementHauteur ?? ""}
-                      originalValue={menuiserie.donneesOriginales.soubassementHauteur}
-                      onChange={(value) => handleFieldChange("soubassementHauteur", value)}
-                      type="number"
-                      unit="mm"
+              {/* ═══════════════════════════════════════════════════════════
+                  SECTION 2 : CONFIGURATION (Ouverture, Soubassement, Ventilation, Pose)
+                  ═══════════════════════════════════════════════════════════ */}
+              <div className="rounded-lg border border-slate-200 bg-white p-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="h-1 w-1 rounded-full bg-slate-400" />
+                  <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
+                    Configuration
+                  </span>
+                </div>
+
+                {/* Ligne 1 : Ouverture, Pose, Ventilation (toujours 3 colonnes) */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+                  {/* Ouverture intérieure */}
+                  {menuiserie.donneesOriginales.ouvertureInterieure &&
+                    detectedInfo?.formConfig?.ouvertureInterieure && (
+                      <DynamicField
+                        fieldKey="ouvertureInterieure"
+                        config={detectedInfo.formConfig.ouvertureInterieure}
+                        value={formData.ouvertureInterieure ?? ""}
+                        originalValue={menuiserie.donneesOriginales.ouvertureInterieure}
+                        onChange={(value) => handleFieldChange("ouvertureInterieure", value)}
+                      />
+                    )}
+
+                  {/* Type de pose */}
+                  {detectedInfo?.formConfig?.pose && (
+                    <DynamicField
+                      fieldKey="pose"
+                      config={detectedInfo.formConfig.pose}
+                      value={formData.pose ?? ""}
+                      originalValue={menuiserie.donneesOriginales.pose}
+                      onChange={(value) => handleFieldChange("pose", value)}
+                    />
+                  )}
+
+                  {/* Ventilation */}
+                  {detectedInfo?.formConfig?.ventilation && (
+                    <DynamicField
+                      fieldKey="ventilation"
+                      config={detectedInfo.formConfig.ventilation}
+                      value={formData.ventilation ?? ""}
+                      originalValue={menuiserie.donneesOriginales.ventilation}
+                      onChange={(value) => handleFieldChange("ventilation", value)}
                     />
                   )}
                 </div>
+
+                {/* Ligne 2 : Soubassement (type + hauteur groupés) */}
+                {detectedInfo?.formConfig?.soubassement && (
+                  <div className="pt-3 border-t border-slate-100">
+                    <div className="grid grid-cols-2 gap-4 items-end">
+                      <DynamicField
+                        fieldKey="soubassement"
+                        config={detectedInfo.formConfig.soubassement}
+                        value={formData.soubassement ?? "sans"}
+                        originalValue={menuiserie.donneesOriginales.soubassement ?? "sans"}
+                        onChange={(value) => handleFieldChange("soubassement", value)}
+                      />
+
+                      {/* Hauteur soubassement - conditionnel */}
+                      {formData.soubassement && formData.soubassement !== "sans" &&
+                       detectedInfo?.formConfig?.soubassementHauteur && (
+                        <FieldWithDiff
+                          id="soubassementHauteur"
+                          label="Hauteur soubassement"
+                          value={formData.soubassementHauteur ?? ""}
+                          originalValue={menuiserie.donneesOriginales.soubassementHauteur}
+                          onChange={(value) => handleFieldChange("soubassementHauteur", value)}
+                          type="number"
+                          unit="mm"
+                        />
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* ═══════════════════════════════════════════════════════════
+                  SECTION 3 : HABILLAGES (Intérieurs & Extérieurs côte à côte)
+                  ═══════════════════════════════════════════════════════════ */}
+              {detectedInfo?.habillageConfig && (
+                <div className="rounded-lg border border-slate-200 bg-white p-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="h-1 w-1 rounded-full bg-slate-400" />
+                    <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
+                      Habillages
+                    </span>
+                  </div>
+
+                  <div className="grid lg:grid-cols-2 gap-6">
+                    {/* Habillages Intérieurs */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-blue-400" />
+                        <span className="text-sm font-medium text-slate-700">Intérieurs</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {SIDES.map((side) => (
+                          <HabillageSelect
+                            key={`int-${side}`}
+                            side={side}
+                            value={habillagesInt.values[side]}
+                            onChange={(value) => handleHabillageIntChange(side, value)}
+                            options={detectedInfo.habillageConfig.interieurs}
+                            variant="interieur"
+                            isHighlighted={habillagesInt.highlightedSides.has(side)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Habillages Extérieurs */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-amber-400" />
+                        <span className="text-sm font-medium text-slate-700">Extérieurs</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {SIDES.map((side) => (
+                          <HabillageSelect
+                            key={`ext-${side}`}
+                            side={side}
+                            value={habillagesExt.values[side]}
+                            onChange={(value) => handleHabillageExtChange(side, value)}
+                            options={detectedInfo.habillageConfig.exterieurs}
+                            variant="exterieur"
+                            isHighlighted={habillagesExt.highlightedSides.has(side)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
 
-              {/* Habillages intérieurs */}
-              {detectedInfo?.habillageConfig && (
-                <>
-                  <div className="space-y-3">
-                    <h3 className="text-sm font-semibold text-gray-900">Habillages intérieurs</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      {SIDES.map((side) => (
-                        <HabillageSelect
-                          key={`int-${side}`}
-                          side={side}
-                          value={habillagesInt.values[side]}
-                          onChange={(value) => handleHabillageIntChange(side, value)}
-                          options={detectedInfo.habillageConfig.interieurs}
-                          variant="interieur"
-                          isHighlighted={habillagesInt.highlightedSides.has(side)}
-                        />
-                      ))}
-                    </div>
+              {/* ═══════════════════════════════════════════════════════════
+                  SECTION 4 : FINITIONS (Gamme, Couleurs)
+                  ═══════════════════════════════════════════════════════════ */}
+              {(detectedInfo?.formConfig?.gamme ||
+                detectedInfo?.formConfig?.couleurInt ||
+                detectedInfo?.formConfig?.couleurExt) && (
+                <div className="rounded-lg border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="h-1 w-1 rounded-full bg-slate-400" />
+                    <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
+                      Finitions
+                    </span>
                   </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Gamme */}
+                    {detectedInfo?.formConfig?.gamme && (
+                      <DynamicField
+                        fieldKey="gamme"
+                        config={detectedInfo.formConfig.gamme}
+                        value={formData.gamme ?? ""}
+                        originalValue={menuiserie.donneesOriginales.gamme}
+                        onChange={(value) => handleFieldChange("gamme", value)}
+                      />
+                    )}
 
-                  {/* Habillages extérieurs */}
-                  <div className="space-y-3">
-                    <h3 className="text-sm font-semibold text-gray-900">Habillages extérieurs</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      {SIDES.map((side) => (
-                        <HabillageSelect
-                          key={`ext-${side}`}
-                          side={side}
-                          value={habillagesExt.values[side]}
-                          onChange={(value) => handleHabillageExtChange(side, value)}
-                          options={detectedInfo.habillageConfig.exterieurs}
-                          variant="exterieur"
-                          isHighlighted={habillagesExt.highlightedSides.has(side)}
-                        />
-                      ))}
-                    </div>
+                    {/* Couleur intérieure */}
+                    {detectedInfo?.formConfig?.couleurInt && (
+                      <DynamicField
+                        fieldKey="couleurInt"
+                        config={detectedInfo.formConfig.couleurInt}
+                        value={formData.couleurInt ?? ""}
+                        originalValue={menuiserie.donneesOriginales.couleurInt}
+                        onChange={(value) => handleFieldChange("couleurInt", value)}
+                      />
+                    )}
+
+                    {/* Couleur extérieure */}
+                    {detectedInfo?.formConfig?.couleurExt && (
+                      <DynamicField
+                        fieldKey="couleurExt"
+                        config={detectedInfo.formConfig.couleurExt}
+                        value={formData.couleurExt ?? ""}
+                        originalValue={menuiserie.donneesOriginales.couleurExt}
+                        onChange={(value) => handleFieldChange("couleurExt", value)}
+                      />
+                    )}
                   </div>
-                </>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -891,66 +988,6 @@ export default function MenuiseriePage() {
               </CardContent>
             </Card>
           )}
-
-          {/* Champs critiques : Caractéristiques produit (toujours visibles) */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
-                🎨 Caractéristiques produit
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 lg:space-y-6">
-              {/* Grille responsive pour les champs */}
-              <div className="grid gap-4 lg:grid-cols-2 lg:gap-6 items-end">
-                {criticalFields.map((key) => {
-                  // Si le champ a une config dynamique, utiliser DynamicField
-                  if (detectedInfo?.formConfig[key]) {
-                    return (
-                      <div key={key} className="min-w-0 lg:col-span-1">
-                        <DynamicField
-                          fieldKey={key}
-                          config={detectedInfo.formConfig[key]}
-                          value={formData[key] ?? ""}
-                          originalValue={menuiserie.donneesOriginales[key]}
-                          onChange={(value) => handleFieldChange(key, value)}
-                        />
-                      </div>
-                    );
-                  }
-
-                  // Sinon, utiliser FieldWithDiff pour les champs numériques
-                  if (NUMERIC_FIELDS.includes(key)) {
-                    return (
-                      <div key={key} className="min-w-0 lg:col-span-1">
-                        <FieldWithDiff
-                          id={key}
-                          label={FIELD_LABELS[key] || key}
-                          value={formData[key] ?? ""}
-                          originalValue={menuiserie.donneesOriginales[key]}
-                          onChange={(value) => handleFieldChange(key, value)}
-                          type="number"
-                          unit="mm"
-                        />
-                      </div>
-                    );
-                  }
-
-                  // Fallback : champ texte
-                  return (
-                    <div key={key} className="min-w-0 lg:col-span-1">
-                      <TextFieldWithDiff
-                        id={key}
-                        label={FIELD_LABELS[key] || key}
-                        value={formData[key] ?? ""}
-                        originalValue={String(menuiserie.donneesOriginales[key])}
-                        onChange={(value) => handleFieldChange(key, value)}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
 
           {/* Détails additionnels (collapsed) */}
           {sortedAdditionalFields.length > 0 && (

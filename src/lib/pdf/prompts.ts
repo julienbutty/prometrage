@@ -51,7 +51,7 @@ Pour chaque menuiserie, extrais les données suivantes au format JSON strict :
       "petitsBoisType": "Petits-bois collés 2 faces plat de 30mm avec faux intercalaire",
       "petitsBoisConfiguration": "1 petit bois vertical par vitrage",
       "petitsBoisCouleur": "2 faces RAL hors standard : 8001",
-      "ventilation": "Description ou vide",
+      "ventilation": "oui" | "non",
       "soubassement": "sans" | "lisse" | "rainuré",
       "soubassementHauteur": 400
     }
@@ -95,5 +95,8 @@ RÈGLES STRICTES:
     - Si "Soubassement lisse (haut XXX)" → soubassement: "lisse", soubassementHauteur: XXX
     - Si "Soubassement rainuré (haut XXX)" → soubassement: "rainuré", soubassementHauteur: XXX
     - Si aucun soubassement mentionné → soubassement: "sans", soubassementHauteur: null
+13. **VENTILATION** : Indique si une ventilation est présente.
+    - Si une entrée d'air ou ventilation est mentionnée → ventilation: "oui"
+    - Si aucune ventilation n'est mentionnée → ventilation: "non"
 
 Réponds UNIQUEMENT avec le JSON, sans texte additionnel avant ou après.`;

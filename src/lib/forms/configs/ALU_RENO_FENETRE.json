@@ -202,25 +202,8 @@
   },
   "ventilation": {
     "label": "Ventilation",
-    "type": "combobox",
-    "options": [
-      "22m3/h - 34db",
-      "22m3/h - 37db",
-      "22m3/h - 39db",
-      "22m3/h - 41db",
-      "30m3/h - 34db",
-      "30m3/h - 37db",
-      "30m3/h - 39db",
-      "30m3/h - 41db",
-      "45m3/h - 37db",
-      "45m3/h - 39db",
-      "Hygroréglable 5-45m3/h - 34db",
-      "Hygroréglable 5-45m3/h - 37db",
-      "Hygroréglable 5-45m3/h - 39db",
-      "Hygroréglable 5-45m3/h - 41db",
-      "Grille dans coffre VRI"
-    ],
-    "allowCustom": true
+    "type": "select",
+    "options": ["oui", "non"]
   },
   "voletType": {
     "label": "Type VRI",
