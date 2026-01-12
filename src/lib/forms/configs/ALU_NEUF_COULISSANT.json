@@ -102,6 +102,16 @@
     "options": ["Fermeture 1 point", "Poignée + serrure", "Standard"],
     "allowCustom": true
   },
+  "soubassement": {
+    "label": "Soubassement",
+    "type": "select",
+    "options": ["sans", "lisse", "rainuré"]
+  },
+  "soubassementHauteur": {
+    "label": "Hauteur soubassement",
+    "type": "number",
+    "unit": "mm"
+  },
   "hauteurAllege": {
     "label": "Hauteur d'allège",
     "type": "number",

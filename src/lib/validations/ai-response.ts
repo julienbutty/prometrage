@@ -58,6 +58,12 @@ export const AIMenuiserieSchema = z.object({
   petitsBoisConfiguration: z.string().optional().nullable(),
   petitsBoisCouleur: z.string().optional().nullable(),
   ventilation: z.string().optional().nullable(),
+  // Soubassement (type + hauteur conditionnelle)
+  soubassement: z.preprocess(
+    (val) => (typeof val === "string" ? val.toLowerCase().trim() : val),
+    z.enum(["sans", "lisse", "rainuré"]).optional().nullable()
+  ),
+  soubassementHauteur: z.number().min(50).max(2000).optional().nullable(),
 });
 
 // Metadata from AI response

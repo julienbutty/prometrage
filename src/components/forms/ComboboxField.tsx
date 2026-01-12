@@ -183,7 +183,7 @@ export function ComboboxField({
           {label}
         </Label>
         {isModified && (
-          <Badge variant="default" className="text-xs">
+          <Badge variant="secondary" className="bg-orange-100 text-orange-800 border-orange-300 text-xs">
             Modifié
           </Badge>
         )}

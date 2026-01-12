@@ -77,6 +77,16 @@
     "type": "select",
     "options": ["26 mm", "18 mm", "45 mm"]
   },
+  "soubassement": {
+    "label": "Soubassement",
+    "type": "select",
+    "options": ["sans", "lisse", "rainuré"]
+  },
+  "soubassementHauteur": {
+    "label": "Hauteur soubassement",
+    "type": "number",
+    "unit": "mm"
+  },
   "hauteurAllege": {
     "label": "Hauteur d'allège",
     "type": "number",

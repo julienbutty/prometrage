@@ -93,7 +93,7 @@ const CRITICAL_FIELDS = [
 ];
 
 // Champs numériques (pour conversion)
-const NUMERIC_FIELDS = ["largeur", "hauteur", "hauteurAllege", "largeurTableau", "hauteurTableau", "nombreVantaux"];
+const NUMERIC_FIELDS = ["largeur", "hauteur", "hauteurAllege", "largeurTableau", "hauteurTableau", "nombreVantaux", "soubassementHauteur"];
 
 // Ordre des champs selon la logique métier du PDF
 const FIELD_ORDER = [
@@ -116,6 +116,8 @@ const FIELD_ORDER = [
   "habillageExt", // habillageExterieur dans le PDF
   "dormantGorge",
   "traverseBasse",
+  "soubassement",
+  "soubassementHauteur",
   "vitrage",
   "doubleVitrage", // Ajout champ manquant
   "intercalaire",
@@ -183,6 +185,8 @@ const FIELD_LABELS: Record<string, string> = {
   volet: "Volet",
   serrure: "Serrure",
   intitule: "Intitulé",
+  soubassement: "Soubassement",
+  soubassementHauteur: "Hauteur soubassement",
 };
 
 export default function MenuiseriePage() {
@@ -456,6 +460,10 @@ export default function MenuiseriePage() {
         } else {
           newData[key] = typeof value === 'string' ? parseInt(value) : value;
         }
+      }
+      // Clear soubassementHauteur if soubassement is set to "sans"
+      if (key === "soubassement" && value === "sans") {
+        newData.soubassementHauteur = null;
       }
       return newData;
     });
@@ -756,6 +764,32 @@ export default function MenuiseriePage() {
                     />
                   )}
               </div>
+
+              {/* Soubassement - Section principale */}
+              {detectedInfo?.formConfig?.soubassement && (
+                <div className="grid gap-4 lg:grid-cols-2 lg:gap-6 items-end">
+                  <DynamicField
+                    fieldKey="soubassement"
+                    config={detectedInfo.formConfig.soubassement}
+                    value={formData.soubassement ?? "sans"}
+                    originalValue={menuiserie.donneesOriginales.soubassement ?? "sans"}
+                    onChange={(value) => handleFieldChange("soubassement", value)}
+                  />
+                  {/* Hauteur conditionnelle - visible seulement si soubassement !== "sans" */}
+                  {formData.soubassement && formData.soubassement !== "sans" &&
+                   detectedInfo?.formConfig?.soubassementHauteur && (
+                    <FieldWithDiff
+                      id="soubassementHauteur"
+                      label="Hauteur soubassement"
+                      value={formData.soubassementHauteur ?? ""}
+                      originalValue={menuiserie.donneesOriginales.soubassementHauteur}
+                      onChange={(value) => handleFieldChange("soubassementHauteur", value)}
+                      type="number"
+                      unit="mm"
+                    />
+                  )}
+                </div>
+              )}
 
               {/* Habillages intérieurs */}
               {detectedInfo?.habillageConfig && (

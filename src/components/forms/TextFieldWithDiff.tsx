@@ -41,7 +41,7 @@ export function TextFieldWithDiff({
           {helpIcon}
         </div>
         {isModified && (
-          <Badge variant="default" className="bg-blue-500 text-xs">
+          <Badge variant="secondary" className="bg-orange-100 text-orange-800 border-orange-300 text-xs">
             Modifié
           </Badge>
         )}
@@ -59,7 +59,7 @@ export function TextFieldWithDiff({
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`h-11 ${isModified ? "border-blue-500 ring-1 ring-blue-500" : ""}`}
+        className={`h-11 ${isModified ? "border-orange-400 ring-1 ring-orange-400" : ""}`}
         placeholder={placeholder || String(originalValue)}
       />
     </div>

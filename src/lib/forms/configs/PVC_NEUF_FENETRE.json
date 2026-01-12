@@ -96,19 +96,13 @@
   },
   "soubassement": {
     "label": "Soubassement",
-    "type": "combobox",
-    "options": [
-      "Vitré",
-      "Plein lisse",
-      "Plein rainuré (blanc)",
-      "Traditionnelles",
-      "Double congés",
-      "Congés",
-      "Cimaise",
-      "Coin mouchoir"
-    ],
-    "allowCustom": true,
-    "placeholder": "Ex: Hauteur traverse à l'axe"
+    "type": "select",
+    "options": ["sans", "lisse", "rainuré"]
+  },
+  "soubassementHauteur": {
+    "label": "Hauteur soubassement",
+    "type": "number",
+    "unit": "mm"
   },
   "epaisseurVitrage": {
     "label": "Épaisseur vitrage",

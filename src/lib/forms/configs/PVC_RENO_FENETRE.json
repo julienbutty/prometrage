@@ -66,6 +66,16 @@
     "type": "select",
     "options": ["Vis", "Pattes std", "Pattes PRDT"]
   },
+  "soubassement": {
+    "label": "Soubassement",
+    "type": "select",
+    "options": ["sans", "lisse", "rainuré"]
+  },
+  "soubassementHauteur": {
+    "label": "Hauteur soubassement",
+    "type": "number",
+    "unit": "mm"
+  },
   "epaisseurVitrage": {
     "label": "Épaisseur vitrage",
     "type": "select",

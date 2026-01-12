@@ -82,15 +82,13 @@
   },
   "soubassement": {
     "label": "Soubassement",
-    "type": "combobox",
-    "options": [
-      "Vitré",
-      "Plein (2 faces alu lisses)",
-      "Plate-bande traditionnelle",
-      "½ linteau"
-    ],
-    "allowCustom": true,
-    "placeholder": "Ex: Hauteur traverse à l'axe"
+    "type": "select",
+    "options": ["sans", "lisse", "rainuré"]
+  },
+  "soubassementHauteur": {
+    "label": "Hauteur soubassement",
+    "type": "number",
+    "unit": "mm"
   },
   "habillageInt": {
     "label": "Habillage intérieur",

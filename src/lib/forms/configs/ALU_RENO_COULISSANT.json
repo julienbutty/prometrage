@@ -177,6 +177,16 @@
     "allowCustom": true,
     "placeholder": "Ex: RAL 9016"
   },
+  "soubassement": {
+    "label": "Soubassement",
+    "type": "select",
+    "options": ["sans", "lisse", "rainuré"]
+  },
+  "soubassementHauteur": {
+    "label": "Hauteur soubassement",
+    "type": "number",
+    "unit": "mm"
+  },
   "hauteurAllege": {
     "label": "Hauteur d'allège",
     "type": "number",

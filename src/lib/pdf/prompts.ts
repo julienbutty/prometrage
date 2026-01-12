@@ -51,7 +51,9 @@ Pour chaque menuiserie, extrais les données suivantes au format JSON strict :
       "petitsBoisType": "Petits-bois collés 2 faces plat de 30mm avec faux intercalaire",
       "petitsBoisConfiguration": "1 petit bois vertical par vitrage",
       "petitsBoisCouleur": "2 faces RAL hors standard : 8001",
-      "ventilation": "Description ou vide"
+      "ventilation": "Description ou vide",
+      "soubassement": "sans" | "lisse" | "rainuré",
+      "soubassementHauteur": 400
     }
   ],
   "metadata": {
@@ -89,5 +91,9 @@ RÈGLES STRICTES:
 9. **IMPORTANT REPÈRE** : Si l'intitulé contient deux points ":" (ex: "Variante coulissant : Coulissant 2 vantaux"), NE MODIFIE PAS l'intitulé, conserve-le tel quel. Le backend se chargera d'extraire le repère.
 10. Si le repère est explicitement mentionné séparément du titre, extrais-le dans le champ "repere", sinon utilise null
 11. Pour les champs optionnels absents, utilise null (ne les omets pas)
+12. **SOUBASSEMENT** : Extrais le type de soubassement et sa hauteur.
+    - Si "Soubassement lisse (haut XXX)" → soubassement: "lisse", soubassementHauteur: XXX
+    - Si "Soubassement rainuré (haut XXX)" → soubassement: "rainuré", soubassementHauteur: XXX
+    - Si aucun soubassement mentionné → soubassement: "sans", soubassementHauteur: null
 
 Réponds UNIQUEMENT avec le JSON, sans texte additionnel avant ou après.`;
